@@ -13,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,10 @@ import android.widget.TextView;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
+import com.zhaorou.zrapplication.home.model.ClassListModel;
+import com.zhaorou.zrapplication.home.model.DtkGoodsListModel;
 import com.zhaorou.zrapplication.home.model.HomeTabModel;
+import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.utils.ScreenInfoHelper;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -80,8 +84,11 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     private float mLastOffset;
     private int mChildCount;
     private List<HomeTabModel> mTabsList = new ArrayList<>();
-    private List<String> mClassList = new ArrayList<>();
     private ClassListAdapter mClassListAdapter;
+    private ViewPagerAdapter mPagerAdapter;
+    private List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
+    private List<DtkGoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList<>();
+    private List<HomeVPItemFragment> mFragmentList = new ArrayList<>();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private Handler mHandler = new Handler();
 
@@ -96,30 +103,19 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
             mUnbinder = ButterKnife.bind(this, mView);
         }
         mSwipeRefreshLayout.setEnabled(false);
-        mClassList.add("女装");
-        mClassList.add("男装");
-        mClassList.add("内衣");
-        mClassList.add("母婴");
-        mClassList.add("美妆");
-        mClassList.add("居家");
-        mClassList.add("鞋包配饰");
-        mClassList.add("美食");
-        mClassList.add("文体车品");
-        mClassList.add("数码家电");
-        mClassList.add("运动户外");
-        mClassList.add("其他");
         initClassListRv();
         initTabs();
         initViewPager();
-        mPresenter.attachView(this);
-        mPresenter.fetchClassList();
+
         return mView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
+        mPresenter.attachView(this);
+        mPresenter.fetchClassList();
+        mPresenter.fetchDtkGoodsList();
     }
 
     @Override
@@ -160,9 +156,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     private void initViewPager() {
+        for (int i = 0; i < mTabsTitleArray.length; i++) {
+            mFragmentList.add(new HomeVPItemFragment());
+        }
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(fm);
-        mViewPager.setAdapter(pagerAdapter);
+        mPagerAdapter = new ViewPagerAdapter(fm);
+        mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(this);
     }
 
@@ -225,8 +224,18 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     @Override
-    public void onFetchedClassList() {
+    public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
+        mClassList.clear();
+        mClassList.addAll(list);
+        mClassListAdapter.notifyDataSetChanged();
+    }
 
+    @Override
+    public void onFetchDtkGoodsList(List<DtkGoodsListModel.DataBean.ListBean> list) {
+        mGoodsList.clear();
+        mGoodsList.addAll(list);
+        int pos = mViewPager.getCurrentItem();
+        mFragmentList.get(pos).notifyDataSetChanged(mGoodsList);
     }
 
     @Override
@@ -331,13 +340,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
         @Override
         public Fragment getItem(int position) {
-            HomeVPItemFragment item = new HomeVPItemFragment();
-            return item;
+            return mFragmentList.get(position);
         }
 
         @Override
         public int getCount() {
-            return mTabsTitleArray.length;
+            return mFragmentList.size();
         }
     }
 
@@ -353,7 +361,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
         @Override
         public void onBindViewHolder(@NonNull ClassListHolder holder, int position) {
-            holder.mClassNameTv.setText(mClassList.get(position));
+            holder.mClassNameTv.setText(mClassList.get(position).getClassname());
         }
 
         @Override

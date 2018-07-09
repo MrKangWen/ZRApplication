@@ -15,6 +15,10 @@ import android.widget.TextView;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
+import com.zhaorou.zrapplication.base.GlideApp;
+import com.zhaorou.zrapplication.home.dialog.CopyWordsDialog;
+import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
+import com.zhaorou.zrapplication.home.model.DtkGoodsListModel;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
@@ -24,7 +28,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -38,7 +41,7 @@ public class HomeVPItemFragment extends BaseFragment {
     private View mView;
     private Unbinder mUnbinder;
     private GoodsAdapter mGoodsAdapter;
-    private List mGoodsList = new ArrayList();
+    private List<DtkGoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList();
 
     public HomeVPItemFragment() {
     }
@@ -72,24 +75,58 @@ public class HomeVPItemFragment extends BaseFragment {
         mRecyclerView.setAdapter(mGoodsAdapter);
     }
 
-    private class GoodsAdapter extends RecyclerView.Adapter {
+    public void notifyDataSetChanged(List<DtkGoodsListModel.DataBean.ListBean> list) {
+        mGoodsList.clear();
+        mGoodsList.addAll(list);
+        mGoodsAdapter.notifyDataSetChanged();
+    }
+
+    private class GoodsAdapter extends RecyclerView.Adapter<GoodsViewHolder> {
+
+        private PerfectWXCircleDialog mPerfectWXCircleDialog;
+        private CopyWordsDialog mCopyWordsDialog;
 
         @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public GoodsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.item_goods_list_home_fragment, parent, false);
             GoodsViewHolder goodsViewHolder = new GoodsViewHolder(view);
             return goodsViewHolder;
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
+        public void onBindViewHolder(@NonNull GoodsViewHolder holder, int position) {
+            String title = mGoodsList.get(position).getTitle();
+            holder.mTitleTv.setText(title);
+            String pic = mGoodsList.get(position).getPic();
+            GlideApp.with(HomeVPItemFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
+            double price = mGoodsList.get(position).getPrice();
+            holder.mPriceTv.setText("￥" + price);
+            int sales = mGoodsList.get(position).getSales();
+            holder.mPayNumberTv.setText(sales + "人付款");
+            holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mPerfectWXCircleDialog == null) {
+                        mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext());
+                    }
+                    mPerfectWXCircleDialog.show();
+                }
+            });
+            holder.mBtnCopyWords.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mCopyWordsDialog == null) {
+                        mCopyWordsDialog = new CopyWordsDialog(getContext());
+                    }
+                    mCopyWordsDialog.show();
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
-            return 10;
+            return mGoodsList.size();
         }
     }
 

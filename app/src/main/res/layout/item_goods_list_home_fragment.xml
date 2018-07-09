@@ -79,6 +79,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:maxLines="2"
+                    android:ellipsize="end"
                     android:text="牛奶滋润补水沐浴露800ml"
                     android:textColor="@color/colorBlack_333333"
                     android:textSize="13sp"/>

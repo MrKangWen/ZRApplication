@@ -10,17 +10,18 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
 
 public interface IRetrofitService {
 
-    @GET("{url}")
-    Call<ResponseBody> executeGet(@Path("url") String url);
+    @GET
+    Call<ResponseBody> executeGet(@Url String url);
 
-    @GET("{url}")
-    Call<ResponseBody> executeGet(@Path("url") String url, @QueryMap Map<String, String> params);
+    @GET
+    Call<ResponseBody> executeGet(@Url String url, @QueryMap Map<String, String> params);
 
     @FormUrlEncoded
     @POST("{url}")
-    Call<ResponseBody> executePost(@Path("url") String url, @FieldMap Map<String, String> params);
+    Call<ResponseBody> executePost(@Url String url, @FieldMap Map<String, String> params);
 
 }
