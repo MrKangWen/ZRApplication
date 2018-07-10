@@ -96,14 +96,14 @@ public class HomeVPItemFragment extends BaseFragment {
 
         @Override
         public void onBindViewHolder(@NonNull GoodsViewHolder holder, int position) {
-            String title = mGoodsList.get(position).getTitle();
-            holder.mTitleTv.setText(title);
-            String pic = mGoodsList.get(position).getPic();
-            GlideApp.with(HomeVPItemFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
-            double price = mGoodsList.get(position).getPrice();
-            holder.mPriceTv.setText("￥" + price);
-            int sales = mGoodsList.get(position).getSales();
-            holder.mPayNumberTv.setText(sales + "人付款");
+//            String title = mGoodsList.get(position).getTitle();
+//            holder.mTitleTv.setText(title);
+//            String pic = mGoodsList.get(position).getPic();
+//            GlideApp.with(HomeVPItemFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
+//            double price = mGoodsList.get(position).getPrice();
+//            holder.mPriceTv.setText("￥" + price);
+//            int sales = mGoodsList.get(position).getSales();
+//            holder.mPayNumberTv.setText(sales + "人付款");
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -126,7 +126,7 @@ public class HomeVPItemFragment extends BaseFragment {
 
         @Override
         public int getItemCount() {
-            return mGoodsList.size();
+            return 10;
         }
     }
 

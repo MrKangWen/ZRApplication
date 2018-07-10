@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -115,7 +116,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         super.onResume();
         mPresenter.attachView(this);
         mPresenter.fetchClassList();
-        mPresenter.fetchDtkGoodsList();
+//        mPresenter.fetchDtkGoodsList();
     }
 
     @Override
@@ -332,7 +333,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         }
     }
 
-    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
 
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
