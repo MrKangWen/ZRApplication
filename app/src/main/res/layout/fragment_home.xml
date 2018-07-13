@@ -34,7 +34,7 @@
                     android:layout_marginLeft="10dp"
                     android:src="@mipmap/icon_home_search"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/fragment_home_action_bar_search_et"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

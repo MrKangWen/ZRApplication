@@ -8,170 +8,187 @@
     android:orientation="vertical"
     tools:context=".user.UserFragment">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorRed_FF2200"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="48dp">
 
         <ImageView
             android:id="@+id/fragment_user_avatar_iv"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_marginTop="30dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
             android:src="@mipmap/ic_launcher"/>
 
         <LinearLayout
+            android:id="@+id/fragment_user_user_info_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_marginLeft="12dp"
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/fragment_user_user_info_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
-                android:text="登录|注册"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="4dp"
-            android:background="#80F0F0F0"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@mipmap/icon_level"
-                    android:paddingBottom="8dp"
-                    android:paddingTop="8dp"
-                    android:text="Lv.0"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                android:text="点击登录/注册"
+                android:textColor="@color/colorBlack_333333"
+                android:textSize="15sp"/>
 
             <TextView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#80F0F0F0"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/fragment_user_tip_text_tv"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="8dp"
-                    android:paddingTop="8dp"
-                    android:text="积分：0"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"/>
-            </LinearLayout>
-
+                android:layout_marginTop="6dp"
+                android:text="查看并编辑资料"
+                android:textColor="@color/colorGray_999999"
+                android:textSize="11sp"
+                android:visibility="gone"/>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorGray_F0F0F0"/>
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorGray_F0F0F0"/>
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@mipmap/icon_bind_pid"/>
+                android:src="@mipmap/icon_level"/>
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/fragment_user_level_tv"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="10dp"
-                android:text="绑定PID"
+                android:layout_marginLeft="4dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="Lv.0"
+                android:textColor="@color/colorBlack_333333"
                 android:textSize="12sp"/>
-
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:src="@mipmap/icon_next"/>
         </LinearLayout>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorGray_F0F0F0"/>
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorGray_F5F5F5"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@mipmap/icon_settings"/>
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/fragment_user_score_tv"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="10dp"
-                android:text="设置"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="积分：0"
+                android:textColor="@color/colorBlack_333333"
                 android:textSize="12sp"/>
 
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:src="@mipmap/icon_next"/>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorGray_F0F0F0"/>
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorGray_F5F5F5"/>
+
+    <LinearLayout
+        android:id="@+id/fragment_user_bind_pid_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/icon_bind_pid"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="绑定PID"
+            android:textColor="@color/colorBlack_333333"/>
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@mipmap/icon_next"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5"/>
+
+    <LinearLayout
+        android:id="@+id/fragment_use_setting_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/icon_settings"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="设置"
+            android:textColor="@color/colorBlack_333333"/>
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@mipmap/icon_next"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5"/>
 </LinearLayout>

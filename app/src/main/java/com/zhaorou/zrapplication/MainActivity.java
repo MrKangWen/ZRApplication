@@ -5,14 +5,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.EventLog;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhaorou.zrapplication.base.BaseActivity;
+import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeFragment;
 import com.zhaorou.zrapplication.user.UserFragment;
 import com.zhaorou.zrapplication.utils.StatusBarUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +65,13 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         }};
         setSelectedTab(mTabHomeIv, mTabHomeTv);
         initViewPager();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @OnClick({R.id.activity_main_tab_home_iv, R.id.activity_main_tab_home_tv,
@@ -117,6 +130,11 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
 
     }
 

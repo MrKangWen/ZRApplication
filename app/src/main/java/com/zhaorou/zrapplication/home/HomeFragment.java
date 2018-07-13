@@ -53,7 +53,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     @BindView(R.id.fragment_home_swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.fragment_home_action_bar_search_et)
-    EditText mSearchEt;
+    TextView mSearchEt;
     @BindView(R.id.fragment_home_action_bar_right_btn_fl)
     FrameLayout mActionBarBtnRight;
     @BindView(R.id.fragment_home_action_bar_right_btn_cancel_tv)
@@ -102,22 +102,17 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_home, container, false);
             mUnbinder = ButterKnife.bind(this, mView);
+            mSwipeRefreshLayout.setEnabled(false);
+            initClassListRv();
+            initTabs();
+            initViewPager();
         }
-        mSwipeRefreshLayout.setEnabled(false);
-        initClassListRv();
-        initTabs();
-        initViewPager();
-
+        mPresenter.attachView(this);
+        mPresenter.fetchClassList();
+        mPresenter.fetchDtkGoodsList();
         return mView;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.attachView(this);
-        mPresenter.fetchClassList();
-//        mPresenter.fetchDtkGoodsList();
-    }
 
     @Override
     public void onDestroy() {

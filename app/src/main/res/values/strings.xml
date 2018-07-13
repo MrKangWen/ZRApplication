@@ -4,7 +4,7 @@
     <string-array name="fragment_home_tab">
         <item>实时排行</item>
         <item>聚划算</item>
-        <item>淘抢购</item>
+        <!--<item>淘抢购</item>-->
         <item>大牌推荐</item>
         <item>全部商品</item>
         <item>分类结果</item>

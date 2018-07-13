@@ -21,7 +21,7 @@ public interface IRetrofitService {
     Call<ResponseBody> executeGet(@Url String url, @QueryMap Map<String, String> params);
 
     @FormUrlEncoded
-    @POST("{url}")
+    @POST
     Call<ResponseBody> executePost(@Url String url, @FieldMap Map<String, String> params);
 
 }
