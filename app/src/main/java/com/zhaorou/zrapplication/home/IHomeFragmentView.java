@@ -12,6 +12,6 @@ public interface IHomeFragmentView extends IBaseMvpView {
 
     void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list);
 
-    void onLoadMore(boolean hasMore);
+    void onLoadMore(boolean loadMore);
 
 }

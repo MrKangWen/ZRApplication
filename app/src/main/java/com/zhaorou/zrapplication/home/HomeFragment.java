@@ -2,6 +2,7 @@ package com.zhaorou.zrapplication.home;
 
 
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.HomeTabModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
+import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.utils.ScreenInfoHelper;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -203,10 +205,13 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     }
 
-    @OnClick({R.id.fragment_home_action_bar_right_btn_menu_iv, R.id.fragment_home_class_list_btn_close_tv,
+    @OnClick({R.id.fragment_home_action_bar_search_et, R.id.fragment_home_action_bar_right_btn_menu_iv, R.id.fragment_home_class_list_btn_close_tv,
             R.id.fragment_home_class_list_root_layout_ll})
     protected void onClick(View v) {
         switch (v.getId()) {
+            case R.id.fragment_home_action_bar_search_et:
+                startActivity(new Intent(getActivity(), SearchActivity.class));
+                break;
             case R.id.fragment_home_action_bar_right_btn_menu_iv:
                 if (mClassListRootLayoutLl.getVisibility() != View.VISIBLE) {
                     showClassList();
