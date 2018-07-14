@@ -5,10 +5,10 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,7 +27,7 @@ import android.widget.TextView;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
-import com.zhaorou.zrapplication.home.model.DtkGoodsListModel;
+import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.HomeTabModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.utils.ScreenInfoHelper;
@@ -36,6 +35,7 @@ import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindArray;
 import butterknife.BindView;
@@ -50,8 +50,8 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     private static final String TAG = "HomeFragment";
 
-    @BindView(R.id.fragment_home_swipe_refresh_layout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    private static SwipeRefreshLayout mSwipeRefreshLayout;
+
     @BindView(R.id.fragment_home_action_bar_search_et)
     TextView mSearchEt;
     @BindView(R.id.fragment_home_action_bar_right_btn_fl)
@@ -75,6 +75,8 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     @BindArray(R.array.fragment_home_tab)
     String[] mTabsTitleArray;
+    @BindArray(R.array.goods_list_type)
+    String[] mGoodsTypeKeys;
 
     private View mView;
     private Unbinder mUnbinder;
@@ -87,11 +89,10 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     private List<HomeTabModel> mTabsList = new ArrayList<>();
     private ClassListAdapter mClassListAdapter;
     private ViewPagerAdapter mPagerAdapter;
-    private List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
-    private List<DtkGoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList<>();
     private List<HomeVPItemFragment> mFragmentList = new ArrayList<>();
-    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
+    private List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
     private Handler mHandler = new Handler();
+    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
 
     public HomeFragment() {
     }
@@ -102,63 +103,21 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_home, container, false);
             mUnbinder = ButterKnife.bind(this, mView);
-            mSwipeRefreshLayout.setEnabled(false);
+            initSwipLayout();
             initClassListRv();
             initTabs();
             initViewPager();
         }
         mPresenter.attachView(this);
         mPresenter.fetchClassList();
-        mPresenter.fetchDtkGoodsList();
         return mView;
     }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
-        mViewPager.removeAllViews();
         mPresenter.detachView();
-    }
-
-    private void initTabs() {
-        for (int i = 0; i < mTabsTitleArray.length; i++) {
-            String tabTitle = mTabsTitleArray[i];
-            HomeTabModel homeTabModel = new HomeTabModel();
-            homeTabModel.setTabTitle(tabTitle);
-            if (i == 0) {
-                homeTabModel.setSelected(true);
-            } else {
-                homeTabModel.setSelected(false);
-            }
-            mTabsList.add(homeTabModel);
-        }
-        mScreenWidth = ScreenInfoHelper.getScreenWidthPixels(getContext());
-        mTabItemWidth = mScreenWidth / 4;
-        mIndicatorTv.setWidth(mTabItemWidth);
-        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mTabRv.setLayoutManager(mLayoutManager);
-        mTabAdapter = new TabAdapter();
-        mTabRv.setAdapter(mTabAdapter);
-    }
-
-    private void initClassListRv() {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4);
-        mClassListRv.setLayoutManager(gridLayoutManager);
-        mClassListAdapter = new ClassListAdapter();
-        mClassListRv.setAdapter(mClassListAdapter);
-
-    }
-
-    private void initViewPager() {
-        for (int i = 0; i < mTabsTitleArray.length; i++) {
-            mFragmentList.add(new HomeVPItemFragment());
-        }
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        mPagerAdapter = new ViewPagerAdapter(fm);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.addOnPageChangeListener(this);
     }
 
     @Override
@@ -227,20 +186,20 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     @Override
-    public void onFetchDtkGoodsList(List<DtkGoodsListModel.DataBean.ListBean> list) {
-        mGoodsList.clear();
-        mGoodsList.addAll(list);
-        int pos = mViewPager.getCurrentItem();
-        mFragmentList.get(pos).notifyDataSetChanged(mGoodsList);
+    public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
+
     }
 
     @Override
     public void onShowLoading() {
-
     }
 
     @Override
     public void onHideLoading() {
+    }
+
+    @Override
+    public void onLoadMore(boolean hasMore) {
 
     }
 
@@ -263,6 +222,71 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
                 break;
             default:
                 break;
+        }
+    }
+
+    private void initSwipLayout() {
+        mSwipeRefreshLayout = mView.findViewById(R.id.fragment_home_swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mFragmentList.get(mViewPager.getCurrentItem()).initData();
+            }
+        });
+    }
+
+    private void initTabs() {
+        for (int i = 0; i < mTabsTitleArray.length; i++) {
+            String tabTitle = mTabsTitleArray[i];
+            HomeTabModel homeTabModel = new HomeTabModel();
+            homeTabModel.setTabTitle(tabTitle);
+            if (i == 0) {
+                homeTabModel.setSelected(true);
+            } else {
+                homeTabModel.setSelected(false);
+            }
+            mTabsList.add(homeTabModel);
+        }
+        mScreenWidth = ScreenInfoHelper.getScreenWidthPixels(getContext());
+        mTabItemWidth = mScreenWidth / 4;
+        mIndicatorTv.setWidth(mTabItemWidth);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mTabRv.setLayoutManager(mLayoutManager);
+        mTabAdapter = new TabAdapter();
+        mTabRv.setAdapter(mTabAdapter);
+    }
+
+    private void initClassListRv() {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4);
+        mClassListRv.setLayoutManager(gridLayoutManager);
+        mClassListAdapter = new ClassListAdapter();
+        mClassListRv.setAdapter(mClassListAdapter);
+
+    }
+
+    private void initViewPager() {
+        for (int i = 0; i < mTabsTitleArray.length; i++) {
+            HomeVPItemFragment homeVPItemFragment = new HomeVPItemFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("goods_type", mGoodsTypeKeys[i]);
+            homeVPItemFragment.setArguments(bundle);
+            mFragmentList.add(homeVPItemFragment);
+        }
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        mPagerAdapter = new ViewPagerAdapter(fm);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.addOnPageChangeListener(this);
+    }
+
+    public static void startRefresh() {
+        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+    }
+
+    public static void finishRefresh() {
+        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -358,6 +382,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         @Override
         public void onBindViewHolder(@NonNull ClassListHolder holder, int position) {
             holder.mClassNameTv.setText(mClassList.get(position).getClassname());
+            holder.mClassNameTv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
 
         @Override

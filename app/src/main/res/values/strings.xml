@@ -10,4 +10,11 @@
         <item>分类结果</item>
     </string-array>
 
+    <string-array name="goods_list_type">
+        <item>shishi</item>
+        <item>jhs</item>
+        <item>dapai</item>
+        <item>www_lingquan</item>
+        <item>""</item>
+    </string-array>
 </resources>

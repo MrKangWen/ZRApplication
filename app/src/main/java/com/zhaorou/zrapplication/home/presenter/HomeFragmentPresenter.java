@@ -1,18 +1,15 @@
 package com.zhaorou.zrapplication.home.presenter;
 
-import android.util.Log;
-
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
-import com.zhaorou.zrapplication.home.model.DtkGoodsListModel;
+import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.GsonHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,20 +57,28 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         });
     }
 
-    public void fetchDtkGoodsList() {
-        final List<DtkGoodsListModel.DataBean.ListBean> dtkGoodsList = new ArrayList<>();
-        Map<String, String> params = new HashMap<>();
-        params.put("type", "www_lingquan");
-        params.put("page", "1");
+    public void fetchGoodsList(Map<String, String> params) {
+        mView.onShowLoading();
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.GET_DGOODS_LIST, params);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                mView.onHideLoading();
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
-                        Log.e(TAG, "onResponse: responseStr： " + responseStr);
-                        mView.onFetchDtkGoodsList(dtkGoodsList);
+                        GoodsListModel goodsListModel = GsonHelper.fromJson(responseStr, GoodsListModel.class);
+                        if (goodsListModel != null && goodsListModel.getCode() == 200) {
+                            GoodsListModel.DataBean data = goodsListModel.getData();
+                            if (data != null) {
+                                List<GoodsListModel.DataBean.ListBean> list = data.getList();
+                                if (list != null && list.size() > 0) {
+                                    mView.onFetchDtkGoodsList(list);
+                                } else {
+                                    mView.onLoadMore(false);
+                                }
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -82,7 +87,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                mView.onHideLoading();
             }
         });
     }

@@ -23,6 +23,7 @@
                 android:src="@mipmap/ic_launcher"/>
 
             <FrameLayout
+                android:id="@+id/item_goods_list_ranking_fl"
                 android:layout_width="30dp"
                 android:layout_height="30dp">
 
@@ -64,8 +65,8 @@
                     android:background="@drawable/shape_rect_yellowbg_corners10"
                     android:gravity="center"
                     android:paddingBottom="2dp"
-                    android:paddingLeft="6dp"
-                    android:paddingRight="6dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:paddingTop="2dp"
                     android:text="天猫"
                     android:textColor="@android:color/white"

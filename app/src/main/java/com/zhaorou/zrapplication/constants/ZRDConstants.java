@@ -8,6 +8,7 @@ public class ZRDConstants {
         public static final String GET_DGOODS_LIST = "api/get_tkjd_goods_list";
         public static final String WX_LOGIN = "api/oauth2";
         public static final String GET_USER_INFO = "api/get_userinfo";
+        public static final String UPDATE_PID = "api/update_pid";
     }
 
     public static class AppIds {

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.GlideApp;
@@ -20,6 +21,7 @@ import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
 import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.widget.SimpleEditTextDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +49,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     private View mView;
     private Unbinder mUnbinder;
     private UserFragmentPresenter mPresenter = new UserFragmentPresenter();
+    private SimpleEditTextDialog mBindPidDialog;
 
     public UserFragment() {
     }
@@ -76,15 +79,21 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         mPresenter.detachView();
     }
 
-    @OnClick({R.id.fragment_user_user_info_ll})
+    @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll})
     protected void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_user_user_info_ll:
+                setUserInfoOrLogin();
+                break;
+            case R.id.fragment_user_bind_pid_ll:
                 String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
                 if (TextUtils.isEmpty(token)) {
-                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                }else{
-
+                    toLogin();
+                } else {
+                    if (mBindPidDialog == null) {
+                        mBindPidDialog = new SimpleEditTextDialog(getContext(), mPresenter);
+                    }
+                    mBindPidDialog.show();
                 }
                 break;
             default:
@@ -92,15 +101,28 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         }
     }
 
+    private void toLogin() {
+        startActivity(new Intent(getActivity(), LoginActivity.class));
+    }
+
+    private void setUserInfoOrLogin() {
+        String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+        if (TextUtils.isEmpty(token)) {
+            toLogin();
+        } else {
+
+        }
+    }
+
     @Override
     public void onFetchedUserInfo(UserInfoModel.DataBean.UserBean userBean) {
-        String nickname = userBean.getNickname();
-        mNameTv.setText(nickname);
-        mTipTv.setVisibility(View.VISIBLE);
-        String headimgurl = userBean.getHeadimgurl();
-        GlideApp.with(this).load(headimgurl).circleCrop().into(mAvatarIv);
-        int score = userBean.getScore();
-        mScoreTv.setText("积分：" + score);
+        setUserInfo(userBean);
+    }
+
+    @Override
+    public void onUpdatedPid() {
+        Toast.makeText(getContext(), "PID更新成功", Toast.LENGTH_SHORT).show();
+        mBindPidDialog.dismiss();
     }
 
     @Override
@@ -122,5 +144,17 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         } else {
             mPresenter.fetchUserInfo(token);
         }
+    }
+
+    private void setUserInfo(UserInfoModel.DataBean.UserBean userBean) {
+        String nickname = userBean.getNickname();
+        mNameTv.setText(nickname);
+        mTipTv.setVisibility(View.VISIBLE);
+
+        String headimgurl = userBean.getHeadimgurl();
+        GlideApp.with(this).load(headimgurl).circleCrop().into(mAvatarIv);
+
+        int score = userBean.getScore();
+        mScoreTv.setText("积分：" + score);
     }
 }

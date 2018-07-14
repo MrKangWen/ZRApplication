@@ -6,29 +6,33 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.KeyListener;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
-import com.zhaorou.zrapplication.home.dialog.CopyWordsDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
-import com.zhaorou.zrapplication.home.model.DtkGoodsListModel;
+import com.zhaorou.zrapplication.home.model.ClassListModel;
+import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -36,21 +40,26 @@ import butterknife.Unbinder;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeVPItemFragment extends BaseFragment {
+public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentView {
 
     private static final String TAG = "HomeVPItemFragment";
     @BindView(R.id.goods_list_fragment_home_vp_item_rv)
     CustomRecyclerView mRecyclerView;
 
+    @BindArray(R.array.goods_list_type)
+    String[] mGoodsTypeKeys;
+
     private View mView;
     private Unbinder mUnbinder;
     private GoodsAdapter mGoodsAdapter;
-    private List<DtkGoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList();
+    private List<GoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList();
     private LinearLayoutManager mLayoutManager;
+    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
+    private String mGoodsType;
+    private int page = 1;
 
     public HomeVPItemFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,18 +69,60 @@ public class HomeVPItemFragment extends BaseFragment {
             mUnbinder = ButterKnife.bind(this, mView);
             initRecyclerView();
         }
+        mPresenter.attachView(this);
+        initData();
         return mView;
     }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
+        mPresenter.detachView();
         ViewGroup parent = (ViewGroup) mView.getParent();
         parent.removeAllViews();
     }
 
+    @Override
+    public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
+
+    }
+
+    @Override
+    public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
+        if (page == 1) {
+            mGoodsList.clear();
+        }
+        mGoodsList.addAll(list);
+        mGoodsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onShowLoading() {
+        HomeFragment.startRefresh();
+    }
+
+    @Override
+    public void onHideLoading() {
+        HomeFragment.finishRefresh();
+    }
+
+    @Override
+    public void onLoadMore(boolean hasMore) {
+        if (hasMore) {
+            page++;
+            Map<String, String> params = new HashMap<>();
+            if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
+                params.put("flag", mGoodsType);
+            } else {
+                params.put("type", mGoodsType);
+            }
+            params.put("page", page + "");
+            mPresenter.fetchGoodsList(params);
+        } else {
+            Toast.makeText(getContext(), "没有更多了~", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void initRecyclerView() {
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -89,15 +140,38 @@ public class HomeVPItemFragment extends BaseFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                mLayoutManager.findLastCompletelyVisibleItemPosition();
+
+                int lastCompleteVisiblePosition = getLastCompleteVisiblePosition();
+                int dataCount = getDataCount();
+                if (lastCompleteVisiblePosition == dataCount - 1) {
+                    onLoadMore(true);
+                }
             }
         });
     }
 
-    public void notifyDataSetChanged(List<DtkGoodsListModel.DataBean.ListBean> list) {
-        mGoodsList.clear();
-        mGoodsList.addAll(list);
-        mGoodsAdapter.notifyDataSetChanged();
+    public void initData() {
+        page = 1;
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mGoodsType = arguments.getString("goods_type");
+            Map<String, String> params = new HashMap<>();
+            if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
+                params.put("flag", mGoodsType);
+            } else {
+                params.put("type", mGoodsType);
+            }
+            params.put("page", page + "");
+            mPresenter.fetchGoodsList(params);
+        }
+    }
+
+    public int getLastCompleteVisiblePosition() {
+        return mLayoutManager.findLastCompletelyVisibleItemPosition();
+    }
+
+    public int getDataCount() {
+        return mGoodsList.size();
     }
 
     private class GoodsAdapter extends RecyclerView.Adapter<GoodsViewHolder> {
@@ -114,18 +188,43 @@ public class HomeVPItemFragment extends BaseFragment {
 
         @Override
         public void onBindViewHolder(@NonNull GoodsViewHolder holder, int position) {
-            String title = mGoodsList.get(position).getTitle();
+            String title = mGoodsList.get(position).getGoods_name();
             holder.mTitleTv.setText(title);
+
             String pic = mGoodsList.get(position).getPic();
             GlideApp.with(HomeVPItemFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
-            double price = mGoodsList.get(position).getPrice();
+
+            String jhs = mGoodsList.get(position).getJhs();
+            if (TextUtils.equals(jhs, "1")) {
+                holder.mPlatformTv.setText("聚");
+            }
+
+            String price = mGoodsList.get(position).getPrice();
             holder.mPriceTv.setText("￥" + price);
-            int sales = mGoodsList.get(position).getSales();
+
+            String sales = mGoodsList.get(position).getSales();
             holder.mPayNumberTv.setText(sales + "人付款");
-            int price_coupons = mGoodsList.get(position).getPrice_coupons();
+
+            String price_coupons = mGoodsList.get(position).getPrice_coupons();
             holder.mCouponTv.setText("优惠券" + price_coupons + "元");
-            double rate = mGoodsList.get(position).getRate();
+
+            String rate = mGoodsList.get(position).getRate();
             holder.mRateTv.setText("佣金：" + rate + "%");
+
+            String quan_shengyu = mGoodsList.get(position).getQuan_shengyu();
+            holder.mRemainderTv.setText("剩余：" + quan_shengyu);
+
+            if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
+                holder.mRankingFl.setVisibility(View.VISIBLE);
+                String sort = mGoodsList.get(position).getSort();
+                if (!TextUtils.isEmpty(sort)) {
+                    int sortInt = Integer.valueOf(sort) + 1;
+                    holder.mRankingTv.setText(sortInt + "");
+                }
+            } else {
+                holder.mRankingFl.setVisibility(View.GONE);
+            }
+
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -149,6 +248,7 @@ public class HomeVPItemFragment extends BaseFragment {
     }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {
+        private FrameLayout mRankingFl;
         private TextView mRankingTv;
         private ImageView mGoodsImageIv;
         private TextView mPlatformTv;
@@ -165,6 +265,7 @@ public class HomeVPItemFragment extends BaseFragment {
 
         public GoodsViewHolder(View itemView) {
             super(itemView);
+            mRankingFl = itemView.findViewById(R.id.item_goods_list_ranking_fl);
             mRankingTv = itemView.findViewById(R.id.item_goods_list_ranking_tv);
             mGoodsImageIv = itemView.findViewById(R.id.item_goods_list_goods_image_iv);
             mPlatformTv = itemView.findViewById(R.id.item_goods_list_platform_tv);
