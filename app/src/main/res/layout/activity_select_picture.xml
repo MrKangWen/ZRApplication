@@ -11,14 +11,14 @@
 
         <include layout="@layout/layout_activity_title"/>
 
-        <com.lykevin.contentresolver.view.LykRecyclerView
+        <com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView
             android:id="@+id/rv_image_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scrollbars="none">
 
-        </com.lykevin.contentresolver.view.LykRecyclerView>
+        </com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView>
 
         <RelativeLayout
             android:layout_width="match_parent"

@@ -4,6 +4,7 @@ import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
+import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.GsonHelper;
@@ -90,5 +91,36 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 mView.onHideLoading();
             }
         });
+    }
+
+    public void getFriendPopDetail(Map<String, String> params) {
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_FRIENDPOP_DETAIL, params);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    try {
+                        String responseStr = response.body().string();
+                        FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
+                        if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
+                            FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
+                            if (data != null && data.getEntity() != null) {
+                                FriendPopDetailModel.DataBean.EntityBean entity = data.getEntity();
+                                mView.onGetFriendPopDetail(entity);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mView.onHideLoading();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mView.onHideLoading();
+            }
+        });
+
     }
 }

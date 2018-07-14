@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -16,12 +17,18 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.GlideApp;
+import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,10 +135,19 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             hidePreviewLayout();
         }
         if (v.getId() == R.id.tv_image_preview_right_text) {
-            mImageModel.setSelected(true);
-            mImageListAdapter.notifyDataSetChanged();
-            hidePreviewLayout();
-            selectedCount();
+            String path = mImageModel.getPath();
+            File file = new File(path);
+            if (file.exists()) {
+                long length = file.length();
+                if (length >= 1024 * 1024) {
+                    Toast.makeText(this, "单张图片大小不超过1M，所有图片总大小不超过5M", Toast.LENGTH_SHORT).show();
+                } else {
+                    mImageModel.setSelected(true);
+                    mImageListAdapter.notifyDataSetChanged();
+                    hidePreviewLayout();
+                    selectedCount();
+                }
+            }
         }
         if (v.getId() == R.id.tv_layout_footer_left_text) {
             List<ImageModel> selectedImageList = new ArrayList<>();
@@ -167,17 +183,43 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
                     selectedImageList.add(imageModel);
                 }
             }
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList(RESULT_DATA, selectedImageList);
-            intent.putExtras(bundle);
-            setResult(0, intent);
+            long singleSize = 0;
+            long totalSize = 0;
+            for (ImageModel imageModel : selectedImageList) {
+                String path = imageModel.getPath();
+                File file = new File(path);
+                long length = file.length();
+                if (length >= 1024 * 1024) {
+                    singleSize = length;
+                    break;
+                } else {
+                    totalSize += length;
+                }
+            }
+            if (singleSize >= 1) {
+                Toast.makeText(this, "单张图片大小不能超过1M", Toast.LENGTH_SHORT).show();
+            } else if (totalSize > 5 * 1024 * 1024) {
+                Toast.makeText(this, "所有图片总大小不能超过5M", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = getIntent();
+                String command = intent.getStringExtra("command");
+                MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
+                event.setCommand(command);
+                event.setData(selectedImageList);
+                EventBus.getDefault().post(event);
+            }
+//            Intent intent = new Intent();
+//            Bundle bundle = new Bundle();
+//            bundle.putParcelableArrayList(RESULT_DATA, selectedImageList);
+//            intent.putExtras(bundle);
+//            setResult(0, intent);
             finish();
         }
     }
 
     private void selectAll(boolean b) {
         for (ImageModel imageModel : mImageModelList) {
+
             imageModel.setSelected(b);
         }
         mImageListAdapter.notifyDataSetChanged();
@@ -236,10 +278,10 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ImageListHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ImageListHolder holder, final int position) {
             String imagePath = mImageModelList.get(position).getPath();
             GlideApp.with(SelectPictureActivity.this).asBitmap().load(imagePath).override(500, 500).into(holder.mImageIv);
-            boolean selected = mImageModelList.get(position).isSelected();
+            final boolean selected = mImageModelList.get(position).isSelected();
             if (selected) {
                 holder.mSelectedStateIv.setImageResource(R.mipmap.ic_select);
             } else {

@@ -25,6 +25,7 @@ import com.zhaorou.zrapplication.home.HomeVPItemFragment;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.search.presenter.SearchPresenter;
+import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -157,7 +158,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     private void initRecyclerView() {
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        CustomItemDecoration itemDecoration = new CustomItemDecoration(1, getResources().getColor(R.color.colorGray_F5F5F5));
+        CustomItemDecoration itemDecoration = new CustomItemDecoration(DisplayUtil.dip2px(this, 10), getResources().getColor(R.color.colorGray_F5F5F5));
         mRecyclerView.addItemDecoration(itemDecoration);
         mSearchAdapter = new SearchAdapter();
         mRecyclerView.setAdapter(mSearchAdapter);

@@ -36,7 +36,7 @@
                     android:src="@mipmap/icon_home_search"/>
 
                 <TextView
-                    android:id="@+id/fragment_home_action_bar_search_et"
+                    android:id="@+id/fragment_home_layout_title_search_et"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -51,7 +51,7 @@
             </LinearLayout>
 
             <FrameLayout
-                android:id="@+id/fragment_home_action_bar_right_btn_fl"
+                android:id="@+id/fragment_home_layout_title_right_btn_fl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -60,7 +60,7 @@
                 android:paddingTop="10dp">
 
                 <TextView
-                    android:id="@+id/fragment_home_action_bar_right_btn_cancel_tv"
+                    android:id="@+id/fragment_home_layout_title_right_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -70,7 +70,7 @@
                     android:visibility="gone"/>
 
                 <ImageView
-                    android:id="@+id/fragment_home_action_bar_right_btn_menu_iv"
+                    android:id="@+id/fragment_home_layout_title_right_iv"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"

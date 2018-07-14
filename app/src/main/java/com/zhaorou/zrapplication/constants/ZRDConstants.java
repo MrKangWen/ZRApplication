@@ -9,6 +9,8 @@ public class ZRDConstants {
         public static final String WX_LOGIN = "api/oauth2";
         public static final String GET_USER_INFO = "api/get_userinfo";
         public static final String UPDATE_PID = "api/update_pid";
+        public static final String GET_FRIENDPOP_DETAIL = "api/get_friendpop_detail";
+        public static final String UPLOAD_FILE = "api/uploadFile";
     }
 
     public static class AppIds {
@@ -21,5 +23,8 @@ public class ZRDConstants {
 
     public static class EventCommand {
         public static final String COMMAND_LOGIN = "command_login";
+        public static final String COMMAND_SELECT_MARKET_IMAGE = "command_select_market_image";
+        public static final String COMMAND_SELECT_IMAGES = "command_select_images";
+
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,7 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +26,7 @@ import android.widget.TextView;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
+import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.HomeTabModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
@@ -37,7 +36,6 @@ import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindArray;
 import butterknife.BindView;
@@ -54,13 +52,13 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     private static SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.fragment_home_action_bar_search_et)
+    @BindView(R.id.fragment_home_layout_title_search_et)
     TextView mSearchEt;
-    @BindView(R.id.fragment_home_action_bar_right_btn_fl)
+    @BindView(R.id.fragment_home_layout_title_right_btn_fl)
     FrameLayout mActionBarBtnRight;
-    @BindView(R.id.fragment_home_action_bar_right_btn_cancel_tv)
+    @BindView(R.id.fragment_home_layout_title_right_tv)
     TextView mActionBarBtnCancel;
-    @BindView(R.id.fragment_home_action_bar_right_btn_menu_iv)
+    @BindView(R.id.fragment_home_layout_title_right_iv)
     ImageView mActionBarBtnMenu;
     @BindView(R.id.fragment_home_tab_rv)
     CustomRecyclerView mTabRv;
@@ -205,14 +203,19 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     }
 
-    @OnClick({R.id.fragment_home_action_bar_search_et, R.id.fragment_home_action_bar_right_btn_menu_iv, R.id.fragment_home_class_list_btn_close_tv,
+    @Override
+    public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+
+    }
+
+    @OnClick({R.id.fragment_home_layout_title_search_et, R.id.fragment_home_layout_title_right_iv, R.id.fragment_home_class_list_btn_close_tv,
             R.id.fragment_home_class_list_root_layout_ll})
     protected void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fragment_home_action_bar_search_et:
+            case R.id.fragment_home_layout_title_search_et:
                 startActivity(new Intent(getActivity(), SearchActivity.class));
                 break;
-            case R.id.fragment_home_action_bar_right_btn_menu_iv:
+            case R.id.fragment_home_layout_title_right_iv:
                 if (mClassListRootLayoutLl.getVisibility() != View.VISIBLE) {
                     showClassList();
                 } else {
@@ -280,6 +283,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         FragmentManager fm = getActivity().getSupportFragmentManager();
         mPagerAdapter = new ViewPagerAdapter(fm);
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
         mViewPager.addOnPageChangeListener(this);
     }
 
@@ -386,11 +390,17 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
         @Override
         public void onBindViewHolder(@NonNull ClassListHolder holder, int position) {
-            holder.mClassNameTv.setText(mClassList.get(position).getClassname());
+            final String classname = mClassList.get(position).getClassname();
+            final String id = mClassList.get(position).getId();
+            holder.mClassNameTv.setText(classname);
             holder.mClassNameTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent intent = new Intent(getActivity(), CategoryActivity.class);
+                    intent.putExtra("category_name", classname);
+                    intent.putExtra("category_id", id);
+                    startActivity(intent);
+                    dismissClassList();
                 }
             });
         }

@@ -2,6 +2,7 @@ package com.zhaorou.zrapplication.home;
 
 import com.zhaorou.zrapplication.base.IBaseMvpView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
+import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface IHomeFragmentView extends IBaseMvpView {
 
     void onLoadMore(boolean loadMore);
 
+    void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean);
 }
