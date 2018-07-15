@@ -8,6 +8,7 @@ import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.GsonHelper;
 
@@ -100,11 +101,9 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.e(TAG, "onResponse: response: " + response);
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
                         FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
                         if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
                             FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
@@ -125,6 +124,29 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 mView.onHideLoading();
             }
         });
+    }
 
+    public void getTaobaoTbkTpwd(Map<String, String> params) {
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_TAOBAO_TBK_TPWD, params);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    try {
+                        String responseStr = response.body().string();
+                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
+                        TaowordsModel taowordsModel = GsonHelper.fromJson(responseStr, TaowordsModel.class);
+                        mView.onGetTaowords(taowordsModel);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 }

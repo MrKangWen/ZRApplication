@@ -10,7 +10,7 @@ import java.util.Set;
  * Created by lykevin on 2017/7/7.
  */
 
-public class SharedPreferenceHelper {
+public class SPreferenceUtil {
 
     public static void put(Context context, String key, Object value) {
         SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);

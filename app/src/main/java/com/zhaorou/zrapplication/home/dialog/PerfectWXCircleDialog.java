@@ -33,9 +33,10 @@ import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
-import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,7 +46,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -237,7 +237,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                                     image = img + "#";
                                 }
                                 image = image.substring(0, image.lastIndexOf("#"));
-                                String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+                                String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                                 Map<String, String> params = new HashMap<>();
                                 params.put("keyid", keyid + "");
                                 params.put("goods_id", goodsId);
@@ -396,6 +396,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
         setFriendPopDetail(entityBean);
+    }
+
+    @Override
+    public void onGetTaowords(TaowordsModel taowordsModel) {
+
     }
 
     @Override

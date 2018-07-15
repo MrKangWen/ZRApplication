@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,9 +17,10 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.login.LoginActivity;
+import com.zhaorou.zrapplication.settings.SettingsActivity;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
-import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.SimpleEditTextDialog;
 
 import butterknife.BindView;
@@ -79,14 +79,14 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         mPresenter.detachView();
     }
 
-    @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll})
+    @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll, R.id.fragment_use_setting_ll})
     protected void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_user_user_info_ll:
                 setUserInfoOrLogin();
                 break;
             case R.id.fragment_user_bind_pid_ll:
-                String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+                String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                 if (TextUtils.isEmpty(token)) {
                     toLogin();
                 } else {
@@ -95,6 +95,10 @@ public class UserFragment extends Fragment implements IUserFragmentView {
                     }
                     mBindPidDialog.show();
                 }
+                break;
+            case R.id.fragment_use_setting_ll:
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;
@@ -106,7 +110,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     }
 
     private void setUserInfoOrLogin() {
-        String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         if (TextUtils.isEmpty(token)) {
             toLogin();
         } else {
@@ -136,7 +140,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     }
 
     private void getUserInfo() {
-        String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         if (TextUtils.isEmpty(token)) {
             GlideApp.with(this).load(R.mipmap.ic_launcher).circleCrop().into(mAvatarIv);
             mNameTv.setText("点击登录/注册");

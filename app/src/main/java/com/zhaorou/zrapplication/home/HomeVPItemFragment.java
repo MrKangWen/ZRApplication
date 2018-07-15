@@ -26,10 +26,11 @@ import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
-import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -122,6 +123,11 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
 
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+    }
+
+    @Override
+    public void onGetTaowords(TaowordsModel taowordsModel) {
+
     }
 
     @Override
@@ -264,7 +270,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     if (TextUtils.isEmpty(token)) {
                         Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getActivity(), LoginActivity.class));
@@ -282,6 +288,16 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             holder.mBtnCopyWords.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                    if (TextUtils.isEmpty(token)) {
+                        Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
+                    } else {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("id", goodsBean.getGoods_id());
+                        params.put("token", token);
+                        mPresenter.getTaobaoTbkTpwd(params);
+                    }
 
                 }
             });
@@ -310,9 +326,9 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         private TextView mPayNumberTv;
         private TextView mRateTv;
         private TextView mRemainderTv;
-        private RelativeLayout mBtnShareWXRl;
         private TextView mBtnPerfectWXCircle;
         private TextView mBtnCopyWords;
+        private RelativeLayout mBtnShareWXRl;
         private TextView mBtnShareWXTv;
 
         public GoodsViewHolder(View itemView) {

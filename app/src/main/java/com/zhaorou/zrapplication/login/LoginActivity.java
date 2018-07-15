@@ -16,7 +16,7 @@ import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.user.model.WXUserInfoModel;
 import com.zhaorou.zrapplication.utils.GsonHelper;
-import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -112,7 +112,7 @@ public class LoginActivity extends BaseActivity {
                         WXUserInfoModel WXUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
                         if (WXUserInfoModel != null && WXUserInfoModel.getCode() == 200) {
                             String token = WXUserInfoModel.getData().getToken();
-                            SharedPreferenceHelper.put(LoginActivity.this, ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, token);
+                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
                             Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                             finish();
                         }

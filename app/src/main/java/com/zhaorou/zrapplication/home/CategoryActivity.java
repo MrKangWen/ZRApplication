@@ -23,6 +23,7 @@ import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
@@ -95,6 +96,11 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
 
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+
+    }
+
+    @Override
+    public void onGetTaowords(TaowordsModel taowordsModel) {
 
     }
 

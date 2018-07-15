@@ -14,7 +14,7 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseDialog;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
-import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 public class SimpleEditTextDialog extends BaseDialog implements View.OnClickListener {
 
@@ -68,7 +68,7 @@ public class SimpleEditTextDialog extends BaseDialog implements View.OnClickList
 
     private void updatePid() {
         String pid = mEditText.getText().toString();
-        String token = SharedPreferenceHelper.getString(mContext, ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+        String token = SPreferenceUtil.getString(mContext, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         mPresenter.bindPid(pid, token);
     }
 }

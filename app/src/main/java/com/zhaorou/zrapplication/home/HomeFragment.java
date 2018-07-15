@@ -29,6 +29,7 @@ import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.HomeTabModel;
+import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.utils.ScreenInfoHelper;
@@ -205,6 +206,11 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+
+    }
+
+    @Override
+    public void onGetTaowords(TaowordsModel taowordsModel) {
 
     }
 
