@@ -57,7 +57,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     String[] mGoodsTypeKeys;
 
 
-    private PerfectWXCircleDialog mPerfectWXCircleDialog;
     private View mView;
 
     private Unbinder mUnbinder;
@@ -123,9 +122,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
 
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
-        if (mPerfectWXCircleDialog != null) {
-            mPerfectWXCircleDialog.setFriendPopDetail(entityBean);
-        }
     }
 
     @Override
@@ -298,15 +294,9 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        if (mPerfectWXCircleDialog == null) {
-            mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext());
-        }
-        mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
-        String goods_id = goodsBean.getGoods_id();
-        Map<String, String> params = new HashMap<>();
-        params.put("goods_id", goods_id);
-        mPresenter.getFriendPopDetail(params);
+        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext());
+        perfectWXCircleDialog.show();
+        perfectWXCircleDialog.setGoodsInfo(goodsBean);
     }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {

@@ -1,5 +1,6 @@
 package com.zhaorou.zrapplication.contentresolver;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -21,6 +24,7 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.GlideApp;
+import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
@@ -54,6 +58,7 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
     private TextView mPreviewCenterText;
     private TextView mPreviewRightText;
     private MultipleImageAdapter mMultipleImageAdapter;
+    private String mImageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,13 +98,39 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
         List<ImageModel> imageModelList = ContentResolverHelper.queryImagesFromExternal(this);
         mImageModelList.addAll(imageModelList);
         mImageListAdapter.notifyDataSetChanged();
+
+        Intent intent = getIntent();
+        String command = intent.getStringExtra("command");
+        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE)) {
+            String imagePath = intent.getStringExtra("image");
+            for (ImageModel imageModel : imageModelList) {
+                String path = imageModel.getPath();
+                if (TextUtils.equals(imagePath, path)) {
+                    imageModel.setSelected(true);
+                }
+            }
+            mImageListAdapter.notifyDataSetChanged();
+        }
+        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
+            ArrayList<String> imageList = intent.getStringArrayListExtra("images");
+            for (ImageModel imageModel : imageModelList) {
+                String path = imageModel.getPath();
+                if (imageList.contains(path)) {
+                    imageModel.setSelected(true);
+                }
+            }
+            mImageListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void OnItemClick(ViewGroup parent, View view, int position) {
         mImageModel = mImageModelList.get(position);
         boolean selected = mImageModel.isSelected();
-        if (!selected) {
+        if (selected) {
+            mImageModel.setSelected(false);
+            mImageListAdapter.notifyDataSetChanged();
+        } else {
             String imagePath = mImageModel.getPath();
             GlideApp.with(SelectPictureActivity.this).asBitmap().load(imagePath).into(mPreviewImageIv);
             mPreviewMultipleImageVp.setVisibility(View.GONE);
@@ -114,9 +145,6 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, mPivotX + mItemViewWidth / 2, mPivotY + mItemViewHeight);
             scaleAnimation.setDuration(200);
             mPreviewLayoutLl.startAnimation(scaleAnimation);
-        } else {
-            mImageModel.setSelected(false);
-            mImageListAdapter.notifyDataSetChanged();
         }
         selectedCount();
     }
@@ -183,44 +211,80 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
                     selectedImageList.add(imageModel);
                 }
             }
-            long singleSize = 0;
-            long totalSize = 0;
-            for (ImageModel imageModel : selectedImageList) {
-                String path = imageModel.getPath();
-                File file = new File(path);
-                long length = file.length();
-                if (length >= 1024 * 1024) {
-                    singleSize = length;
-                    break;
-                } else {
-                    totalSize += length;
+            Intent intent = getIntent();
+            String command = intent.getStringExtra("command");
+            if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
+                ArrayList<String> imageList = intent.getStringArrayListExtra("images");
+                if (imageList != null && imageList.size() > 0) {
+                    for (int i = 0; i < selectedImageList.size(); i++) {
+                        if (i >= imageList.size()) {
+                            break;
+                        }
+                        String path = selectedImageList.get(i).getPath();
+                        if (!imageList.contains(path)) {
+                            ImageModel imageModel = new ImageModel();
+                            imageModel.setPath(imageList.get(i));
+                            selectedImageList.add(imageModel);
+                        }
+                    }
                 }
             }
-            if (singleSize >= 1) {
-                Toast.makeText(this, "单张图片大小不能超过1M", Toast.LENGTH_SHORT).show();
-            } else if (totalSize > 5 * 1024 * 1024) {
-                Toast.makeText(this, "所有图片总大小不能超过5M", Toast.LENGTH_SHORT).show();
+            if (selectedImageList.size() > 9) {
+                Toast.makeText(this, "最多只能选择9张图片", Toast.LENGTH_SHORT).show();
             } else {
-                Intent intent = getIntent();
-                String command = intent.getStringExtra("command");
-                MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
-                event.setCommand(command);
-                event.setData(selectedImageList);
-                EventBus.getDefault().post(event);
-            }
+                long singleSize = 0;
+                long totalSize = 0;
+                for (ImageModel imageModel : selectedImageList) {
+                    String path = imageModel.getPath();
+                    File file = new File(path);
+                    long length = file.length();
+                    if (length >= 1024 * 1024) {
+                        singleSize = length;
+                        break;
+                    } else {
+                        totalSize += length;
+                    }
+                }
+                if (singleSize >= 1) {
+                    Toast.makeText(this, "单张图片大小不能超过1M", Toast.LENGTH_SHORT).show();
+                } else if (totalSize > 5 * 1024 * 1024) {
+                    Toast.makeText(this, "所有图片总大小不能超过5M", Toast.LENGTH_SHORT).show();
+                } else {
+                    MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
+                    event.setCommand(command);
+                    event.setData(selectedImageList);
+                    EventBus.getDefault().post(event);
+                }
 //            Intent intent = new Intent();
 //            Bundle bundle = new Bundle();
 //            bundle.putParcelableArrayList(RESULT_DATA, selectedImageList);
 //            intent.putExtras(bundle);
 //            setResult(0, intent);
-            finish();
+                finish();
+            }
+
         }
     }
 
     private void selectAll(boolean b) {
-        for (ImageModel imageModel : mImageModelList) {
-
-            imageModel.setSelected(b);
+        if (b) {
+            for (ImageModel imageModel : mImageModelList) {
+                imageModel.setSelected(b);
+            }
+        } else {
+            Intent intent = getIntent();
+            if (intent != null) {
+                String command = intent.getStringExtra("command");
+                if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
+                    ArrayList<String> imageList = intent.getStringArrayListExtra("images");
+                    for (ImageModel imageModel : mImageModelList) {
+                        String path = imageModel.getPath();
+                        if (!imageList.contains(path)) {
+                            imageModel.setSelected(false);
+                        }
+                    }
+                }
+            }
         }
         mImageListAdapter.notifyDataSetChanged();
     }

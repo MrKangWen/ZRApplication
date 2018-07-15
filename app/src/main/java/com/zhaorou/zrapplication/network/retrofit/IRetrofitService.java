@@ -31,7 +31,8 @@ public interface IRetrofitService {
     Call<ResponseBody> executePost(@Url String url, @FieldMap Map<String, String> params);
 
     @Multipart
-    @POST()
+    @POST
     Call<ResponseBody> uploadFile(@Url String url, @Part("name") String name, @Part MultipartBody.Part file);
+
 
 }

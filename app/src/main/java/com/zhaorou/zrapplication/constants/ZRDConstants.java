@@ -11,6 +11,7 @@ public class ZRDConstants {
         public static final String UPDATE_PID = "api/update_pid";
         public static final String GET_FRIENDPOP_DETAIL = "api/get_friendpop_detail";
         public static final String UPLOAD_FILE = "api/uploadFile";
+        public static final String ADD_FRIEND_POP = "api/add_friendpop";
     }
 
     public static class AppIds {

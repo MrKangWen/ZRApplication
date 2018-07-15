@@ -52,6 +52,9 @@ public class ImageModel implements Parcelable {
     private int height;
     private boolean isSelected;
 
+    public ImageModel() {
+    }
+
     protected ImageModel(Parcel in) {
         id = in.readString();
         path = in.readString();

@@ -3,6 +3,8 @@ package com.zhaorou.zrapplication.home.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,19 +29,27 @@ import com.zhaorou.zrapplication.contentresolver.ImageModel;
 import com.zhaorou.zrapplication.contentresolver.SelectPictureActivity;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeVPItemFragment;
+import com.zhaorou.zrapplication.home.IHomeFragmentView;
+import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.SharedPreferenceHelper;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -48,7 +59,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickListener {
+public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentView, View.OnClickListener {
 
     private static final String TAG = "PerfectWXCircleDialog";
 
@@ -63,14 +74,24 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
     private TextView mBtnCancel;
     private TextView mBtnSubmit;
     private CustomRecyclerView mRecyclerView;
+    private LinearLayout mLoadingLayout;
 
     private LinearLayoutManager mLayoutManager;
     private ImagesAdapter mImagesAdapter;
-    private List<String> mImagesList = new ArrayList<>();
+    private ArrayList<String> mImagesList = new ArrayList<>();
     private String mMarketImageUrl = "";
     private ImageView mMarketImgIv;
     private GoodsListModel.DataBean.ListBean mGoodsBean;
     private ImageView mDeleMarketImg;
+    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Toast.makeText(getContext(), "文案提交成功", Toast.LENGTH_SHORT).show();
+            dismiss();
+        }
+    };
 
     public PerfectWXCircleDialog(@NonNull Context context) {
         super(context);
@@ -82,6 +103,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_perfect_wx_circle_dialog);
         EventBus.getDefault().register(this);
+        mPresenter.attachView(this);
         initViews();
     }
 
@@ -91,11 +113,13 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
             case R.id.perfect_wx_circle_dialog_btn_add_main_image:
                 Intent intent = new Intent(getContext(), SelectPictureActivity.class);
                 intent.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE);
+                intent.putExtra("image", mMarketImageUrl);
                 mContext.startActivity(intent);
                 break;
             case R.id.perfect_wx_circle_dialog_btn_add_images:
                 Intent intent1 = new Intent(getContext(), SelectPictureActivity.class);
                 intent1.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES);
+                intent1.putStringArrayListExtra("images", mImagesList);
                 mContext.startActivity(intent1);
                 break;
             case R.id.perfet_wx_circle_dialog_delete_market_img_iv:
@@ -115,11 +139,9 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
                 } else if (mImagesList.size() == 0) {
                     Toast.makeText(getContext(), "请至少添加三张晒图~", Toast.LENGTH_SHORT).show();
                 } else {
-                    uploadImages();
-                    int keyid = mGoodsBean.getKeyid();
-                    String goodsId = mGoodsBean.getGoods_id();
-                    String goodsTitle = mTitleTv.getText().toString();
-                    String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+                    onShowLoading();
+                    uploadMarketImage();
+
                 }
                 break;
             default:
@@ -130,43 +152,47 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
     @Subscribe
     public void onMessageEvent(MessageEvent<ArrayList<ImageModel>> event) {
         String command = event.getCommand();
-        ArrayList<ImageModel> imageModels = event.getData();
+        ArrayList<ImageModel> imageModelList = event.getData();
         if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE)) {
-            ImageModel imageModel = imageModels.get(imageModels.size() - 1);
+            ImageModel imageModel = imageModelList.get(imageModelList.size() - 1);
             String path = imageModel.getPath();
             mMarketImageUrl = path;
             mDeleMarketImg.setVisibility(View.VISIBLE);
             GlideApp.with(getContext()).asBitmap().load(path).into(mMarketImgIv);
         }
         if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
-            for (ImageModel imageModel : imageModels) {
+            mImagesList.clear();
+            for (ImageModel imageModel : imageModelList) {
                 String path = imageModel.getPath();
-                mImagesList.add(path);
+                if (!mImagesList.contains(path)) {
+                    mImagesList.add(path);
+                }
             }
             mImagesAdapter.notifyDataSetChanged();
         }
-
     }
 
-    private void uploadImages() {
-        List<File> fileList = new ArrayList<>();
-        for (String imagePath : mImagesList) {
-            File file = new File(imagePath);
-            fileList.add(file);
-        }
-        File file = fileList.get(0);
+    private void uploadMarketImage() {
+        File file = new File(mMarketImageUrl);
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        MultipartBody.Part image = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), image);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                uploadImages();
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
-                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
+                        JSONObject jsonObject = new JSONObject(responseStr);
+                        if (jsonObject != null && jsonObject.optInt("code") == 200) {
+                            mMarketImageUrl = jsonObject.optString("data");
+                        }
                     }
+
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
@@ -179,10 +205,99 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
         });
     }
 
+    private void uploadImages() {
+        final List<File> fileList = new ArrayList<>();
+        for (String imagePath : mImagesList) {
+            File file = new File(imagePath);
+            fileList.add(file);
+        }
+        final List<String> uploadList = new ArrayList<>();
+        for (File file : fileList) {
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+            Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        if (response != null && response.body() != null) {
+                            final String responseStr = response.body().string();
+                            JSONObject jsonObject = new JSONObject(responseStr);
+                            if (jsonObject != null && jsonObject.optInt("code") == 200) {
+                                String uploadPath = jsonObject.optString("data");
+                                uploadList.add(uploadPath);
+                            }
+                            if (uploadList.size() == fileList.size()) {
+                                int keyid = mGoodsBean.getKeyid();
+                                String goodsId = mGoodsBean.getGoods_id();
+                                String goodsTitle = mTitleTv.getText().toString();
+                                String content = mContentEt.getText().toString();
+                                String image = "";
+                                for (String img : uploadList) {
+                                    image = img + "#";
+                                }
+                                image = image.substring(0, image.lastIndexOf("#"));
+                                String token = SharedPreferenceHelper.getString(getContext(), ZRDConstants.SharedPreferenceKey.SP_LOGIN_TOKEN, "");
+                                Map<String, String> params = new HashMap<>();
+                                params.put("keyid", keyid + "");
+                                params.put("goods_id", goodsId);
+                                params.put("goods_title", goodsTitle);
+                                params.put("content", content);
+                                params.put("image", image);
+                                params.put("token", token);
+                                params.put("market_image", mMarketImageUrl);
+
+                                Call<ResponseBody> call1 = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.ADD_FRIEND_POP, params);
+                                call1.enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        try {
+                                            if (response != null && response.body() != null) {
+                                                String str = response.body().string();
+                                                JSONObject jsonObj = new JSONObject(str);
+                                                if (jsonObj.optInt("code") == 200) {
+                                                    mHandler.sendEmptyMessage(0);
+                                                }
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        }
+
+    }
+
     private void initViews() {
+        mMarketImageUrl = "";
+        mImagesList.clear();
         mUrlTv = findViewById(R.id.perfect_wx_circle_dialog_url_tv);
         mTitleTv = findViewById(R.id.perfect_wx_circle_dialog_title_tv);
         mMarketImgIv = findViewById(R.id.perfet_wx_circle_dialog_market_img_iv);
+        mLoadingLayout = findViewById(R.id.perfect_wx_dialog_loading_ll);
 
         mDeleMarketImg = findViewById(R.id.perfet_wx_circle_dialog_delete_market_img_iv);
         mDeleMarketImg.setOnClickListener(this);
@@ -231,6 +346,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
 
         String quan_guid_content = goodsBean.getQuan_guid_content();
         mTitleTv.setText(quan_guid_content);
+
+        String goods_id = goodsBean.getGoods_id();
+        Map<String, String> params = new HashMap<>();
+        params.put("goods_id", goods_id);
+        mPresenter.getFriendPopDetail(params);
     }
 
     public void setFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
@@ -241,8 +361,10 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
+            Log.e(TAG, "setFriendPopDetail: mMarketImageUrl" + mMarketImageUrl);
             GlideApp.with(getContext()).asBitmap().load(mMarketImageUrl).into(mMarketImgIv);
             String image = entityBean.getImage();
+            Log.e(TAG, "setFriendPopDetail: image" + image);
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
                     String[] imageArray = image.split("#");
@@ -254,6 +376,36 @@ public class PerfectWXCircleDialog extends BaseDialog implements View.OnClickLis
                 }
             }
         }
+    }
+
+    @Override
+    public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
+
+    }
+
+    @Override
+    public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
+
+    }
+
+    @Override
+    public void onLoadMore(boolean loadMore) {
+
+    }
+
+    @Override
+    public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+        setFriendPopDetail(entityBean);
+    }
+
+    @Override
+    public void onShowLoading() {
+        mLoadingLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onHideLoading() {
+        mLoadingLayout.setVisibility(View.GONE);
     }
 
     private class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {

@@ -1,5 +1,7 @@
 package com.zhaorou.zrapplication.home.presenter;
 
+import android.util.Log;
+
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
@@ -98,9 +100,11 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.e(TAG, "onResponse: response: " + response);
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
+                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
                         FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
                         if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
                             FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
