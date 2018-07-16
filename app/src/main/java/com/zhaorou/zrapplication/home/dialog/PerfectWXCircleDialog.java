@@ -399,7 +399,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     }
 
     @Override
-    public void onGetTaowords(TaowordsModel taowordsModel) {
+    public void onGetTaowords(String tkl) {
 
     }
 

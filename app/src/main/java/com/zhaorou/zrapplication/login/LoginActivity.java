@@ -109,10 +109,14 @@ public class LoginActivity extends BaseActivity {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        WXUserInfoModel WXUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
-                        if (WXUserInfoModel != null && WXUserInfoModel.getCode() == 200) {
-                            String token = WXUserInfoModel.getData().getToken();
+                        WXUserInfoModel wxUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
+                        if (wxUserInfoModel != null && wxUserInfoModel.getCode() == 200) {
+                            String token = wxUserInfoModel.getData().getToken();
                             SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
+                            String pid = wxUserInfoModel.getData().getUser().getPid();
+                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
+                            String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
+                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
                             Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                             finish();
                         }

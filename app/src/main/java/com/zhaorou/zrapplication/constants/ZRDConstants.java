@@ -13,6 +13,7 @@ public class ZRDConstants {
         public static final String UPLOAD_FILE = "api/uploadFile";
         public static final String ADD_FRIEND_POP = "api/add_friendpop";
         public static final String GET_TAOBAO_TBK_TPWD = "api/get_taobao_tbk_tpwd";
+        public static final String UPDATE_TKL_TYPE = "api/update_tkl_type";
     }
 
     public static class AppIds {
@@ -21,6 +22,8 @@ public class ZRDConstants {
 
     public static class SPreferenceKey {
         public static final String SP_LOGIN_TOKEN = "login_token";
+        public static final String SP_PID = "login_token";
+        public static final String SP_TAO_SESSION = "login_token";
         public static final String SP_LINK_TAO = "link_tao";
     }
 

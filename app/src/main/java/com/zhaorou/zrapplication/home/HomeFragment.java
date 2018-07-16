@@ -210,7 +210,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     @Override
-    public void onGetTaowords(TaowordsModel taowordsModel) {
+    public void onGetTaowords(String tkl) {
 
     }
 

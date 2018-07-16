@@ -68,9 +68,9 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:paddingTop="2dp"
-                    android:text="天猫"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/item_goods_list_title_tv"

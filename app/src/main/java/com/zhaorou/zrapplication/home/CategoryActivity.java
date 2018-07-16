@@ -100,7 +100,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
     }
 
     @Override
-    public void onGetTaowords(TaowordsModel taowordsModel) {
+    public void onGetTaowords(String tkl) {
 
     }
 

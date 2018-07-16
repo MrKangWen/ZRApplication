@@ -18,5 +18,5 @@ public interface IHomeFragmentView extends IBaseMvpView {
 
     void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean);
 
-    void onGetTaowords(TaowordsModel taowordsModel);
+    void onGetTaowords(String tkl);
 }

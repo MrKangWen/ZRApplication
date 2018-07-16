@@ -89,7 +89,7 @@ public class WXUserInfoModel {
 
             private int id;
             private String openid;
-            private Object subscribe;
+            private String subscribe;
             private String nickname;
             private int sex;
             private String city;
@@ -97,24 +97,24 @@ public class WXUserInfoModel {
             private String province;
             private String language;
             private String headimgurl;
-            private Object subscribe_time;
+            private String subscribe_time;
             private String unionid;
             private String privilege;
-            private Object remark;
-            private Object groupid;
-            private Object tagid_list;
-            private Object subscribe_scene;
-            private Object qr_scene;
-            private Object qr_scene_str;
+            private String remark;
+            private String groupid;
+            private String tagid_list;
+            private String subscribe_scene;
+            private String qr_scene;
+            private String qr_scene_str;
             private String create_time;
             private String pid;
             private int adopt_friendpop_num;
             private int total_friendpop_num;
             private int add_goods_num;
-            private Object password;
-            private Object telephone;
+            private String password;
+            private String telephone;
             private int score;
-            private Object tao_session;
+            private String tao_session;
             private String tkl_type;
             private IsDeleteBean is_delete;
 
@@ -138,7 +138,7 @@ public class WXUserInfoModel {
                 return subscribe;
             }
 
-            public void setSubscribe(Object subscribe) {
+            public void setSubscribe(String subscribe) {
                 this.subscribe = subscribe;
             }
 
@@ -202,7 +202,7 @@ public class WXUserInfoModel {
                 return subscribe_time;
             }
 
-            public void setSubscribe_time(Object subscribe_time) {
+            public void setSubscribe_time(String subscribe_time) {
                 this.subscribe_time = subscribe_time;
             }
 
@@ -222,35 +222,35 @@ public class WXUserInfoModel {
                 this.privilege = privilege;
             }
 
-            public Object getRemark() {
+            public String getRemark() {
                 return remark;
             }
 
-            public void setRemark(Object remark) {
+            public void setRemark(String remark) {
                 this.remark = remark;
             }
 
-            public Object getGroupid() {
+            public String getGroupid() {
                 return groupid;
             }
 
-            public void setGroupid(Object groupid) {
+            public void setGroupid(String groupid) {
                 this.groupid = groupid;
             }
 
-            public Object getTagid_list() {
+            public String getTagid_list() {
                 return tagid_list;
             }
 
-            public void setTagid_list(Object tagid_list) {
+            public void setTagid_list(String tagid_list) {
                 this.tagid_list = tagid_list;
             }
 
-            public Object getSubscribe_scene() {
+            public String getSubscribe_scene() {
                 return subscribe_scene;
             }
 
-            public void setSubscribe_scene(Object subscribe_scene) {
+            public void setSubscribe_scene(String subscribe_scene) {
                 this.subscribe_scene = subscribe_scene;
             }
 
@@ -258,7 +258,7 @@ public class WXUserInfoModel {
                 return qr_scene;
             }
 
-            public void setQr_scene(Object qr_scene) {
+            public void setQr_scene(String qr_scene) {
                 this.qr_scene = qr_scene;
             }
 
@@ -266,7 +266,7 @@ public class WXUserInfoModel {
                 return qr_scene_str;
             }
 
-            public void setQr_scene_str(Object qr_scene_str) {
+            public void setQr_scene_str(String qr_scene_str) {
                 this.qr_scene_str = qr_scene_str;
             }
 
@@ -314,7 +314,7 @@ public class WXUserInfoModel {
                 return password;
             }
 
-            public void setPassword(Object password) {
+            public void setPassword(String password) {
                 this.password = password;
             }
 
@@ -322,7 +322,7 @@ public class WXUserInfoModel {
                 return telephone;
             }
 
-            public void setTelephone(Object telephone) {
+            public void setTelephone(String telephone) {
                 this.telephone = telephone;
             }
 
@@ -334,11 +334,11 @@ public class WXUserInfoModel {
                 this.score = score;
             }
 
-            public Object getTao_session() {
+            public String getTao_session() {
                 return tao_session;
             }
 
-            public void setTao_session(Object tao_session) {
+            public void setTao_session(String tao_session) {
                 this.tao_session = tao_session;
             }
 
