@@ -134,7 +134,6 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        Log.e(TAG, "onResponse: responseStr" + responseStr);
                         TaowordsModel taowordsModel = GsonHelper.fromJson(responseStr, TaowordsModel.class);
                         if (taowordsModel != null && taowordsModel.getCode() == 200) {
                             TaowordsModel.DataBeanX data = taowordsModel.getData();

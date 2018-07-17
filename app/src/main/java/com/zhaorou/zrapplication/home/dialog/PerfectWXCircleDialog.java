@@ -1,6 +1,7 @@
 package com.zhaorou.zrapplication.home.dialog;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -106,6 +107,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mPresenter.attachView(this);
         initViews();
     }
+
 
     @Override
     public void onClick(View v) {
@@ -315,41 +317,34 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mBtnCancel.setOnClickListener(this);
 
         mContentEt = findViewById(R.id.perfect_wx_circle_dialog_content_et);
-        mContentEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
 
         mRecyclerView = findViewById(R.id.perfect_wx_circle_dialog_images_rv);
         mLayoutManager = new GridLayoutManager(getContext(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mImagesAdapter = new ImagesAdapter();
         mRecyclerView.setAdapter(mImagesAdapter);
+
+        setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mPresenter.detachView();
+            }
+        });
     }
 
     public void setGoodsInfo(GoodsListModel.DataBean.ListBean goodsBean) {
         mGoodsBean = goodsBean;
-        String goods_url = goodsBean.getGoods_url();
-        mUrlTv.setText(goods_url);
+        String goodsId = goodsBean.getGoods_id();
+        mUrlTv.setText("https://detail.tmall.com/item.html?id=" + goodsId);
 
-        String quan_guid_content = goodsBean.getQuan_guid_content();
-        mTitleTv.setText(quan_guid_content);
+        String goodsName = goodsBean.getGoods_name();
+        mTitleTv.setText(goodsName);
 
-        String goods_id = goodsBean.getGoods_id();
+        String quanGuidContent = goodsBean.getQuan_guid_content();
+        mContentEt.setText(quanGuidContent);
+
         Map<String, String> params = new HashMap<>();
-        params.put("goods_id", goods_id);
+        params.put("goods_id", goodsId);
         mPresenter.getFriendPopDetail(params);
     }
 
@@ -361,10 +356,8 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
-            Log.e(TAG, "setFriendPopDetail: mMarketImageUrl" + mMarketImageUrl);
             GlideApp.with(getContext()).asBitmap().load(mMarketImageUrl).into(mMarketImgIv);
             String image = entityBean.getImage();
-            Log.e(TAG, "setFriendPopDetail: image" + image);
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
                     String[] imageArray = image.split("#");

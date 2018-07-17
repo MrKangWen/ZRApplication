@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,7 +152,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             cm.setPrimaryClip(clipData);
             Toast.makeText(getContext(), "淘口令已复制", Toast.LENGTH_SHORT).show();
         }
-        if (TextUtils.equals(mShareType,"WX")){
+        if (TextUtils.equals(mShareType, "WX")) {
 
         }
     }
@@ -292,17 +293,25 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 holder.mRankingFl.setVisibility(View.VISIBLE);
                 String sort = goodsBean.getSort();
                 if (!TextUtils.isEmpty(sort)) {
-                    int sortInt = Integer.valueOf(sort) + 1;
-                    holder.mRankingTv.setText(sortInt + "");
+                    holder.mRankingTv.setText(position + 1 + "");
                 }
             } else {
                 holder.mRankingFl.setVisibility(View.GONE);
             }
 
+            int isFriendpop = goodsBean.getIs_friendpop();
+            if (isFriendpop == 0) {
+                holder.mBtnPerfectWXCircle.setBackgroundResource(R.drawable.selector_rect_whitebg_blackbor1_cor4);
+                holder.mBtnPerfectWXCircle.setTextColor(getResources().getColor(R.color.colorBlack_333333));
+            } else if (isFriendpop == 1) {
+                holder.mBtnPerfectWXCircle.setBackgroundResource(R.drawable.selector_rect_whitebg_redbor1_cor4);
+                holder.mBtnPerfectWXCircle.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
+            }
 
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     if (TextUtils.isEmpty(token)) {
                         Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
@@ -311,7 +320,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                         String[] permissons = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
                         boolean hasPermissions = EasyPermissions.hasPermissions(getContext(), permissons);
                         if (hasPermissions) {
-                            showDialog(mGoodsBean);
+                            showDialog(goodsBean);
                         } else {
                             EasyPermissions.requestPermissions(HomeVPItemFragment.this, "需要读取储存权限", 0, permissons);
                         }
@@ -322,13 +331,14 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 @Override
                 public void onClick(View v) {
                     mShareType = "TKL";
+                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     if (TextUtils.isEmpty(token)) {
                         Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getActivity(), LoginActivity.class));
                     } else {
                         Map<String, String> params = new HashMap<>();
-                        params.put("id", mGoodsBean.getGoods_id());
+                        params.put("id", goodsBean.getGoods_id());
                         params.put("token", token);
                         mPresenter.getTaobaoTbkTpwd(params);
                     }
@@ -339,6 +349,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 @Override
                 public void onClick(View v) {
                     mShareType = "WX";
+                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
                     String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
@@ -347,7 +358,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                         startActivity(intent);
                     } else {
                         Map<String, String> params = new HashMap<>();
-                        params.put("id", mGoodsBean.getGoods_id());
+                        params.put("id", goodsBean.getGoods_id());
                         params.put("token", token);
                         mPresenter.getTaobaoTbkTpwd(params);
                     }
@@ -357,13 +368,14 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 @Override
                 public void onClick(View v) {
                     mShareType = "WX_CIRCLE";
+                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     if (TextUtils.isEmpty(token)) {
                         Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
                     } else {
                         Map<String, String> params = new HashMap<>();
-                        params.put("id", mGoodsBean.getGoods_id());
+                        params.put("id", goodsBean.getGoods_id());
                         params.put("token", token);
                         mPresenter.getTaobaoTbkTpwd(params);
                     }

@@ -148,7 +148,15 @@ public class GoodsListModel {
             private String type;
             private String sort;
             private String tao_pwd;
+            private FriendPopDetailModel.DataBean.EntityBean friendPopDetailModel;
 
+            public FriendPopDetailModel.DataBean.EntityBean getFriendPopDetailModel() {
+                return friendPopDetailModel;
+            }
+
+            public void setFriendPopDetailModel(FriendPopDetailModel.DataBean.EntityBean friendPopDetailModel) {
+                this.friendPopDetailModel = friendPopDetailModel;
+            }
 
             public int getKeyid() {
                 return keyid;

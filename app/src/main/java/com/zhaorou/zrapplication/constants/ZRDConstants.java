@@ -22,8 +22,8 @@ public class ZRDConstants {
 
     public static class SPreferenceKey {
         public static final String SP_LOGIN_TOKEN = "login_token";
-        public static final String SP_PID = "login_token";
-        public static final String SP_TAO_SESSION = "login_token";
+        public static final String SP_PID = "pid";
+        public static final String SP_TAO_SESSION = "tao_session";
         public static final String SP_LINK_TAO = "link_tao";
     }
 

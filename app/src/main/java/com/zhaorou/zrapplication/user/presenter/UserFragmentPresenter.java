@@ -1,5 +1,7 @@
 package com.zhaorou.zrapplication.user.presenter;
 
+import android.util.Log;
+
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
@@ -31,6 +33,7 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
+                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
                         UserInfoModel userInfoModel = GsonHelper.fromJson(responseStr, UserInfoModel.class);
                         if (userInfoModel != null && userInfoModel.getCode() == 200) {
                             UserInfoModel.DataBean data = userInfoModel.getData();
