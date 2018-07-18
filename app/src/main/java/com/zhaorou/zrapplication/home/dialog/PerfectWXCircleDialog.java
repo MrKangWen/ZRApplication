@@ -1,5 +1,7 @@
 package com.zhaorou.zrapplication.home.dialog;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +87,12 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private ImageView mMarketImgIv;
     private GoodsListModel.DataBean.ListBean mGoodsBean;
     private ImageView mDeleMarketImg;
+    private LinearLayout mHasFriendPopLl;
+    private LinearLayout mNoFriendPop;
+    private TextView mBtnCopyWords;
+    private TextView mBtnEditWords;
+    private TextView mBtnClose;
+
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private Handler mHandler = new Handler() {
         @Override
@@ -93,6 +102,8 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             dismiss();
         }
     };
+    private TextView mDialogTitle;
+
 
     public PerfectWXCircleDialog(@NonNull Context context) {
         super(context);
@@ -133,18 +144,24 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 dismiss();
                 break;
             case R.id.perfect_wx_circle_dialog_btn_submit:
-                String content = mContentEt.getText().toString();
-                if (TextUtils.isEmpty(content)) {
-                    Toast.makeText(getContext(), "请先完善朋友圈文案~", Toast.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(mMarketImageUrl)) {
-                    Toast.makeText(getContext(), "请添加营销主图~", Toast.LENGTH_SHORT).show();
-                } else if (mImagesList.size() == 0) {
-                    Toast.makeText(getContext(), "请至少添加三张晒图~", Toast.LENGTH_SHORT).show();
-                } else {
-                    onShowLoading();
-                    uploadMarketImage();
-
-                }
+                onShowLoading();
+                uploadMarketImage();
+                break;
+            case R.id.perfect_wx_circle_dialog_btn_copy_words:
+                ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("words", mContentEt.getText().toString());
+                cm.setPrimaryClip(clipData);
+                Toast.makeText(mContext, "文案已复制", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.perfect_wx_circle_dialog_btn_edit_words:
+                mContentEt.setFocusable(true);
+                mContentEt.setFocusableInTouchMode(true);
+                mContentEt.requestFocus();
+                mNoFriendPop.setVisibility(View.VISIBLE);
+                mHasFriendPopLl.setVisibility(View.GONE);
+                break;
+            case R.id.perfect_wx_circle_dialog_btn_close:
+                dismiss();
                 break;
             default:
                 break;
@@ -170,41 +187,53 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     mImagesList.add(path);
                 }
             }
-            mImagesAdapter.notifyDataSetChanged();
+            mImagesAdapter.notifyDataSetChanged("picker");
         }
     }
 
     private void uploadMarketImage() {
-        File file = new File(mMarketImageUrl);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                uploadImages();
-                try {
-                    if (response != null && response.body() != null) {
-                        String responseStr = response.body().string();
-                        JSONObject jsonObject = new JSONObject(responseStr);
-                        if (jsonObject != null && jsonObject.optInt("code") == 200) {
-                            mMarketImageUrl = jsonObject.optString("data");
+        if (!TextUtils.isEmpty(mMarketImageUrl)) {
+            File file = new File(mMarketImageUrl);
+            if (file != null && file.exists()) {
+                RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+                Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.e(TAG, "onResponse: uploadMarketImage: " + response);
+                        uploadImages();
+                        try {
+                            if (response != null && response.body() != null) {
+                                String responseStr = response.body().string();
+                                Log.e(TAG, "onResponse: uploadMarketImage: " + responseStr);
+                                JSONObject jsonObject = new JSONObject(responseStr);
+                                if (jsonObject != null && jsonObject.optInt("code") == 200) {
+                                    mMarketImageUrl = jsonObject.optString("data");
+                                }
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "onFailure: Throwable:mMarketImgUrl " + t);
+                        uploadImages();
+                    }
 
+                });
+            } else {
+                uploadImages();
             }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+        } else {
+            uploadImages();
+        }
     }
 
     private void uploadImages() {
@@ -213,93 +242,113 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             File file = new File(imagePath);
             fileList.add(file);
         }
-        final List<String> uploadList = new ArrayList<>();
-        for (File file : fileList) {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-            Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
-                        if (response != null && response.body() != null) {
-                            final String responseStr = response.body().string();
-                            JSONObject jsonObject = new JSONObject(responseStr);
-                            if (jsonObject != null && jsonObject.optInt("code") == 200) {
-                                String uploadPath = jsonObject.optString("data");
-                                uploadList.add(uploadPath);
-                            }
-                            if (uploadList.size() == fileList.size()) {
-                                int keyid = mGoodsBean.getKeyid();
-                                String goodsId = mGoodsBean.getGoods_id();
-                                String goodsTitle = mTitleTv.getText().toString();
-                                String content = mContentEt.getText().toString();
-                                String image = "";
-                                for (String img : uploadList) {
-                                    image = img + "#";
+        if (fileList.size() > 0) {
+            final List<String> uploadList = new ArrayList<>();
+            for (File file : fileList) {
+                RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+                Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().uploadFile(ZRDConstants.HttpUrls.UPLOAD_FILE, file.getName(), part);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.e(TAG, "onResponse: uploadImages: " + response);
+                        try {
+                            if (response != null && response.body() != null) {
+                                final String responseStr = response.body().string();
+                                Log.e(TAG, "onResponse: uploadImages: " + responseStr);
+                                JSONObject jsonObject = new JSONObject(responseStr);
+                                if (jsonObject != null && jsonObject.optInt("code") == 200) {
+                                    String uploadPath = jsonObject.optString("data");
+                                    uploadList.add(uploadPath);
                                 }
-                                image = image.substring(0, image.lastIndexOf("#"));
-                                String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                                Map<String, String> params = new HashMap<>();
-                                params.put("keyid", keyid + "");
-                                params.put("goods_id", goodsId);
-                                params.put("goods_title", goodsTitle);
-                                params.put("content", content);
-                                params.put("image", image);
-                                params.put("token", token);
-                                params.put("market_image", mMarketImageUrl);
-
-                                Call<ResponseBody> call1 = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.ADD_FRIEND_POP, params);
-                                call1.enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        try {
-                                            if (response != null && response.body() != null) {
-                                                String str = response.body().string();
-                                                JSONObject jsonObj = new JSONObject(str);
-                                                if (jsonObj.optInt("code") == 200) {
-                                                    mHandler.sendEmptyMessage(0);
-                                                }
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                    }
-                                });
+                                if (uploadList.size() == fileList.size()) {
+                                    saveFriendPop(uploadList);
+                                }
                             }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
 
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                }
-            });
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "onFailure: Throwable:images " + t);
+                        uploadList.add("");
+                        if (uploadList.size() == fileList.size()) {
+                            saveFriendPop(uploadList);
+                        }
+                    }
+                });
+            }
+        } else {
+            saveFriendPop(null);
         }
 
+    }
+
+    private void saveFriendPop(List<String> uploadList) {
+        String goodsId = mGoodsBean.getGoods_id();
+        String goodsTitle = mTitleTv.getText().toString();
+        String content = mContentEt.getText().toString();
+        String image = "";
+        if (uploadList != null) {
+            for (String img : uploadList) {
+                image = img + "#";
+            }
+            image = image.substring(0, image.lastIndexOf("#"));
+        }
+        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+        Map<String, String> params = new HashMap<>();
+        params.put("keyid", goodsId);
+        params.put("goods_id", goodsId);
+        params.put("goods_title", goodsTitle);
+        params.put("content", content);
+        params.put("image", image);
+        params.put("token", token);
+        params.put("market_image", mMarketImageUrl);
+
+        Call<ResponseBody> call1 = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.ADD_FRIEND_POP, params);
+        call1.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.e(TAG, "onResponse: response: " + response);
+                try {
+                    if (response != null && response.body() != null) {
+                        String str = response.body().string();
+                        Log.e(TAG, "onResponse: str: " + str);
+                        JSONObject jsonObj = new JSONObject(str);
+                        if (jsonObj.optInt("code") == 200) {
+                            mHandler.sendEmptyMessage(0);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(TAG, "onFailure: Throwable: " + t);
+            }
+        });
     }
 
     private void initViews() {
         mMarketImageUrl = "";
         mImagesList.clear();
+
+        mDialogTitle = findViewById(R.id.perfect_wx_circle_dialog_dialog_title);
         mUrlTv = findViewById(R.id.perfect_wx_circle_dialog_url_tv);
         mTitleTv = findViewById(R.id.perfect_wx_circle_dialog_title_tv);
         mMarketImgIv = findViewById(R.id.perfet_wx_circle_dialog_market_img_iv);
         mLoadingLayout = findViewById(R.id.perfect_wx_dialog_loading_ll);
+        mLoadingLayout.setOnClickListener(this);
 
         mDeleMarketImg = findViewById(R.id.perfet_wx_circle_dialog_delete_market_img_iv);
         mDeleMarketImg.setOnClickListener(this);
@@ -317,6 +366,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mBtnCancel.setOnClickListener(this);
 
         mContentEt = findViewById(R.id.perfect_wx_circle_dialog_content_et);
+        mHasFriendPopLl = findViewById(R.id.perfect_wx_circle_dialog_has_friendpop);
+        mNoFriendPop = findViewById(R.id.perfect_wx_circle_dialog_no_friendpop);
+        mBtnCopyWords = findViewById(R.id.perfect_wx_circle_dialog_btn_copy_words);
+        mBtnCopyWords.setOnClickListener(this);
+        mBtnEditWords = findViewById(R.id.perfect_wx_circle_dialog_btn_edit_words);
+        mBtnEditWords.setOnClickListener(this);
+        mBtnClose = findViewById(R.id.perfect_wx_circle_dialog_btn_close);
+        mBtnClose.setOnClickListener(this);
 
         mRecyclerView = findViewById(R.id.perfect_wx_circle_dialog_images_rv);
         mLayoutManager = new GridLayoutManager(getContext(), 3);
@@ -335,13 +392,34 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     public void setGoodsInfo(GoodsListModel.DataBean.ListBean goodsBean) {
         mGoodsBean = goodsBean;
         String goodsId = goodsBean.getGoods_id();
-        mUrlTv.setText("https://detail.tmall.com/item.html?id=" + goodsId);
-
-        String goodsName = goodsBean.getGoods_name();
-        mTitleTv.setText(goodsName);
 
         String quanGuidContent = goodsBean.getQuan_guid_content();
         mContentEt.setText(quanGuidContent);
+
+        int isFriendpop = goodsBean.getIs_friendpop();
+        if (isFriendpop == 0) {
+            mDialogTitle.setText("完善朋友圈文案");
+            mUrlTv.setVisibility(View.VISIBLE);
+            mUrlTv.setText("https://detail.tmall.com/item.html?id=" + goodsId);
+
+            String goodsName = goodsBean.getGoods_name();
+            mTitleTv.setVisibility(View.VISIBLE);
+            mTitleTv.setText(goodsName);
+
+            mHasFriendPopLl.setVisibility(View.GONE);
+            mNoFriendPop.setVisibility(View.VISIBLE);
+            mContentEt.setFocusable(true);
+            mContentEt.setFocusableInTouchMode(true);
+        } else if (isFriendpop == 1) {
+            mDialogTitle.setText("朋友圈文案");
+            mUrlTv.setVisibility(View.GONE);
+            mTitleTv.setVisibility(View.GONE);
+
+            mHasFriendPopLl.setVisibility(View.VISIBLE);
+            mNoFriendPop.setVisibility(View.GONE);
+            mContentEt.setFocusable(false);
+            mContentEt.setFocusableInTouchMode(false);
+        }
 
         Map<String, String> params = new HashMap<>();
         params.put("goods_id", goodsId);
@@ -356,7 +434,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
-            GlideApp.with(getContext()).asBitmap().load(mMarketImageUrl).into(mMarketImgIv);
+            GlideApp.with(getContext()).asBitmap().load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl).into(mMarketImgIv);
             String image = entityBean.getImage();
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
@@ -368,6 +446,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     mImagesList.add(image);
                 }
             }
+            mImagesAdapter.notifyDataSetChanged("server");
         }
     }
 
@@ -408,6 +487,13 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     private class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
 
+        String imageFrom;
+
+        public void notifyDataSetChanged(String imageFrom) {
+            this.imageFrom = imageFrom;
+            mImagesAdapter.notifyDataSetChanged();
+        }
+
         @NonNull
         @Override
         public ImagesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -418,12 +504,16 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
         @Override
         public void onBindViewHolder(@NonNull ImagesViewHolder holder, int position) {
-            final String imageUrl = mImagesList.get(position);
+            String imageUrl = mImagesList.get(position);
+            if (TextUtils.equals(imageFrom, "server")) {
+                imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageUrl;
+            }
             GlideApp.with(getContext()).asBitmap().load(imageUrl).into(holder.mImageView);
+            final String finalImageUrl = imageUrl;
             holder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mImagesList.remove(imageUrl);
+                    mImagesList.remove(finalImageUrl);
                     mImagesAdapter.notifyDataSetChanged();
                 }
             });

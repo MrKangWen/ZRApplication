@@ -33,7 +33,6 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        Log.e(TAG, "onResponse: responseStr: " + responseStr);
                         UserInfoModel userInfoModel = GsonHelper.fromJson(responseStr, UserInfoModel.class);
                         if (userInfoModel != null && userInfoModel.getCode() == 200) {
                             UserInfoModel.DataBean data = userInfoModel.getData();
