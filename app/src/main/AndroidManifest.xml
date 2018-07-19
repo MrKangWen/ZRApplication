@@ -45,6 +45,12 @@
         </activity>
         <activity android:name=".settings.SettingsActivity">
         </activity>
+
+        <service
+            android:name=".home.service.SendWXImgMessageService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

@@ -2,6 +2,8 @@ package com.zhaorou.zrapplication.base;
 
 import android.app.Application;
 import android.icu.util.TaiwanCalendar;
+import android.os.Build;
+import android.os.StrictMode;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -20,6 +22,11 @@ public class BaseApplication extends Application {
         ApplicationUtils.setApplicationContext(this);
         HttpRequestUtil.init();
         initWXAPI();
+        //解决android N（>=24）系统以上分享 路径为file://时的 android.os.FileUriExposedException异常
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+        }
     }
 
     private void initWXAPI() {

@@ -107,7 +107,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                         FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
                         if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
                             FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
-                            if (data != null && data.getEntity() != null) {
+                            if (data != null) {
                                 FriendPopDetailModel.DataBean.EntityBean entity = data.getEntity();
                                 mView.onGetFriendPopDetail(entity);
                             }

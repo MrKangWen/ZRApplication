@@ -4,15 +4,16 @@ package com.zhaorou.zrapplication.home;
 import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,10 +38,12 @@ import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
+import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomItemDecoration;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +79,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private int page = 1;
     private GoodsListModel.DataBean.ListBean mGoodsBean;
     private String mShareType;
+    private String mTaoword;
 
     public HomeVPItemFragment() {
     }
@@ -131,6 +135,51 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
 
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+        shareFriendPopToWx(entityBean);
+    }
+
+    private void shareFriendPopToWx(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+        final List<String> list = new ArrayList<>();
+        if (entityBean != null) {
+            String imageStr = entityBean.getImage();
+            if (!TextUtils.isEmpty(imageStr)) {
+                if (imageStr.contains("#")) {
+                    String[] imageArray = imageStr.split("#");
+                    for (String img : imageArray) {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                    }
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                }
+            } else {
+                list.add(mGoodsBean.getPic());
+            }
+        } else {
+            list.add(mGoodsBean.getPic());
+        }
+
+        final List<File> fileList = new ArrayList<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (String imgUrl : list) {
+                    File file = FileUtils.saveImageToSdCard(getContext(), imgUrl);
+                    fileList.add(file);
+                }
+                Intent intent = new Intent();
+                ComponentName comp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareImgUI");
+                intent.setComponent(comp);
+                intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                intent.setType("image/*");
+                ArrayList<Uri> imgUriList = new ArrayList<>();
+                for (File file : fileList) {
+                    imgUriList.add(Uri.fromFile(file));
+                }
+                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
+                intent.putExtra("Kdescription", mTaoword);
+                startActivity(intent);
+            }
+        }).start();
     }
 
     @Override
@@ -147,32 +196,30 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         if (TextUtils.equals(mShareType, "WX")) {
             shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
         }
-        if (TextUtils.equals(mShareType,"WX_CIRCLE")){
+        if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
 
         }
     }
 
     private void shareWX(String tkl, String tklType, String goods_name, String price, String price_after_coupons, String content) {
-        String taoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
                 price_after_coupons + "\n" +
                 "--------抢购方式--------" + "\n";
         if (TextUtils.equals(tklType, "1")) {
-            taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
+            mTaoword = mTaoword + "复制本信息" + tkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {
             String pic = mGoodsBean.getPic();
             String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
+            mTaoword = mTaoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
         }
-        WXTextObject textObj = new WXTextObject();
-        textObj.text = taoword;
-        WXMediaMessage msg = new WXMediaMessage();
-        msg.mediaObject = textObj;
-        msg.description = taoword;
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = buildTransaction("text");
-        req.message = msg;
-        req.scene = SendMessageToWX.Req.WXSceneSession;
-        BaseApplication.getWXAPI().sendReq(req);
+        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
+        cm.setPrimaryClip(clipData);
+        Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("goods_id", mGoodsBean.getGoods_id());
+        mPresenter.getFriendPopDetail(params);
     }
 
     private String buildTransaction(final String type) {
