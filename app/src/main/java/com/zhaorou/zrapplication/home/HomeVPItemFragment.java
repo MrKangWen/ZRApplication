@@ -167,7 +167,14 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     fileList.add(file);
                 }
                 Intent intent = new Intent();
-                ComponentName comp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareImgUI");
+                ComponentName comp = null;
+                if (TextUtils.equals(mShareType, "WX")) {
+                    comp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareImgUI");
+                }
+                if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
+                    comp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI");
+                    intent.putExtra("Kdescription", mTaoword);
+                }
                 intent.setComponent(comp);
                 intent.setAction(Intent.ACTION_SEND_MULTIPLE);
                 intent.setType("image/*");
@@ -176,7 +183,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     imgUriList.add(Uri.fromFile(file));
                 }
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
-                intent.putExtra("Kdescription", mTaoword);
                 startActivity(intent);
             }
         }).start();
@@ -197,7 +203,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
         }
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
-
+            shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
         }
     }
 
@@ -220,10 +226,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         Map<String, String> params = new HashMap<>();
         params.put("goods_id", mGoodsBean.getGoods_id());
         mPresenter.getFriendPopDetail(params);
-    }
-
-    private String buildTransaction(final String type) {
-        return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
 
     private void shareTKL(String tkl, String tklType, String title, String goods_name, String price, String price_after_coupons) {

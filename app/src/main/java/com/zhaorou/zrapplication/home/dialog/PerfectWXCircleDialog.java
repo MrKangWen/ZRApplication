@@ -9,19 +9,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.ScaleAnimation;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +38,6 @@ import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
@@ -92,17 +92,20 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private TextView mBtnCopyWords;
     private TextView mBtnEditWords;
     private TextView mBtnClose;
+    private ViewPager mPreviewMultipleImageVp;
 
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Toast.makeText(getContext(), "文案提交成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "文案提交成功，请等待审核", Toast.LENGTH_SHORT).show();
             dismiss();
         }
     };
     private TextView mDialogTitle;
+    private MultipleImageAdapter mMultipleImageAdapter;
+    private FrameLayout mPreviewImgLayout;
 
 
     public PerfectWXCircleDialog(@NonNull Context context) {
@@ -162,6 +165,19 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 break;
             case R.id.perfect_wx_circle_dialog_btn_close:
                 dismiss();
+                break;
+            case R.id.perfet_wx_circle_dialog_market_img_iv:
+                List<String> tempList = new ArrayList<>();
+                tempList.add(mMarketImageUrl);
+                tempList.addAll(mImagesList);
+                MultipleImageAdapter multipleImageAdapter = new MultipleImageAdapter(tempList);
+                mPreviewMultipleImageVp.setAdapter(multipleImageAdapter);
+                mPreviewImgLayout.setVisibility(View.VISIBLE);
+                break;
+            case R.id.preview_img_btn_back:
+                if (mPreviewImgLayout.getVisibility() == View.VISIBLE) {
+                    mPreviewImgLayout.setVisibility(View.GONE);
+                }
                 break;
             default:
                 break;
@@ -381,6 +397,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mImagesAdapter = new ImagesAdapter();
         mRecyclerView.setAdapter(mImagesAdapter);
 
+        mPreviewMultipleImageVp = findViewById(R.id.perfect_wx_circle_dialog_vp_image_preview);
+        mPreviewImgLayout = findViewById(R.id.preview_img_layout);
+        mMarketImgIv.setOnClickListener(this);
+        findViewById(R.id.preview_img_btn_back).setOnClickListener(this);
+
         setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
@@ -508,13 +529,22 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             if (TextUtils.equals(imageFrom, "server")) {
                 imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageUrl;
             }
-            GlideApp.with(getContext()).asBitmap().load(imageUrl).into(holder.mImageView);
+            GlideApp.with(getContext()).asBitmap().override(80).load(imageUrl).into(holder.mImageView);
             final String finalImageUrl = imageUrl;
             holder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mImagesList.remove(finalImageUrl);
                     mImagesAdapter.notifyDataSetChanged();
+                }
+            });
+            holder.mImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    mMultipleImageAdapter = new MultipleImageAdapter(mImagesList);
+                    mPreviewMultipleImageVp.setAdapter(mMultipleImageAdapter);
+                    mPreviewImgLayout.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -534,6 +564,39 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             super(itemView);
             mImageView = itemView.findViewById(R.id.item_wx_circle_dialog_img_iv);
             mBtnDelete = itemView.findViewById(R.id.item_wx_circle_dialog_delete_icon);
+        }
+    }
+
+    private class MultipleImageAdapter extends PagerAdapter {
+        private List<String> imageList;
+
+        public MultipleImageAdapter(List<String> imageList) {
+            this.imageList = imageList;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
+            ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
+            GlideApp.with(getContext()).asBitmap().load(ZRDConstants.HttpUrls.BASE_URL + imageList.get(position)).override(500, 500).into(imageView);
+            container.addView(view);
+            return view;
+        }
+
+        @Override
+        public int getCount() {
+            return imageList.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View) object);
         }
     }
 }
