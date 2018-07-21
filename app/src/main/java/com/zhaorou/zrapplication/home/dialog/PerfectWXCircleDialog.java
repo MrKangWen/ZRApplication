@@ -99,8 +99,16 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Toast.makeText(getContext(), "文案提交成功，请等待审核", Toast.LENGTH_SHORT).show();
-            dismiss();
+            switch (msg.what) {
+                case 0:
+                    Toast.makeText(getContext(), "文案提交成功，请等待审核", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                    break;
+                case 1:
+                    mFragment.onLoginTimeout();
+                    dismiss();
+                    break;
+            }
         }
     };
     private TextView mDialogTitle;
@@ -111,6 +119,12 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     public PerfectWXCircleDialog(@NonNull Context context) {
         super(context);
         mContext = context;
+    }
+
+    public PerfectWXCircleDialog(@NonNull Context context, HomeVPItemFragment fragment) {
+        super(context);
+        mContext = context;
+        mFragment = fragment;
     }
 
     @Override
@@ -217,12 +231,10 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.e(TAG, "onResponse: uploadMarketImage: " + response);
                         uploadImages();
                         try {
                             if (response != null && response.body() != null) {
                                 String responseStr = response.body().string();
-                                Log.e(TAG, "onResponse: uploadMarketImage: " + responseStr);
                                 JSONObject jsonObject = new JSONObject(responseStr);
                                 if (jsonObject != null && jsonObject.optInt("code") == 200) {
                                     mMarketImageUrl = jsonObject.optString("data");
@@ -239,7 +251,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Log.e(TAG, "onFailure: Throwable:mMarketImgUrl " + t);
                         uploadImages();
                     }
 
@@ -267,11 +278,9 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.e(TAG, "onResponse: uploadImages: " + response);
                         try {
                             if (response != null && response.body() != null) {
                                 final String responseStr = response.body().string();
-                                Log.e(TAG, "onResponse: uploadImages: " + responseStr);
                                 JSONObject jsonObject = new JSONObject(responseStr);
                                 if (jsonObject != null && jsonObject.optInt("code") == 200) {
                                     String uploadPath = jsonObject.optString("data");
@@ -292,7 +301,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Log.e(TAG, "onFailure: Throwable:images " + t);
                         uploadList.add("");
                         if (uploadList.size() == fileList.size()) {
                             saveFriendPop(uploadList);
@@ -331,14 +339,16 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         call1.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.e(TAG, "onResponse: response: " + response);
                 try {
                     if (response != null && response.body() != null) {
                         String str = response.body().string();
-                        Log.e(TAG, "onResponse: str: " + str);
                         JSONObject jsonObj = new JSONObject(str);
                         if (jsonObj.optInt("code") == 200) {
                             mHandler.sendEmptyMessage(0);
+                        }
+                        if (jsonObj.optInt("code") == 401) {
+                            mHandler.sendEmptyMessage(1);
+
                         }
                     }
                 } catch (IOException e) {
@@ -350,7 +360,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e(TAG, "onFailure: Throwable: " + t);
             }
         });
     }
@@ -504,6 +513,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     @Override
     public void onHideLoading() {
         mLoadingLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onLoginTimeout() {
+
     }
 
     private class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {

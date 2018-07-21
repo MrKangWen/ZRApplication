@@ -74,6 +74,9 @@ public class SearchPresenter extends BasePresenter<ISearchView> {
                                 mView.onGetTaowords(tkl);
                             }
                         }
+                        if (taowordsModel != null && taowordsModel.getCode() == 401) {
+                            mView.onLoginTimeout();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

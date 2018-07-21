@@ -139,6 +139,12 @@ public class UserFragment extends Fragment implements IUserFragmentView {
 
     }
 
+    @Override
+    public void onLoginTimeout() {
+        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(getActivity(), LoginActivity.class));
+    }
+
     private void getUserInfo() {
         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         if (TextUtils.isEmpty(token)) {

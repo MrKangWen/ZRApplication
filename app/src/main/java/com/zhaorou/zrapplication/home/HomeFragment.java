@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,17 +22,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.HomeTabModel;
-import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
+import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.search.SearchActivity;
-import com.zhaorou.zrapplication.utils.ScreenInfoHelper;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import java.util.ArrayList;
@@ -61,10 +60,8 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     TextView mActionBarBtnCancel;
     @BindView(R.id.fragment_home_layout_title_right_iv)
     ImageView mActionBarBtnMenu;
-    @BindView(R.id.fragment_home_tab_rv)
-    CustomRecyclerView mTabRv;
-    @BindView(R.id.fragment_home_tab_indicator_tv)
-    TextView mIndicatorTv;
+    @BindView(R.id.fragment_home_tab_layout)
+    TabLayout mTabLayout;
     @BindView(R.id.fragment_home_viewpager)
     ViewPager mViewPager;
     @BindView(R.id.fragment_home_class_list_root_layout_ll)
@@ -81,13 +78,6 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     private View mView;
     private Unbinder mUnbinder;
-    private int mScreenWidth;
-    private TabAdapter mTabAdapter;
-    private LinearLayoutManager mLayoutManager;
-    private int mTabItemWidth;
-    private float mLastOffset;
-    private int mChildCount;
-    private List<HomeTabModel> mTabsList = new ArrayList<>();
     private ClassListAdapter mClassListAdapter;
     private ViewPagerAdapter mPagerAdapter;
     private List<HomeVPItemFragment> mFragmentList = new ArrayList<>();
@@ -106,8 +96,8 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
             mUnbinder = ButterKnife.bind(this, mView);
             initSwipLayout();
             initClassListRv();
-            initTabs();
             initViewPager();
+            initTabs();
         }
         mPresenter.attachView(this);
         mPresenter.fetchClassList();
@@ -123,56 +113,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        if (positionOffset != 0) {
-            if (positionOffset - mLastOffset > 0) {
-                if (position >= mChildCount - 1) {
-                    int firstPosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-                    int offset = (int) ((positionOffset + (position - firstPosition)) * mTabItemWidth);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mIndicatorTv.getLayoutParams();
-                    params.leftMargin = offset;
-                    mIndicatorTv.setLayoutParams(params);
-                } else {
-                    int offset = (int) ((positionOffset + position) * mTabItemWidth);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mIndicatorTv.getLayoutParams();
-                    params.leftMargin = offset;
-                    mIndicatorTv.setLayoutParams(params);
-                }
-            } else {
-                int firstPosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-                if (firstPosition == 0) {
-                    int offset = (int) ((positionOffset + position) * mTabItemWidth);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mIndicatorTv.getLayoutParams();
-                    params.leftMargin = offset;
-                    mIndicatorTv.setLayoutParams(params);
-                } else {
-                    int offset = (int) ((positionOffset + (position - firstPosition)) * mTabItemWidth);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mIndicatorTv.getLayoutParams();
-                    params.leftMargin = offset;
-                    mIndicatorTv.setLayoutParams(params);
-                }
-            }
-            mLastOffset = positionOffset;
-        }
 
     }
 
     @Override
     public void onPageSelected(int position) {
-        mChildCount = mTabRv.getChildCount();
-        for (int i = 0; i < mTabsList.size(); i++) {
-            HomeTabModel homeTabModel = mTabsList.get(i);
-            if (i == position) {
-                homeTabModel.setSelected(true);
-            } else {
-                homeTabModel.setSelected(false);
-            }
-        }
-        mTabAdapter.notifyDataSetChanged();
-        int lastPosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
-        int firstPosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-        if (position < firstPosition || position > lastPosition) {
-            mTabRv.scrollToPosition(position);
-        }
+
     }
 
     @Override
@@ -197,6 +143,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     @Override
     public void onHideLoading() {
+    }
+
+    @Override
+    public void onLoginTimeout() {
+        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(getActivity(), LoginActivity.class));
     }
 
     @Override
@@ -250,24 +202,14 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     private void initTabs() {
+
+        mTabLayout.setupWithViewPager(mViewPager);
         for (int i = 0; i < mTabsTitleArray.length; i++) {
-            String tabTitle = mTabsTitleArray[i];
-            HomeTabModel homeTabModel = new HomeTabModel();
-            homeTabModel.setTabTitle(tabTitle);
-            if (i == 0) {
-                homeTabModel.setSelected(true);
-            } else {
-                homeTabModel.setSelected(false);
-            }
-            mTabsList.add(homeTabModel);
+            TabLayout.Tab tab = mTabLayout.getTabAt(i);
+            TextView tabTextTv = (TextView) getLayoutInflater().inflate(R.layout.item_home_tab, mTabLayout, false);
+            tabTextTv.setText(mTabsTitleArray[i]);
+            tab.setCustomView(tabTextTv);
         }
-        mScreenWidth = ScreenInfoHelper.getScreenWidthPixels(getContext());
-        mTabItemWidth = mScreenWidth / 4;
-        mIndicatorTv.setWidth(mTabItemWidth);
-        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mTabRv.setLayoutManager(mLayoutManager);
-        mTabAdapter = new TabAdapter();
-        mTabRv.setAdapter(mTabAdapter);
     }
 
     private void initClassListRv() {
@@ -307,12 +249,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     private void showClassList() {
         mClassListRootLayoutLl.setVisibility(View.VISIBLE);
-        ObjectAnimator.ofFloat(mClassListContentLayoutLl, "translationY", -mClassListContentLayoutLl.getHeight(), mTabRv.getTop()).setDuration(250).start();
+        ObjectAnimator.ofFloat(mClassListContentLayoutLl, "translationY", -mClassListContentLayoutLl.getHeight(), mTabLayout.getTop()).setDuration(250).start();
         ObjectAnimator.ofFloat(mClassListRootLayoutLl, "alpha", 0, 1).setDuration(200).start();
     }
 
     private void dismissClassList() {
-        ObjectAnimator.ofFloat(mClassListContentLayoutLl, "translationY", mTabRv.getTop(), -mClassListContentLayoutLl.getHeight()).setDuration(250).start();
+        ObjectAnimator.ofFloat(mClassListContentLayoutLl, "translationY", mTabLayout.getTop(), -mClassListContentLayoutLl.getHeight()).setDuration(250).start();
         ObjectAnimator.ofFloat(mClassListRootLayoutLl, "alpha", 1, 0).setDuration(200).start();
         mHandler.postDelayed(new Runnable() {
             @Override
@@ -322,50 +264,6 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         }, 250);
     }
 
-    private class TabAdapter extends RecyclerView.Adapter<TabViewHolder> {
-
-        @NonNull
-        @Override
-        public TabViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view_simple_text, parent, false);
-            return new TabViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull TabViewHolder holder, final int position) {
-            HomeTabModel homeTabModel = mTabsList.get(position);
-            String tabTitle = homeTabModel.getTabTitle();
-            boolean selected = homeTabModel.isSelected();
-            holder.mTabTitleTv.setText(tabTitle);
-            if (selected) {
-                holder.mTabTitleTv.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
-            } else {
-                holder.mTabTitleTv.setTextColor(getResources().getColor(R.color.colorBlack_333333));
-            }
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mViewPager.setCurrentItem(position);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mTabsTitleArray.length;
-        }
-    }
-
-    private class TabViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView mTabTitleTv;
-
-        public TabViewHolder(View itemView) {
-            super(itemView);
-            mTabTitleTv = itemView.findViewById(R.id.item_recycler_view_simple_text_tv);
-            mTabTitleTv.setWidth(mTabItemWidth);
-        }
-    }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
 

@@ -5,4 +5,6 @@ public interface IBaseMvpView {
     void onShowLoading();
 
     void onHideLoading();
+
+    void onLoginTimeout();
 }

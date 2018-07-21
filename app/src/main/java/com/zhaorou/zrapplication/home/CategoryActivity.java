@@ -235,6 +235,12 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         }
     }
 
+    @Override
+    public void onLoginTimeout() {
+        Toast.makeText(this, "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
     @OnClick({R.id.activity_category_layout_title_left_btn_rl})
     protected void onClick(View v) {
         switch (v.getId()) {

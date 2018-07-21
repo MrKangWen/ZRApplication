@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <application
         android:name=".base.BaseApplication"
@@ -18,6 +20,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="PGYER_APPID"
+            android:value="048867734e15ece8f714b933189a0dad">
+        </meta-data>
+
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">
@@ -29,7 +37,9 @@
         </activity>
         <activity android:name=".base.BaseActivity">
         </activity>
-        <activity android:name=".login.LoginActivity">
+        <activity
+            android:name=".login.LoginActivity"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".wxapi.WXEntryActivity"
@@ -46,11 +56,6 @@
         <activity android:name=".settings.SettingsActivity">
         </activity>
 
-        <service
-            android:name=".home.service.SendWXImgMessageService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
     </application>
 
 </manifest>

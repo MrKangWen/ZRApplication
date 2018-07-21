@@ -5,6 +5,7 @@ import android.icu.util.TaiwanCalendar;
 import android.os.Build;
 import android.os.StrictMode;
 
+import com.pgyersdk.crash.PgyCrashManager;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
@@ -27,6 +28,7 @@ public class BaseApplication extends Application {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+        PgyCrashManager.register(this);
     }
 
     private void initWXAPI() {

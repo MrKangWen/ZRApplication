@@ -238,6 +238,12 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         }
     }
 
+    @Override
+    public void onLoginTimeout() {
+        Toast.makeText(this, "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
     @OnClick({R.id.activity_search_action_bar_right_btn_fl})
     protected void onClick(View v) {
         switch (v.getId()) {

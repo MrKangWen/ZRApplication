@@ -5,8 +5,8 @@
     android:id="@+id/fragment_home_swipe_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:filterTouchesWhenObscured="true"
     android:background="@color/colorGray_F5F5F5"
+    android:filterTouchesWhenObscured="true"
     tools:context=".home.HomeFragment">
 
     <LinearLayout
@@ -94,24 +94,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/fragment_home_tab_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:background="@android:color/white">
 
-                    <com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView
-                        android:id="@+id/fragment_home_tab_rv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    </com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView>
-
-                    <TextView
-                        android:id="@+id/fragment_home_tab_indicator_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="2dp"
-                        android:background="@color/colorRed_FF2200"/>
-                </LinearLayout>
+                </android.support.design.widget.TabLayout>
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/fragment_home_viewpager"

@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pgyersdk.crash.PgyCrashManager;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
+import com.zhaorou.zrapplication.MainActivity;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseApplication;
 import com.zhaorou.zrapplication.base.BaseFragment;
@@ -191,13 +194,12 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     @Override
     public void onGetTaowords(String tkl) {
         String tklType = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
-        String title = mGoodsBean.getTitle();
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = mGoodsBean.getQuan_guid_content();
         if (TextUtils.equals(mShareType, "TKL")) {
-            shareTKL(tkl, tklType, title, goods_name, price, price_after_coupons);
+            shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
         }
         if (TextUtils.equals(mShareType, "WX")) {
             shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
@@ -208,15 +210,19 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void shareWX(String tkl, String tklType, String goods_name, String price, String price_after_coupons, String content) {
-        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
-        if (TextUtils.equals(tklType, "1")) {
-            mTaoword = mTaoword + "复制本信息" + tkl + "打开淘宝即可获取";
-        } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            mTaoword = mTaoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
+        if (TextUtils.equals(mShareType, "WX")) {
+            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+            if (TextUtils.equals(tklType, "1")) {
+                mTaoword = mTaoword + "复制本信息" + tkl + "打开淘宝即可获取";
+            } else if (TextUtils.equals(tklType, "2")) {
+                String pic = mGoodsBean.getPic();
+                String str = "https://wenan001.kuaizhan.com/?taowords=";
+                mTaoword = mTaoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+            }
+        } else {
+            mTaoword = content;
         }
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
@@ -228,9 +234,9 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         mPresenter.getFriendPopDetail(params);
     }
 
-    private void shareTKL(String tkl, String tklType, String title, String goods_name, String price, String price_after_coupons) {
+    private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 
-        String taoword = title + "\n" + goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
+        String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
                 price_after_coupons + "\n" +
                 "--------抢购方式--------" + "\n";
         if (TextUtils.equals(tklType, "1")) {
@@ -238,7 +244,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         } else if (TextUtils.equals(tklType, "2")) {
             String pic = mGoodsBean.getPic();
             String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
+            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
         }
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("tkl", taoword);
@@ -254,6 +260,12 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     @Override
     public void onHideLoading() {
         HomeFragment.finishRefresh();
+    }
+
+    @Override
+    public void onLoginTimeout() {
+        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(getActivity(), LoginActivity.class));
     }
 
     @Override
@@ -422,18 +434,22 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             holder.mBtnCopyWords.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "TKL";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean = goodsBean;
-                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    if (TextUtils.isEmpty(token)) {
-                        Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getActivity(), LoginActivity.class));
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "TKL";
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        mGoodsBean = goodsBean;
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        if (TextUtils.isEmpty(token)) {
+                            Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
+                        PgyCrashManager.reportCaughtException(getContext(), e);
                     }
 
                 }
@@ -441,38 +457,48 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             holder.mBtnShareWXTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "WX";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean = goodsBean;
-                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
-                    String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
-                    if (TextUtils.isEmpty(pid) || TextUtils.isEmpty(tao_session) || TextUtils.isEmpty(token)) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "WX";
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        mGoodsBean = goodsBean;
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
+                        String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
+                        if (TextUtils.isEmpty(pid) || TextUtils.isEmpty(tao_session) || TextUtils.isEmpty(token)) {
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
+                        PgyCrashManager.reportCaughtException(getContext(), e);
                     }
+
                 }
             });
             holder.mBtnShareWXRl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "WX_CIRCLE";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    if (TextUtils.isEmpty(token)) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "WX_CIRCLE";
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        if (TextUtils.isEmpty(token)) {
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
+                        PgyCrashManager.reportCaughtException(getContext(), e);
                     }
+
                 }
             });
         }
@@ -484,7 +510,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext());
+        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         perfectWXCircleDialog.show();
         perfectWXCircleDialog.setGoodsInfo(goodsBean);
     }

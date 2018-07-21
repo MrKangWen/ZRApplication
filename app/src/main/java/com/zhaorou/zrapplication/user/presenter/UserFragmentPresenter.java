@@ -1,6 +1,7 @@
 package com.zhaorou.zrapplication.user.presenter;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
@@ -41,6 +42,9 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                                 mView.onFetchedUserInfo(user);
                             }
                         }
+                        if (userInfoModel != null && userInfoModel.getCode() == 401) {
+                            mView.onLoginTimeout();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -68,6 +72,9 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                         PidModel pidModel = GsonHelper.fromJson(responseStr, PidModel.class);
                         if (pidModel != null && pidModel.getCode() == 200) {
                             mView.onUpdatedPid();
+                        }
+                        if (pidModel != null && pidModel.getCode() == 401) {
+                            mView.onLoginTimeout();
                         }
                     }
                 } catch (IOException e) {

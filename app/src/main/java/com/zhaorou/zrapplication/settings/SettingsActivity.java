@@ -89,6 +89,10 @@ public class SettingsActivity extends BaseActivity {
                                         String data = jsonObj.optString("data");
                                         Toast.makeText(SettingsActivity.this, data, Toast.LENGTH_SHORT).show();
                                     }
+                                    if (jsonObj != null && jsonObj.optInt("code") == 401) {
+                                        Toast.makeText(SettingsActivity.this, "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+                                    }
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 } catch (JSONException e) {

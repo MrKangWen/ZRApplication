@@ -3,6 +3,8 @@ package com.zhaorou.zrapplication.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.zhaorou.zrapplication.base.BaseApplication;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,8 +14,10 @@ import java.util.Set;
 
 public class SPreferenceUtil {
 
+    private static final String SP_NAME = ApplicationUtils.getPackageName();
+
     public static void put(Context context, String key, Object value) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
         if (value instanceof String) {
             edit.putString(key, (String) value);
@@ -32,37 +36,37 @@ public class SPreferenceUtil {
     }
 
     public static boolean getBoolean(Context context, String key, boolean defaultValue) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         boolean b = sp.getBoolean(key, defaultValue);
         return b;
     }
 
     public static String getString(Context context, String key, String defaultStr) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         String str = sp.getString(key, defaultStr);
         return str;
     }
 
     public static int getInt(Context context, String key, int defaultInt) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         int i = sp.getInt(key, defaultInt);
         return i;
     }
 
     public static long getLong(Context context, String key, long defaultLong) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         long l = sp.getLong(key, defaultLong);
         return l;
     }
 
     public static float getFloat(Context context, String key, float defaultFloat) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         float f = sp.getFloat(key, defaultFloat);
         return f;
     }
 
     public static Set<String> getStringSet(Context context, String key) {
-        SharedPreferences sp = context.getSharedPreferences("yfsp", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         Set<String> hashSet = new HashSet<>();
         Set<String> stringSet = sp.getStringSet(key, hashSet);
         return stringSet;
