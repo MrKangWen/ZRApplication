@@ -126,6 +126,11 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     }
 
     @Override
+    public void onLoadFail(String str) {
+        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
         mClassList.clear();
         mClassList.addAll(list);

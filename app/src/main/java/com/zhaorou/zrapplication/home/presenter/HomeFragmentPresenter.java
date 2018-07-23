@@ -1,7 +1,5 @@
 package com.zhaorou.zrapplication.home.presenter;
 
-import android.util.Log;
-
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
@@ -11,6 +9,9 @@ import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.GsonHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,21 +36,34 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
-                        ClassListModel classListModel = GsonHelper.fromJson(responseStr, ClassListModel.class);
-                        if (classListModel != null && classListModel.getCode() == 200) {
-                            ClassListModel.DataBean dataBean = classListModel.getData();
-                            if (dataBean != null) {
-                                List<ClassListModel.DataBean.ListBean> listBeans = dataBean.getList();
-                                if (listBeans != null) {
-                                    for (ClassListModel.DataBean.ListBean listBean : listBeans) {
-                                        mClassList.add(listBean);
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            ClassListModel classListModel = GsonHelper.fromJson(responseStr, ClassListModel.class);
+                            if (classListModel != null && classListModel.getCode() == 200) {
+                                ClassListModel.DataBean dataBean = classListModel.getData();
+                                if (dataBean != null) {
+                                    List<ClassListModel.DataBean.ListBean> listBeans = dataBean.getList();
+                                    if (listBeans != null) {
+                                        for (ClassListModel.DataBean.ListBean listBean : listBeans) {
+                                            mClassList.add(listBean);
+                                        }
                                     }
                                 }
                             }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            mView.onLoadFail(message);
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            mView.onLoadFail(message);
+                        } else {
+                            mView.onLoadFail("请求错误");
                         }
                     }
                     mView.onFetchedClassList(mClassList);
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -71,20 +85,33 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
-                        GoodsListModel goodsListModel = GsonHelper.fromJson(responseStr, GoodsListModel.class);
-                        if (goodsListModel != null && goodsListModel.getCode() == 200) {
-                            GoodsListModel.DataBean data = goodsListModel.getData();
-                            if (data != null) {
-                                List<GoodsListModel.DataBean.ListBean> list = data.getList();
-                                if (list != null && list.size() > 0) {
-                                    mView.onFetchDtkGoodsList(list);
-                                } else {
-                                    mView.onLoadMore(false);
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            GoodsListModel goodsListModel = GsonHelper.fromJson(responseStr, GoodsListModel.class);
+                            if (goodsListModel != null && goodsListModel.getCode() == 200) {
+                                GoodsListModel.DataBean data = goodsListModel.getData();
+                                if (data != null) {
+                                    List<GoodsListModel.DataBean.ListBean> list = data.getList();
+                                    if (list != null && list.size() > 0) {
+                                        mView.onFetchDtkGoodsList(list);
+                                    } else {
+                                        mView.onLoadMore(false);
+                                    }
                                 }
                             }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            mView.onLoadFail(message);
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            mView.onLoadFail(message);
+                        } else {
+                            mView.onLoadFail("请求错误");
                         }
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -104,15 +131,28 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
-                        if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
-                            FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
-                            if (data != null) {
-                                FriendPopDetailModel.DataBean.EntityBean entity = data.getEntity();
-                                mView.onGetFriendPopDetail(entity);
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            FriendPopDetailModel friendPopDetailModel = GsonHelper.fromJson(responseStr, FriendPopDetailModel.class);
+                            if (friendPopDetailModel != null && friendPopDetailModel.getCode() == 200) {
+                                FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
+                                if (data != null) {
+                                    FriendPopDetailModel.DataBean.EntityBean entity = data.getEntity();
+                                    mView.onGetFriendPopDetail(entity);
+                                }
                             }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            mView.onLoadFail(message);
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            mView.onLoadFail(message);
+                        } else {
+                            mView.onLoadFail("请求错误");
                         }
                     } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -121,7 +161,6 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mView.onHideLoading();
             }
         });
     }
@@ -134,15 +173,28 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        TaowordsModel taowordsModel = GsonHelper.fromJson(responseStr, TaowordsModel.class);
-                        if (taowordsModel != null && taowordsModel.getCode() == 200) {
-                            TaowordsModel.DataBeanX data = taowordsModel.getData();
-                            if (data != null) {
-                                String tkl = data.getTkl();
-                                mView.onGetTaowords(tkl);
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            TaowordsModel taowordsModel = GsonHelper.fromJson(responseStr, TaowordsModel.class);
+                            if (taowordsModel != null && taowordsModel.getCode() == 200) {
+                                TaowordsModel.DataBeanX data = taowordsModel.getData();
+                                if (data != null) {
+                                    String tkl = data.getTkl();
+                                    mView.onGetTaowords(tkl);
+                                }
                             }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            mView.onLoadFail(message);
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            mView.onLoadFail(message);
+                        } else {
+                            mView.onLoadFail("请求错误");
                         }
                     } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }

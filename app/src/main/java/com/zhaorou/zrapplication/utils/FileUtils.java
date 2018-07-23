@@ -16,17 +16,17 @@ public class FileUtils {
     public static int i = 0;
 
     //根据网络图片url路径保存到本地
-    public static final File saveImageToSdCard(Context context, String image) {
+    public static final File saveImageToSdCard(File fileDir, String image) {
         boolean success = false;
         File file = null;
         try {
-            file = createStableImageFile(context);
+            file = createStableImageFile(fileDir);
 
-            Bitmap bitmap = null;
+            Bitmap bitmap;
             URL url = new URL(image);
-            HttpURLConnection conn = null;
+            HttpURLConnection conn;
             conn = (HttpURLConnection) url.openConnection();
-            InputStream is = null;
+            InputStream is;
             is = conn.getInputStream();
             bitmap = BitmapFactory.decodeStream(is);
 
@@ -49,10 +49,10 @@ public class FileUtils {
     }
 
     //创建本地保存路径
-    public static File createStableImageFile(Context context) throws IOException {
+    public static File createStableImageFile(File fileDir) throws IOException {
         i++;
         String imageFileName = IMAGE_NAME + i + ".jpg";
-        File storageDir = context.getExternalCacheDir();
+        File storageDir = fileDir;
         File image = new File(storageDir, imageFileName);
         return image;
     }

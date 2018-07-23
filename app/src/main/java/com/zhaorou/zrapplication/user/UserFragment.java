@@ -145,6 +145,11 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         startActivity(new Intent(getActivity(), LoginActivity.class));
     }
 
+    @Override
+    public void onLoadFail(String str) {
+        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+    }
+
     private void getUserInfo() {
         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         if (TextUtils.isEmpty(token)) {

@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.home.CategoryActivity;
 import com.zhaorou.zrapplication.home.HomeVPItemFragment;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
@@ -74,6 +76,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     private GoodsListModel.DataBean.ListBean mGoodsBean;
     private String mShareType;
     private String mTaoword;
+    private String mTkl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,22 +117,52 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     }
 
     @Override
+    public void onLoadFail(String str) {
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onGetTaowords(String tkl) {
-        String tklType = SPreferenceUtil.getString(SearchActivity.this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
-        String title = mGoodsBean.getTitle();
+        mTkl = tkl;
+        String tklType = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
-        String content = mGoodsBean.getQuan_guid_content();
+
         if (TextUtils.equals(mShareType, "TKL")) {
-            shareTKL(tkl, tklType, title, goods_name, price, price_after_coupons);
+            shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
         }
         if (TextUtils.equals(mShareType, "WX")) {
-            shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
+            getFriendPop();
         }
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
-            shareWX(tkl, tklType, goods_name, price, price_after_coupons, content);
+            getFriendPop();
         }
+    }
+
+    private void getFriendPop() {
+        Map<String, String> params = new HashMap<>();
+        params.put("goods_id", mGoodsBean.getGoods_id());
+        mPresenter.getFriendPopDetail(params);
+    }
+
+
+    private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
+
+        String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
+                price_after_coupons + "\n" +
+                "--------抢购方式--------" + "\n";
+        if (TextUtils.equals(tklType, "1")) {
+            taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
+        } else if (TextUtils.equals(tklType, "2")) {
+            String pic = mGoodsBean.getPic();
+            String str = "https://wenan001.kuaizhan.com/?taowords=";
+            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+        }
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("tkl", taoword);
+        cm.setPrimaryClip(clipData);
+        Toast.makeText(this, "淘口令已复制", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -138,8 +171,36 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     }
 
     private void shareFriendPopToWx(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+        String tklType = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+        String goods_name = mGoodsBean.getGoods_name();
+        String price = mGoodsBean.getPrice();
+        String price_after_coupons = mGoodsBean.getPrice_after_coupons();
+        String content = mGoodsBean.getQuan_guid_content();
+        if (entityBean != null) {
+            content = entityBean.getContent();
+        }
+        if (TextUtils.equals(mShareType, "WX")) {
+            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+            if (TextUtils.equals(tklType, "1")) {
+                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
+            } else if (TextUtils.equals(tklType, "2")) {
+                String pic = mGoodsBean.getPic();
+                String str = "https://wenan001.kuaizhan.com/?taowords=";
+                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+            }
+        } else {
+            mTaoword = content;
+        }
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
+        cm.setPrimaryClip(clipData);
+        Toast.makeText(this, "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
+            list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
             String imageStr = entityBean.getImage();
             if (!TextUtils.isEmpty(imageStr)) {
                 if (imageStr.contains("#")) {
@@ -150,10 +211,8 @@ public class SearchActivity extends BaseActivity implements ISearchView {
                 } else {
                     list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
                 }
-            } else {
-                list.add(mGoodsBean.getPic());
             }
-        } else {
+        }else{
             list.add(mGoodsBean.getPic());
         }
 
@@ -162,7 +221,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
             @Override
             public void run() {
                 for (String imgUrl : list) {
-                    File file = FileUtils.saveImageToSdCard(SearchActivity.this, imgUrl);
+                    File file = FileUtils.saveImageToSdCard(getExternalCacheDir(), imgUrl);
                     fileList.add(file);
                 }
                 Intent intent = new Intent();
@@ -185,45 +244,6 @@ public class SearchActivity extends BaseActivity implements ISearchView {
                 startActivity(intent);
             }
         }).start();
-    }
-
-    private void shareWX(String tkl, String tklType, String goods_name, String price, String price_after_coupons, String content) {
-        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
-        if (TextUtils.equals(tklType, "1")) {
-            mTaoword = mTaoword + "复制本信息" + tkl + "打开淘宝即可获取";
-        } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            mTaoword = mTaoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
-        }
-        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
-        cm.setPrimaryClip(clipData);
-        Toast.makeText(this, "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
-
-        Map<String, String> params = new HashMap<>();
-        params.put("goods_id", mGoodsBean.getGoods_id());
-        mPresenter.getFriendPopDetail(params);
-    }
-
-    private void shareTKL(String tkl, String tklType, String title, String goods_name, String price, String price_after_coupons) {
-
-        String taoword = title + "\n" + goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
-        if (TextUtils.equals(tklType, "1")) {
-            taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
-        } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + pic;
-        }
-        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText("tkl", taoword);
-        cm.setPrimaryClip(clipData);
-        Toast.makeText(this, "淘口令已复制", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -344,7 +364,6 @@ public class SearchActivity extends BaseActivity implements ISearchView {
 
     private class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
-        private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
         @NonNull
         @Override

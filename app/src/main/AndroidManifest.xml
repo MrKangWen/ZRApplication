@@ -20,11 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data
-            android:name="PGYER_APPID"
-            android:value="048867734e15ece8f714b933189a0dad">
-        </meta-data>
-
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">

@@ -20,6 +20,8 @@ import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -109,19 +111,32 @@ public class LoginActivity extends BaseActivity {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        WXUserInfoModel wxUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
-                        if (wxUserInfoModel != null && wxUserInfoModel.getCode() == 200) {
-                            String token = wxUserInfoModel.getData().getToken();
-                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
-                            String pid = wxUserInfoModel.getData().getUser().getPid();
-                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
-                            String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
-                            SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
-                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                            finish();
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        int code = jsonObj.optInt("code");
+                        if (code == 200) {
+                            WXUserInfoModel wxUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
+                            if (wxUserInfoModel != null && wxUserInfoModel.getCode() == 200) {
+                                String token = wxUserInfoModel.getData().getToken();
+                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
+                                String pid = wxUserInfoModel.getData().getUser().getPid();
+                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
+                                String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
+                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
+                                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "请求错误", Toast.LENGTH_SHORT).show();
                         }
-                        finish();
                     } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }

@@ -96,14 +96,6 @@
                             android:layout_height="60dp"
                             android:scaleType="centerCrop"/>
 
-                        <ImageView
-                            android:id="@+id/perfet_wx_circle_dialog_delete_market_img_iv"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="top|right"
-                            android:src="@mipmap/icon_delete_pic"
-                            android:visibility="gone"/>
-
                     </FrameLayout>
 
                     <com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView
@@ -124,17 +116,17 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/perfect_wx_circle_dialog_btn_copy_words"
+                        android:id="@+id/perfect_wx_circle_dialog_btn_share_wx"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="1.5"
                         android:background="@drawable/selector_rect_redbg_corners4"
                         android:gravity="center"
                         android:paddingBottom="8dp"
                         android:paddingLeft="12dp"
                         android:paddingRight="12dp"
                         android:paddingTop="8dp"
-                        android:text="复制文案"
+                        android:text="分享朋友圈"
                         android:textColor="@android:color/white"
                         android:textSize="12sp"/>
 
@@ -143,7 +135,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:layout_weight="1"
+                        android:layout_weight="1.5"
                         android:background="@drawable/selector_rect_redbg_corners4"
                         android:gravity="center"
                         android:paddingBottom="8dp"
@@ -266,41 +258,19 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
-                                android:background="@drawable/selector_rect_redbg_corners4"
+                                android:background="@drawable/selector_submit_friend_pop"
                                 android:gravity="center"
                                 android:paddingBottom="4dp"
                                 android:paddingLeft="12dp"
                                 android:paddingRight="12sp"
                                 android:paddingTop="4dp"
                                 android:text="提交"
-                                android:textColor="@android:color/white"/>
+                                android:textColor="@color/colorGray_999999"/>
                         </RelativeLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/perfect_wx_dialog_loading_ll"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorGray_80F5F5F5"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="正在加载..."
-            android:textColor="@color/colorGray_666666"
-            android:textSize="12sp"/>
     </LinearLayout>
 
     <FrameLayout
@@ -328,4 +298,26 @@
                 android:src="@mipmap/ic_back"/>
         </RelativeLayout>
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/perfect_wx_dialog_loading_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorGray_80F5F5F5"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="正在加载..."
+            android:textColor="@color/colorGray_666666"
+            android:textSize="12sp"/>
+    </LinearLayout>
 </FrameLayout>

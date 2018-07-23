@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <FrameLayout
@@ -18,7 +19,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="搜索"
+            android:textColor="@color/ColorMainText"
+            android:textSize="14sp"/>
     </FrameLayout>
 
     <TextView
@@ -26,5 +31,26 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="title"/>
+        android:text="title"
+        android:textColor="@color/ColorMainText"
+        android:textSize="18sp"/>
+
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="取消"
+            android:textColor="@color/ColorMainText"
+            android:textSize="14sp"/>
+    </FrameLayout>
 </LinearLayout>

@@ -1,24 +1,32 @@
 package com.zhaorou.zrapplication.home.dialog;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.AndroidException;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.ScaleAnimation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -26,6 +34,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseDialog;
 import com.zhaorou.zrapplication.base.GlideApp;
@@ -40,6 +51,8 @@ import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.utils.DataStorageDirectoryHelper;
+import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -47,8 +60,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +75,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,7 +103,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private String mMarketImageUrl = "";
     private ImageView mMarketImgIv;
     private GoodsListModel.DataBean.ListBean mGoodsBean;
-    private ImageView mDeleMarketImg;
     private LinearLayout mHasFriendPopLl;
     private LinearLayout mNoFriendPop;
     private TextView mBtnCopyWords;
@@ -114,6 +130,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private TextView mDialogTitle;
     private MultipleImageAdapter mMultipleImageAdapter;
     private FrameLayout mPreviewImgLayout;
+    private FriendPopDetailModel.DataBean.EntityBean mEntityBean;
 
 
     public PerfectWXCircleDialog(@NonNull Context context) {
@@ -152,23 +169,23 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 intent1.putStringArrayListExtra("images", mImagesList);
                 mContext.startActivity(intent1);
                 break;
-            case R.id.perfet_wx_circle_dialog_delete_market_img_iv:
-                mMarketImgIv.setImageResource(0);
-                mDeleMarketImg.setVisibility(View.GONE);
-                mMarketImageUrl = "";
-                break;
             case R.id.perfect_wx_circle_dialog_btn_cancel:
                 dismiss();
                 break;
             case R.id.perfect_wx_circle_dialog_btn_submit:
-                onShowLoading();
-                uploadMarketImage();
+                if (TextUtils.isEmpty(mMarketImageUrl)) {
+                    Toast.makeText(mContext, "请添加主营销图", Toast.LENGTH_SHORT).show();
+                } else if (mImagesList == null || mImagesList.size() < 3) {
+                    Toast.makeText(mContext, "至少添加3张晒图", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mContentEt.getText().toString())) {
+                    Toast.makeText(mContext, "请填写文案内容", Toast.LENGTH_SHORT).show();
+                } else {
+                    onShowLoading();
+                    uploadMarketImage();
+                }
                 break;
-            case R.id.perfect_wx_circle_dialog_btn_copy_words:
-                ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("words", mContentEt.getText().toString());
-                cm.setPrimaryClip(clipData);
-                Toast.makeText(mContext, "文案已复制", Toast.LENGTH_SHORT).show();
+            case R.id.perfect_wx_circle_dialog_btn_share_wx:
+                shareFriendPopToWx();
                 break;
             case R.id.perfect_wx_circle_dialog_btn_edit_words:
                 mContentEt.setFocusable(true);
@@ -206,7 +223,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             ImageModel imageModel = imageModelList.get(imageModelList.size() - 1);
             String path = imageModel.getPath();
             mMarketImageUrl = path;
-            mDeleMarketImg.setVisibility(View.VISIBLE);
             GlideApp.with(getContext()).asBitmap().load(path).into(mMarketImgIv);
         }
         if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
@@ -216,6 +232,13 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 if (!mImagesList.contains(path)) {
                     mImagesList.add(path);
                 }
+            }
+            if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
+                mBtnSubmit.setEnabled(false);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
+            } else {
+                mBtnSubmit.setEnabled(true);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
             }
             mImagesAdapter.notifyDataSetChanged("picker");
         }
@@ -375,8 +398,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mLoadingLayout = findViewById(R.id.perfect_wx_dialog_loading_ll);
         mLoadingLayout.setOnClickListener(this);
 
-        mDeleMarketImg = findViewById(R.id.perfet_wx_circle_dialog_delete_market_img_iv);
-        mDeleMarketImg.setOnClickListener(this);
 
         mBtnAddMainImage = findViewById(R.id.perfect_wx_circle_dialog_btn_add_main_image);
         mBtnAddMainImage.setOnClickListener(this);
@@ -386,6 +407,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
         mBtnSubmit = findViewById(R.id.perfect_wx_circle_dialog_btn_submit);
         mBtnSubmit.setOnClickListener(this);
+        mBtnSubmit.setEnabled(false);
 
         mBtnCancel = findViewById(R.id.perfect_wx_circle_dialog_btn_cancel);
         mBtnCancel.setOnClickListener(this);
@@ -393,7 +415,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mContentEt = findViewById(R.id.perfect_wx_circle_dialog_content_et);
         mHasFriendPopLl = findViewById(R.id.perfect_wx_circle_dialog_has_friendpop);
         mNoFriendPop = findViewById(R.id.perfect_wx_circle_dialog_no_friendpop);
-        mBtnCopyWords = findViewById(R.id.perfect_wx_circle_dialog_btn_copy_words);
+        mBtnCopyWords = findViewById(R.id.perfect_wx_circle_dialog_btn_share_wx);
         mBtnCopyWords.setOnClickListener(this);
         mBtnEditWords = findViewById(R.id.perfect_wx_circle_dialog_btn_edit_words);
         mBtnEditWords.setOnClickListener(this);
@@ -477,6 +499,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 }
             }
             mImagesAdapter.notifyDataSetChanged("server");
+
+            if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
+                mBtnSubmit.setEnabled(false);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
+            } else {
+                mBtnSubmit.setEnabled(true);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
+            }
         }
     }
 
@@ -498,6 +528,59 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     @Override
     public void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean) {
         setFriendPopDetail(entityBean);
+        mEntityBean = entityBean;
+    }
+
+    private void shareFriendPopToWx() {
+
+        final String content = mContentEt.getText().toString();
+        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("taoword", content);
+        cm.setPrimaryClip(clipData);
+        Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
+        final List<String> list = new ArrayList<>();
+        if (mEntityBean != null) {
+            String marketImage = mEntityBean.getMarket_image();
+            list.add(ZRDConstants.HttpUrls.BASE_URL + marketImage);
+            String imageStr = mEntityBean.getImage();
+            if (!TextUtils.isEmpty(imageStr)) {
+                if (imageStr.contains("#")) {
+                    String[] imageArray = imageStr.split("#");
+                    for (String img : imageArray) {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                    }
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                }
+            }
+        }else{
+            list.add(mGoodsBean.getPic());
+        }
+
+        final List<File> fileList = new ArrayList<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (String imgUrl : list) {
+                    File file = FileUtils.saveImageToSdCard(getContext().getExternalCacheDir(), imgUrl);
+                    fileList.add(file);
+                }
+                Intent intent = new Intent();
+                ComponentName comp;
+                comp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI");
+                intent.putExtra("Kdescription", content);
+                intent.setComponent(comp);
+                intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                intent.setType("image/*");
+                ArrayList<Uri> imgUriList = new ArrayList<>();
+                for (File file : fileList) {
+                    imgUriList.add(Uri.fromFile(file));
+                }
+                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
+                mContext.startActivity(intent);
+            }
+        }).start();
     }
 
     @Override
@@ -518,6 +601,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     @Override
     public void onLoginTimeout() {
 
+    }
+
+    @Override
+    public void onLoadFail(String str) {
+        Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
     }
 
     private class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
@@ -543,15 +631,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             if (TextUtils.equals(imageFrom, "server")) {
                 imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageUrl;
             }
-            GlideApp.with(getContext()).asBitmap().override(80).load(imageUrl).into(holder.mImageView);
-            final String finalImageUrl = imageUrl;
-            holder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mImagesList.remove(finalImageUrl);
-                    mImagesAdapter.notifyDataSetChanged();
-                }
-            });
+            GlideApp.with(getContext()).asBitmap().override(50).load(imageUrl).into(holder.mImageView);
             holder.mImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -572,12 +652,10 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private class ImagesViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView mImageView;
-        private ImageView mBtnDelete;
 
         public ImagesViewHolder(View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.item_wx_circle_dialog_img_iv);
-            mBtnDelete = itemView.findViewById(R.id.item_wx_circle_dialog_delete_icon);
         }
     }
 
@@ -591,9 +669,17 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         @NonNull
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            final String imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageList.get(position);
             View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
             ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
-            GlideApp.with(getContext()).asBitmap().load(ZRDConstants.HttpUrls.BASE_URL + imageList.get(position)).override(500, 500).into(imageView);
+            GlideApp.with(getContext()).asBitmap().load(imageUrl).override(500, 500).into(imageView);
+            TextView btnSaveImage = view.findViewById(R.id.iv_multiple_preview_item_btn_save_image);
+            btnSaveImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new SaveImageAsync(imageUrl).execute();
+                }
+            });
             container.addView(view);
             return view;
         }
@@ -611,6 +697,38 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((View) object);
+        }
+    }
+
+    private class SaveImageAsync extends AsyncTask<String, File, File> {
+
+        private String imageUrl;
+
+        public SaveImageAsync(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        @Override
+        protected File doInBackground(String... strings) {
+            File file = FileUtils.saveImageToSdCard(DataStorageDirectoryHelper.getExternalPublicDcimDir(), imageUrl);
+            return file;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            onShowLoading();
+        }
+
+
+        @Override
+        protected void onPostExecute(File file) {
+            super.onPostExecute(file);
+            if (file != null && file.exists()) {
+                Toast.makeText(mContext, "图片保存成功", Toast.LENGTH_SHORT).show();
+            }
+            onHideLoading();
         }
     }
 }

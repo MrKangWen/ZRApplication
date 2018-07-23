@@ -11,6 +11,9 @@ import com.zhaorou.zrapplication.user.model.PidModel;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
 import com.zhaorou.zrapplication.utils.GsonHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,15 +72,25 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
-                        PidModel pidModel = GsonHelper.fromJson(responseStr, PidModel.class);
-                        if (pidModel != null && pidModel.getCode() == 200) {
-                            mView.onUpdatedPid();
-                        }
-                        if (pidModel != null && pidModel.getCode() == 401) {
-                            mView.onLoginTimeout();
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            PidModel pidModel = GsonHelper.fromJson(responseStr, PidModel.class);
+                            if (pidModel != null && pidModel.getCode() == 200) {
+                                mView.onUpdatedPid();
+                            }
+                        } else if (!jsonObj.isNull("message")) {
+                            String message = jsonObj.optString("message");
+                            mView.onLoadFail(message);
+                        } else if (!jsonObj.isNull("msg")) {
+                            String message = jsonObj.optString("msg");
+                            mView.onLoadFail(message);
+                        } else {
+                            mView.onLoadFail("请求错误");
                         }
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
