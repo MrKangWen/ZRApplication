@@ -1,5 +1,7 @@
 package com.zhaorou.zrapplication.home.presenter;
 
+import android.util.Log;
+
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
@@ -183,14 +185,9 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                                     mView.onGetTaowords(tkl);
                                 }
                             }
-                        } else if (!jsonObj.isNull("message")) {
-                            String message = jsonObj.optString("message");
+                        } else if (!jsonObj.isNull("data")) {
+                            String message = jsonObj.optString("data");
                             mView.onLoadFail(message);
-                        } else if (!jsonObj.isNull("msg")) {
-                            String message = jsonObj.optString("msg");
-                            mView.onLoadFail(message);
-                        } else {
-                            mView.onLoadFail("请求错误");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -202,7 +199,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                mView.onLoadFail("网络请求失败");
             }
         });
     }

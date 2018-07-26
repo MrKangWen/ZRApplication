@@ -121,8 +121,15 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     dismiss();
                     break;
                 case 1:
-                    mFragment.onLoginTimeout();
+                    Bundle bundle = msg.getData();
+                    if (bundle != null) {
+                        String data = bundle.getString("data");
+                        mFragment.onLoadFail(data);
+                    }
                     dismiss();
+                    break;
+                case 2:
+                    mFragment.onLoadFail("网络请求失败");
                     break;
             }
         }
@@ -258,9 +265,18 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                         try {
                             if (response != null && response.body() != null) {
                                 String responseStr = response.body().string();
-                                JSONObject jsonObject = new JSONObject(responseStr);
-                                if (jsonObject != null && jsonObject.optInt("code") == 200) {
-                                    mMarketImageUrl = jsonObject.optString("data");
+                                JSONObject jsonObj = new JSONObject(responseStr);
+                                if (jsonObj != null && jsonObj.optInt("code") == 200) {
+                                    mMarketImageUrl = jsonObj.optString("data");
+                                } else if (!jsonObj.isNull("data")) {
+                                    String data = jsonObj.optString("data");
+                                    Message message = new Message();
+                                    message.what = 1;
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("data", data);
+                                    message.setData(bundle);
+                                    mHandler.sendMessage(message);
+
                                 }
                             }
 
@@ -334,7 +350,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         } else {
             saveFriendPop(null);
         }
-
     }
 
     private void saveFriendPop(List<String> uploadList) {
@@ -368,10 +383,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                         JSONObject jsonObj = new JSONObject(str);
                         if (jsonObj.optInt("code") == 200) {
                             mHandler.sendEmptyMessage(0);
-                        }
-                        if (jsonObj.optInt("code") == 401) {
-                            mHandler.sendEmptyMessage(1);
-
+                        } else if (!jsonObj.isNull("data")) {
+                            String data = jsonObj.optString("data");
+                            Message message = new Message();
+                            message.what = 1;
+                            Bundle bundle = new Bundle();
+                            bundle.putString("data", data);
+                            message.setData(bundle);
+                            mHandler.sendMessage(message);
                         }
                     }
                 } catch (IOException e) {
@@ -383,6 +402,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mHandler.sendEmptyMessage(2);
             }
         });
     }
@@ -554,7 +574,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
                 }
             }
-        }else{
+        } else {
             list.add(mGoodsBean.getPic());
         }
 
