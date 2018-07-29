@@ -74,7 +74,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@mipmap/icon_level"/>
+                android:src="@drawable/icon_level"/>
 
             <TextView
                 android:id="@+id/fragment_user_level_tv"
@@ -137,7 +137,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@mipmap/icon_bind_pid"/>
+            android:src="@drawable/icon_bind_pid"/>
 
         <TextView
             android:layout_width="0dp"
@@ -150,7 +150,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@mipmap/icon_next"/>
+            android:src="@drawable/icon_next"/>
     </LinearLayout>
 
     <TextView
@@ -171,7 +171,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@mipmap/icon_settings"/>
+            android:src="@drawable/icon_settings"/>
 
         <TextView
             android:layout_width="0dp"
@@ -184,7 +184,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@mipmap/icon_next"/>
+            android:src="@drawable/icon_next"/>
     </LinearLayout>
 
     <TextView

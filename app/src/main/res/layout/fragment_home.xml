@@ -33,7 +33,7 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="10dp"
-                    android:src="@mipmap/icon_home_search"/>
+                    android:src="@drawable/icon_home_search"/>
 
                 <TextView
                     android:id="@+id/fragment_home_layout_title_search_et"
@@ -75,7 +75,7 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/icon_home_menu"
+                    android:src="@drawable/icon_home_menu"
                     android:visibility="visible"/>
             </FrameLayout>
         </LinearLayout>

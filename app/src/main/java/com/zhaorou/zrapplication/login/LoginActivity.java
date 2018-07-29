@@ -82,7 +82,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void initTitleBar() {
-        mTitleLeftIconIv.setImageResource(R.mipmap.icon_x);
+        mTitleLeftIconIv.setImageResource(R.drawable.icon_x);
         mTitleLeftIconIv.setVisibility(View.VISIBLE);
         mTitleRightTextTv.setText("注册");
         mTitleRightTextTv.setVisibility(View.VISIBLE);

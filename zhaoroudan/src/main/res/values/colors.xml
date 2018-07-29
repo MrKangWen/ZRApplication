@@ -4,6 +4,12 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="ColorMainText">#333333</color>
-    <color name="ColorSubText">#999999</color>
+    <color name="colorMainText">#333333</color>
+    <color name="colorSubText">#999999</color>
+    <color name="colorRedText">#FF2200</color>
+    <color name="colorGrayBg">#F5F5F5</color>
+    <color name="colorDivider">#F0F0F0</color>
+    <color name="colorPink">#FFEBE8</color>
+    <color name="colorGreen">#04BE02</color>
+    <color name="colorYellow">#FFD930</color>
 </resources>

@@ -186,7 +186,7 @@
                                 android:id="@+id/perfect_wx_circle_dialog_btn_add_main_image"
                                 android:layout_width="65dp"
                                 android:layout_height="65dp"
-                                android:src="@mipmap/icon_add_pic"/>
+                                android:src="@drawable/icon_add_pic"/>
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -209,7 +209,7 @@
                                 android:id="@+id/perfect_wx_circle_dialog_btn_add_images"
                                 android:layout_width="65dp"
                                 android:layout_height="65dp"
-                                android:src="@mipmap/icon_add_pic"/>
+                                android:src="@drawable/icon_add_pic"/>
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -295,7 +295,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_back"/>
+                android:src="@drawable/ic_back"/>
         </RelativeLayout>
     </FrameLayout>
 

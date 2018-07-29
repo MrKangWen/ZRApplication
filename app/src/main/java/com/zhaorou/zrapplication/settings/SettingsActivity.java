@@ -46,9 +46,9 @@ public class SettingsActivity extends BaseActivity {
 
         mLinkTao = SPreferenceUtil.getString(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         if (TextUtils.equals(mLinkTao, "2")) {
-            mBtnLinkTao.setImageResource(R.mipmap.icon_toggle_on);
+            mBtnLinkTao.setImageResource(R.drawable.icon_toggle_on);
         } else if (TextUtils.equals(mLinkTao, "1")) {
-            mBtnLinkTao.setImageResource(R.mipmap.icon_toggle_off);
+            mBtnLinkTao.setImageResource(R.drawable.icon_toggle_off);
         }
     }
 
@@ -69,11 +69,11 @@ public class SettingsActivity extends BaseActivity {
                     Map<String, String> params = new HashMap<>();
                     if (TextUtils.equals(mLinkTao, "1")) {
                         SPreferenceUtil.put(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "2");
-                        mBtnLinkTao.setImageResource(R.mipmap.icon_toggle_on);
+                        mBtnLinkTao.setImageResource(R.drawable.icon_toggle_on);
                         params.put("tkl_type", "2");
                     } else if (TextUtils.equals(mLinkTao, "2")) {
                         SPreferenceUtil.put(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
-                        mBtnLinkTao.setImageResource(R.mipmap.icon_toggle_off);
+                        mBtnLinkTao.setImageResource(R.drawable.icon_toggle_off);
                         params.put("tkl_type", "1");
                     }
                     params.put("token", token);

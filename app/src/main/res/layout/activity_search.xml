@@ -31,7 +31,7 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="10dp"
-                    android:src="@mipmap/icon_home_search"/>
+                    android:src="@drawable/icon_home_search"/>
 
                 <EditText
                     android:id="@+id/activity_search_action_bar_search_et"

@@ -26,7 +26,7 @@
                 android:id="@+id/activity_settings_layout_title_left_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_back"/>
+                android:src="@drawable/ic_back"/>
         </RelativeLayout>
 
         <TextView
@@ -49,7 +49,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_back"/>
+                android:src="@drawable/ic_back"/>
         </RelativeLayout>
     </LinearLayout>
 
@@ -82,7 +82,7 @@
             android:id="@+id/activity_settings_btn_link_taoword"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@mipmap/icon_toggle_off"/>
+            android:src="@drawable/icon_toggle_off"/>
     </LinearLayout>
 
     <LinearLayout
@@ -109,7 +109,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@mipmap/icon_next"/>
+            android:src="@drawable/icon_next"/>
     </LinearLayout>
 
     <TextView

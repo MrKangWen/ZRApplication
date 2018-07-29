@@ -18,7 +18,7 @@
             android:layout_height="48dp"
             android:onClick="onClick"
             android:padding="12dp"
-            android:src="@mipmap/ic_back" />
+            android:src="@drawable/ic_back"/>
 
         <TextView
             android:id="@+id/tv_image_preview_center_text"

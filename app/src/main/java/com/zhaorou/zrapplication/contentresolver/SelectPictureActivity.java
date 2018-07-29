@@ -1,6 +1,5 @@
 package com.zhaorou.zrapplication.contentresolver;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,8 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -32,7 +29,6 @@ import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -347,9 +343,9 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             GlideApp.with(SelectPictureActivity.this).asBitmap().load(imagePath).override(500, 500).into(holder.mImageIv);
             final boolean selected = mImageModelList.get(position).isSelected();
             if (selected) {
-                holder.mSelectedStateIv.setImageResource(R.mipmap.ic_select);
+                holder.mSelectedStateIv.setImageResource(R.drawable.ic_select);
             } else {
-                holder.mSelectedStateIv.setImageResource(R.mipmap.ic_not_select);
+                holder.mSelectedStateIv.setImageResource(R.drawable.ic_not_select);
             }
         }
 

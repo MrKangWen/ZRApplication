@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".home.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/layout_search_title"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs_layout_home_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </android.support.design.widget.TabLayout>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/view_pager_home_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </android.support.v4.view.ViewPager>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/class_layout_home_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#50000000"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@color/colorPink"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="全部分类"
+                        android:textColor="@color/colorMainText"/>
+
+                    <TextView
+                        android:id="@+id/btn_close_class_layout_home_fragment"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/colorGreen"/>
+                </LinearLayout>
+
+                <com.zhaoroudan.widget.recyclerview.CustomRecyclerView
+                    android:id="@+id/class_recycler_view_home_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white">
+
+                </com.zhaoroudan.widget.recyclerview.CustomRecyclerView>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

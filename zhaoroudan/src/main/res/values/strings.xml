@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">zhaoroudan</string>
+    <string name="app_name">找肉单</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
 </resources>
