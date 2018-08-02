@@ -7,5 +7,7 @@ public interface IUserFragmentView extends IBaseMvpView {
 
     void onFetchedUserInfo(UserInfoModel.DataBean.UserBean userBean);
 
-    void onUpdatedPid();
+    void onUpdatedPid(String pid);
+
+    void onUpdatedTaoSession(String taoSession);
 }

@@ -8,13 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -27,14 +27,13 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
-import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
@@ -73,6 +72,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
     private String mShareType;
     private String mTaoword;
     private String mTkl;
+    private LoadingDialog mLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +80,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         setContentView(R.layout.activity_category);
         ButterKnife.bind(this);
         mPresenter.attachView(this);
+        mLoadingDialog = new LoadingDialog(this);
         initIntent();
         initLayoutTitle();
         initSwipLayout();
@@ -160,7 +161,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
                     list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
                 }
             }
-        }else{
+        } else {
             list.add(mGoodsBean.getPic());
         }
 
@@ -245,7 +246,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
 
     @Override
     public void onShowLoading() {
-
+        mLoadingDialog.show();
     }
 
     @Override
@@ -253,12 +254,14 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
-    }
-
-    @Override
-    public void onLoginTimeout() {
-        Toast.makeText(this, "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, LoginActivity.class));
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
     @OnClick({R.id.activity_category_layout_title_left_btn_rl})

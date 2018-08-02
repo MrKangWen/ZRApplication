@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
@@ -37,13 +38,14 @@ public class SettingsActivity extends BaseActivity {
     ImageView mBtnLinkTao;
 
     private String mLinkTao;
+    private LoadingDialog mLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
-
+        mLoadingDialog = new LoadingDialog(this);
         mLinkTao = SPreferenceUtil.getString(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         if (TextUtils.equals(mLinkTao, "2")) {
             mBtnLinkTao.setImageResource(R.drawable.icon_toggle_on);
@@ -78,6 +80,7 @@ public class SettingsActivity extends BaseActivity {
                     }
                     params.put("token", token);
                     Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.UPDATE_TKL_TYPE, params);
+                    mLoadingDialog.show();
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -88,14 +91,9 @@ public class SettingsActivity extends BaseActivity {
                                     if (jsonObj != null && jsonObj.optInt("code") == 200) {
                                         String data = jsonObj.optString("data");
                                         Toast.makeText(SettingsActivity.this, data, Toast.LENGTH_SHORT).show();
-                                    } else if (!jsonObj.isNull("message")) {
-                                        String message = jsonObj.optString("message");
-                                        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-                                    } else if (!jsonObj.isNull("msg")) {
-                                        String message = jsonObj.optString("msg");
-                                        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(SettingsActivity.this, "请求错误", Toast.LENGTH_SHORT).show();
+                                        String data = jsonObj.optString("data");
+                                        Toast.makeText(SettingsActivity.this, data, Toast.LENGTH_SHORT).show();
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -103,11 +101,13 @@ public class SettingsActivity extends BaseActivity {
                                     e.printStackTrace();
                                 }
                             }
+                            mLoadingDialog.dismiss();
                         }
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                            Toast.makeText(SettingsActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                            mLoadingDialog.dismiss();
                         }
                     });
                 }

@@ -1,8 +1,5 @@
 package com.zhaorou.zrapplication.user.presenter;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
@@ -28,6 +25,7 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
     private static final String TAG = "UserFragmentPresenter";
 
     public void fetchUserInfo(String token) {
+        mView.onShowLoading();
         Map<String, String> params = new HashMap<>();
         params.put("token", token);
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_USER_INFO, params);
@@ -37,31 +35,37 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                 if (response != null && response.body() != null) {
                     try {
                         String responseStr = response.body().string();
-                        UserInfoModel userInfoModel = GsonHelper.fromJson(responseStr, UserInfoModel.class);
-                        if (userInfoModel != null && userInfoModel.getCode() == 200) {
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            UserInfoModel userInfoModel = GsonHelper.fromJson(responseStr, UserInfoModel.class);
                             UserInfoModel.DataBean data = userInfoModel.getData();
                             if (data != null && data.getUser() != null) {
                                 UserInfoModel.DataBean.UserBean user = data.getUser();
                                 mView.onFetchedUserInfo(user);
                             }
-                        }
-                        if (userInfoModel != null && userInfoModel.getCode() == 401) {
-                            mView.onLoginTimeout();
+                        } else {
+                            String data = jsonObj.optString("data");
+                            mView.onLoadFail(data);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
+                mView.onHideLoading();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                mView.onLoadFail("网络请求失败");
+                mView.onHideLoading();
             }
         });
     }
 
     public void bindPid(final String pid, String token) {
+        mView.onShowLoading();
         Map<String, String> params = new HashMap<>();
         params.put("pid", pid);
         params.put("token", token);
@@ -74,18 +78,10 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                         String responseStr = response.body().string();
                         JSONObject jsonObj = new JSONObject(responseStr);
                         if (jsonObj.optInt("code") == 200) {
-                            PidModel pidModel = GsonHelper.fromJson(responseStr, PidModel.class);
-                            if (pidModel != null && pidModel.getCode() == 200) {
-                                mView.onUpdatedPid();
-                            }
-                        } else if (!jsonObj.isNull("message")) {
-                            String message = jsonObj.optString("message");
-                            mView.onLoadFail(message);
-                        } else if (!jsonObj.isNull("msg")) {
-                            String message = jsonObj.optString("msg");
-                            mView.onLoadFail(message);
+                            mView.onUpdatedPid(pid);
                         } else {
-                            mView.onLoadFail("请求错误");
+                            String data = jsonObj.optString("data");
+                            mView.onLoadFail(data);
                         }
                     }
                 } catch (IOException e) {
@@ -93,10 +89,52 @@ public class UserFragmentPresenter extends BasePresenter<IUserFragmentView> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                mView.onHideLoading();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mView.onLoadFail("网络请求失败");
+                mView.onHideLoading();
+            }
+        });
+    }
+
+    public void bindTaoSession(final String taoSession, String token) {
+        mView.onShowLoading();
+        Map<String, String> params = new HashMap<>();
+        params.put("tao_session", taoSession);
+        params.put("token", token);
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.BIND_TAO_SESSION, params);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    if (response != null && response.body() != null) {
+                        String responseStr = response.body().string();
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            PidModel pidModel = GsonHelper.fromJson(responseStr, PidModel.class);
+                            if (pidModel != null && pidModel.getCode() == 200) {
+                                mView.onUpdatedTaoSession(taoSession);
+                            }
+                        } else {
+                            String data = jsonObj.optString("data");
+                            mView.onLoadFail(data);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mView.onHideLoading();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mView.onLoadFail("网络请求失败");
+                mView.onHideLoading();
             }
         });
     }

@@ -26,11 +26,11 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
-import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -84,6 +84,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     private List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
     private Handler mHandler = new Handler();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
+    private LoadingDialog mLoadingDialog;
 
     public HomeFragment() {
     }
@@ -94,6 +95,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_home, container, false);
             mUnbinder = ButterKnife.bind(this, mView);
+            mLoadingDialog = new LoadingDialog(getContext());
             initSwipLayout();
             initClassListRv();
             initViewPager();
@@ -144,17 +146,21 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     @Override
     public void onShowLoading() {
+        mLoadingDialog.show();
     }
 
     @Override
     public void onHideLoading() {
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
-    @Override
-    public void onLoginTimeout() {
-        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(getActivity(), LoginActivity.class));
-    }
 
     @Override
     public void onLoadMore(boolean hasMore) {

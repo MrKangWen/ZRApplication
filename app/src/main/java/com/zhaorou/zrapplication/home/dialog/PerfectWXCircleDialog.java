@@ -1,30 +1,23 @@
 package com.zhaorou.zrapplication.home.dialog;
 
-import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.AndroidException;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -34,9 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseDialog;
 import com.zhaorou.zrapplication.base.GlideApp;
@@ -60,11 +50,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,7 +62,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -95,7 +81,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private TextView mBtnCancel;
     private TextView mBtnSubmit;
     private CustomRecyclerView mRecyclerView;
-    private LinearLayout mLoadingLayout;
 
     private LinearLayoutManager mLayoutManager;
     private ImagesAdapter mImagesAdapter;
@@ -138,6 +123,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private MultipleImageAdapter mMultipleImageAdapter;
     private FrameLayout mPreviewImgLayout;
     private FriendPopDetailModel.DataBean.EntityBean mEntityBean;
+    private LoadingDialog mLoadingDialog;
 
 
     public PerfectWXCircleDialog(@NonNull Context context) {
@@ -157,6 +143,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         setContentView(R.layout.layout_perfect_wx_circle_dialog);
         EventBus.getDefault().register(this);
         mPresenter.attachView(this);
+        mLoadingDialog = new LoadingDialog(mContext);
         initViews();
     }
 
@@ -415,8 +402,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mUrlTv = findViewById(R.id.perfect_wx_circle_dialog_url_tv);
         mTitleTv = findViewById(R.id.perfect_wx_circle_dialog_title_tv);
         mMarketImgIv = findViewById(R.id.perfet_wx_circle_dialog_market_img_iv);
-        mLoadingLayout = findViewById(R.id.perfect_wx_dialog_loading_ll);
-        mLoadingLayout.setOnClickListener(this);
 
 
         mBtnAddMainImage = findViewById(R.id.perfect_wx_circle_dialog_btn_add_main_image);
@@ -506,7 +491,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
-            GlideApp.with(getContext()).asBitmap().load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl).into(mMarketImgIv);
+            GlideApp.with(getContext()).asBitmap().override(50).load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl).into(mMarketImgIv);
             String image = entityBean.getImage();
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
@@ -610,17 +595,19 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     @Override
     public void onShowLoading() {
-        mLoadingLayout.setVisibility(View.VISIBLE);
+        mLoadingDialog.show();
     }
 
     @Override
     public void onHideLoading() {
-        mLoadingLayout.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onLoginTimeout() {
-
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
     @Override

@@ -36,6 +36,7 @@
                 android:src="@drawable/icon_user_name"/>
 
             <EditText
+                android:id="@+id/phone_login_activity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -69,6 +70,7 @@
                 android:src="@drawable/icon_password"/>
 
             <EditText
+                android:id="@+id/password_login_activity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -88,6 +90,7 @@
             android:background="@color/colorGray_F0F0F0"/>
 
         <TextView
+            android:id="@+id/btn_login_login_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"

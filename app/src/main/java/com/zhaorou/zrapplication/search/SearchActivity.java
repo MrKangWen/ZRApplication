@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,7 +17,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -30,8 +30,7 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
-import com.zhaorou.zrapplication.home.CategoryActivity;
-import com.zhaorou.zrapplication.home.HomeVPItemFragment;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
@@ -77,6 +76,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     private String mShareType;
     private String mTaoword;
     private String mTkl;
+    private LoadingDialog mLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +84,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
         mPresenter.attachView(this);
+        mLoadingDialog = new LoadingDialog(this);
         initSearchEditText();
         initSwipLayout();
         initRecyclerView();
@@ -212,7 +213,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
                     list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
                 }
             }
-        }else{
+        } else {
             list.add(mGoodsBean.getPic());
         }
 
@@ -248,7 +249,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
 
     @Override
     public void onShowLoading() {
-
+        mLoadingDialog.show();
     }
 
     @Override
@@ -256,13 +257,16 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
-    @Override
-    public void onLoginTimeout() {
-        Toast.makeText(this, "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, LoginActivity.class));
-    }
 
     @OnClick({R.id.activity_search_action_bar_right_btn_fl})
     protected void onClick(View v) {

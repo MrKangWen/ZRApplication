@@ -2,7 +2,6 @@ package com.zhaorou.zrapplication.home;
 
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -10,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +29,7 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
@@ -79,6 +80,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private String mShareType;
     private String mTaoword;
     private String mTkl;
+    private LoadingDialog mLoadingDialog;
 
     public HomeVPItemFragment() {
     }
@@ -96,6 +98,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         if (arguments != null) {
             mGoodsType = arguments.getString("goods_type");
         }
+        mLoadingDialog = new LoadingDialog(getContext());
         initData();
         return mView;
     }
@@ -185,7 +188,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
                 }
             }
-        }else{
+        } else {
             list.add(mGoodsBean.getPic());
         }
 
@@ -265,18 +268,22 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     @Override
     public void onShowLoading() {
         HomeFragment.startRefresh();
+        mLoadingDialog.show();
     }
 
     @Override
     public void onHideLoading() {
         HomeFragment.finishRefresh();
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
-    @Override
-    public void onLoginTimeout() {
-        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(getActivity(), LoginActivity.class));
-    }
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {

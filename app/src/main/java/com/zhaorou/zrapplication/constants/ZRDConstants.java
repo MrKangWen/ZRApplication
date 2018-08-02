@@ -14,6 +14,8 @@ public class ZRDConstants {
         public static final String ADD_FRIEND_POP = "api/add_friendpop";
         public static final String GET_TAOBAO_TBK_TPWD = "api/get_taobao_tbk_tpwd";
         public static final String UPDATE_TKL_TYPE = "api/update_tkl_type";
+        public static final String BIND_TAO_SESSION = "api/update_tao_session";
+        public static final String LOGIN = "api/login";
     }
 
     public static class AppIds {

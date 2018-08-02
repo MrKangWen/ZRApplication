@@ -6,7 +6,5 @@ public interface IBaseMvpView {
 
     void onHideLoading();
 
-    void onLoginTimeout();
-
     void onLoadFail(String str);
 }

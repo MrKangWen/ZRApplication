@@ -3,6 +3,7 @@ package com.zhaorou.zrapplication.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,12 +17,12 @@ import android.widget.Toast;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.settings.SettingsActivity;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
-import com.zhaorou.zrapplication.widget.SimpleEditTextDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +50,9 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     private View mView;
     private Unbinder mUnbinder;
     private UserFragmentPresenter mPresenter = new UserFragmentPresenter();
-    private SimpleEditTextDialog mBindPidDialog;
+    private BindPidDialog mBindPidDialog;
+    private BindTaoSessionDialog mBindTaoSessionDialog;
+    private LoadingDialog mLoadingDialog;
 
     public UserFragment() {
     }
@@ -63,6 +66,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
             mUnbinder = ButterKnife.bind(this, mView);
         }
         mPresenter.attachView(this);
+        mLoadingDialog = new LoadingDialog(getContext());
         return mView;
     }
 
@@ -79,7 +83,8 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         mPresenter.detachView();
     }
 
-    @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll, R.id.fragment_use_setting_ll})
+    @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll, R.id.fragment_use_setting_ll,
+            R.id.fragment_user_get_tao_session, R.id.fragment_user_bind_tao_session})
     protected void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_user_user_info_ll:
@@ -91,9 +96,24 @@ public class UserFragment extends Fragment implements IUserFragmentView {
                     toLogin();
                 } else {
                     if (mBindPidDialog == null) {
-                        mBindPidDialog = new SimpleEditTextDialog(getContext(), mPresenter);
+                        mBindPidDialog = new BindPidDialog(getContext(), mPresenter);
                     }
                     mBindPidDialog.show();
+                }
+                break;
+            case R.id.fragment_user_get_tao_session:
+                Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
+                startActivityForResult(webViewIntent, 0);
+                break;
+            case R.id.fragment_user_bind_tao_session:
+                String token1 = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                if (TextUtils.isEmpty(token1)) {
+                    toLogin();
+                } else {
+                    if (mBindTaoSessionDialog == null) {
+                        mBindTaoSessionDialog = new BindTaoSessionDialog(getContext(), mPresenter);
+                    }
+                    mBindTaoSessionDialog.show();
                 }
                 break;
             case R.id.fragment_use_setting_ll:
@@ -124,26 +144,36 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     }
 
     @Override
-    public void onUpdatedPid() {
+    public void onUpdatedPid(String pid) {
+        SPreferenceUtil.put(getContext(), ZRDConstants.SPreferenceKey.SP_PID, pid);
         Toast.makeText(getContext(), "PID更新成功", Toast.LENGTH_SHORT).show();
         mBindPidDialog.dismiss();
     }
 
     @Override
-    public void onShowLoading() {
+    public void onUpdatedTaoSession(String taoSession) {
+        SPreferenceUtil.put(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, taoSession);
+        Toast.makeText(getContext(), "淘session绑定成功", Toast.LENGTH_SHORT).show();
+        mBindTaoSessionDialog.dismiss();
+    }
 
+    @Override
+    public void onShowLoading() {
+        mLoadingDialog.show();
     }
 
     @Override
     public void onHideLoading() {
-
+        if (mLoadingDialog != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadingDialog.dismiss();
+                }
+            }, 1500);
+        }
     }
 
-    @Override
-    public void onLoginTimeout() {
-        Toast.makeText(getContext(), "登录已过期，请重新登录", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(getActivity(), LoginActivity.class));
-    }
 
     @Override
     public void onLoadFail(String str) {
