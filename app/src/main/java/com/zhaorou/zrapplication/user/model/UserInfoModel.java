@@ -1,4 +1,4 @@
-package com.zhaorou.zhuanquan.user.model;
+package com.zhaorou.zrapplication.user.model;
 
 import java.util.List;
 
