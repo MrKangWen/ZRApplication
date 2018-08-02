@@ -1,4 +1,4 @@
-package com.zhaorou.zrapplication.widget.recyclerview;
+package com.zhaorou.zhuanquan.widget.recyclerview;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
