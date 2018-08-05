@@ -1,6 +1,7 @@
 package com.zhaorou.zrapplication.user;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -16,7 +17,7 @@ import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
-public class BindPidDialog extends BaseDialog implements View.OnClickListener {
+public class BindPidDialog extends BaseDialog implements View.OnClickListener, DialogInterface.OnShowListener {
 
     private Context mContext;
     private EditText mEditText;
@@ -33,18 +34,35 @@ public class BindPidDialog extends BaseDialog implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_simple_edittext_dialog);
-        String pid = SPreferenceUtil.getString(mContext, ZRDConstants.SPreferenceKey.SP_PID, "");
 
         ((TextView) findViewById(R.id.bind_dialog_title)).setText("绑定PID");
 
         mBtnOk = findViewById(R.id.bind_dialog_btn_ok);
         mBtnOk.setOnClickListener(this);
-        mBtnOk.setEnabled(false);
-
         mEditText = findViewById(R.id.bind_dialog_content_et);
+        setOnShowListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        updatePid();
+    }
+
+    private void updatePid() {
+        String pid = mEditText.getText().toString();
+        String token = SPreferenceUtil.getString(mContext, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+        mPresenter.bindPid(pid, token);
+    }
+
+    @Override
+    public void onShow(DialogInterface dialog) {
+        String pid = SPreferenceUtil.getString(mContext, ZRDConstants.SPreferenceKey.SP_PID, "");
         if (!TextUtils.isEmpty(pid)) {
             mEditText.setText(pid);
-            mEditText.setEnabled(true);
+            mEditText.setSelection(pid.length());
+            mBtnOk.setEnabled(true);
+        } else {
+            mBtnOk.setEnabled(false);
         }
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -66,16 +84,5 @@ public class BindPidDialog extends BaseDialog implements View.OnClickListener {
                 }
             }
         });
-    }
-
-    @Override
-    public void onClick(View v) {
-        updatePid();
-    }
-
-    private void updatePid() {
-        String pid = mEditText.getText().toString();
-        String token = SPreferenceUtil.getString(mContext, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-        mPresenter.bindPid(pid, token);
     }
 }
