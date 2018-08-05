@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorGray_F5F5F5"
+    android:orientation="vertical"
+    tools:context=".settings.SettingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/activity_settings_layout_title_left_btn_rl"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:padding="12dp">
+
+            <ImageView
+                android:id="@+id/activity_settings_layout_title_left_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/activity_settings_layout_title_center_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="设置"
+            android:textColor="@color/colorBlack_333333"
+            android:textSize="16sp"/>
+
+        <RelativeLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:visibility="invisible">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="淘口令链接版"
+            android:textColor="@color/colorBlack_333333"
+            android:textSize="14sp"/>
+
+        <ImageView
+            android:id="@+id/activity_settings_btn_link_taoword"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/icon_toggle_off"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_settings_version_info_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="版本信息"
+            android:textColor="@color/colorBlack_333333"
+            android:textSize="14sp"/>
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/icon_next"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/activity_settings_btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="64dp"
+        android:layout_marginRight="64dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/selector_rect_whitebg_redbor1_cor4"
+        android:gravity="center"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:text="退出登录"
+        android:textColor="@color/colorRed_FF2200"
+        android:textSize="14sp"/>
+</LinearLayout>

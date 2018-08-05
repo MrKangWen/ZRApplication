@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".home.HomeVPItemFragment">
+
+    <com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView
+        android:id="@+id/goods_list_fragment_home_vp_item_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView>
+
+</FrameLayout>

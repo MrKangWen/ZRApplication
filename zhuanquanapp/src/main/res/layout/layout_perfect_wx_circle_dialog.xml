@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="64dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/perfect_wx_circle_dialog_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_rect_redbg_topcorners10"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="完善朋友圈文案"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_rect_whitebg_bottomcorners10">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/perfect_wx_circle_dialog_url_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_rect_graybg_corners10"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="6dp"
+                    android:textColor="@color/colorBlack_333333"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/perfect_wx_circle_dialog_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_rect_graybg_corners10"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="6dp"
+                    android:textColor="@color/colorBlack_333333"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/perfect_wx_circle_dialog_content_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_rect_graybg_corners10"
+                    android:gravity="left|top"
+                    android:padding="10dp"
+                    android:textColor="@color/colorBlack_333333"
+                    android:textSize="12sp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="60dp"
+                        android:layout_height="60dp">
+
+                        <ImageView
+                            android:id="@+id/perfet_wx_circle_dialog_market_img_iv"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:scaleType="centerCrop"/>
+
+                    </FrameLayout>
+
+                    <com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView
+                        android:id="@+id/perfect_wx_circle_dialog_images_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="6dp">
+
+                    </com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/perfect_wx_circle_dialog_has_friendpop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/perfect_wx_circle_dialog_btn_share_wx"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:background="@drawable/selector_rect_redbg_corners4"
+                        android:gravity="center"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:paddingTop="8dp"
+                        android:text="分享朋友圈"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"/>
+
+                    <TextView
+                        android:id="@+id/perfect_wx_circle_dialog_btn_edit_words"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1.5"
+                        android:background="@drawable/selector_rect_redbg_corners4"
+                        android:gravity="center"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:paddingTop="8dp"
+                        android:text="更好文案"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"/>
+
+                    <TextView
+                        android:id="@+id/perfect_wx_circle_dialog_btn_close"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/selector_rect_redbg_corners4"
+                        android:gravity="center"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:paddingTop="8dp"
+                        android:text="关闭"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/perfect_wx_circle_dialog_no_friendpop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/perfect_wx_circle_dialog_btn_add_main_image"
+                                android:layout_width="65dp"
+                                android:layout_height="65dp"
+                                android:src="@drawable/icon_add_pic"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:gravity="center"
+                                android:text="请添加营销主图"
+                                android:textColor="@color/colorBlack_333333"
+                                android:textSize="10sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/perfect_wx_circle_dialog_btn_add_images"
+                                android:layout_width="65dp"
+                                android:layout_height="65dp"
+                                android:src="@drawable/icon_add_pic"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:gravity="center"
+                                android:text="请添加最少三张晒图"
+                                android:textColor="@color/colorBlack_333333"
+                                android:textSize="10sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/perfect_wx_circle_dialog_btn_cancel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/selector_rect_redbg_corners4"
+                                android:gravity="center"
+                                android:paddingBottom="4dp"
+                                android:paddingLeft="12dp"
+                                android:paddingRight="12sp"
+                                android:paddingTop="4dp"
+                                android:text="取消"
+                                android:textColor="@android:color/white"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/perfect_wx_circle_dialog_btn_submit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/selector_submit_friend_pop"
+                                android:gravity="center"
+                                android:paddingBottom="4dp"
+                                android:paddingLeft="12dp"
+                                android:paddingRight="12sp"
+                                android:paddingTop="4dp"
+                                android:text="提交"
+                                android:textColor="@color/colorGray_999999"/>
+                        </RelativeLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/preview_img_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/perfect_wx_circle_dialog_vp_image_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v4.view.ViewPager>
+
+        <RelativeLayout
+            android:id="@+id/preview_img_btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
+        </RelativeLayout>
+    </FrameLayout>
+</FrameLayout>

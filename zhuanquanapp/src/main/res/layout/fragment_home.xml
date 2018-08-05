@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_home_swipe_refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorGray_F5F5F5"
+    android:filterTouchesWhenObscured="true"
+    tools:context=".home.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:color/white"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_rect_whitebg_corners4"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/icon_home_search"/>
+
+                <TextView
+                    android:id="@+id/fragment_home_layout_title_search_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="赚圈，可以赚钱的朋友圈"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textSize="12sp"/>
+
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_home_layout_title_right_btn_fl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:paddingBottom="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp">
+
+                <TextView
+                    android:id="@+id/fragment_home_layout_title_right_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="取消"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/fragment_home_layout_title_right_iv"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/icon_home_menu"
+                    android:visibility="visible"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray_F0F0F0"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/fragment_home_tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white">
+
+                </android.support.design.widget.TabLayout>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/fragment_home_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/white">
+
+                </android.support.v4.view.ViewPager>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/fragment_home_class_list_root_layout_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#807a7a7a"
+                android:visibility="invisible">
+
+                <LinearLayout
+                    android:id="@+id/fragment_home_class_list_content_layout_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPink_ffebe8"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:paddingBottom="10dp"
+                            android:paddingTop="10dp"
+                            android:text="全部分类"
+                            android:textColor="@color/colorBlack_333333"/>
+
+                        <TextView
+                            android:id="@+id/fragment_home_class_list_btn_close_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:text="关闭"
+                            android:textColor="@color/colorGreen_04be02"/>
+                    </LinearLayout>
+
+                    <com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView
+                        android:id="@+id/fragment_home_class_list_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp">
+
+                    </com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView>
+                </LinearLayout>
+            </RelativeLayout>
+        </FrameLayout>
+    </LinearLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
