@@ -276,12 +276,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     public void onHideLoading() {
         HomeFragment.finishRefresh();
         if (mLoadingDialog != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadingDialog.dismiss();
-                }
-            }, 1500);
+            mLoadingDialog.dismiss();
         }
     }
 

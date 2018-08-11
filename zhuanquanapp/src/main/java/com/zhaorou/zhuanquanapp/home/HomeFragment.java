@@ -153,12 +153,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     @Override
     public void onHideLoading() {
         if (mLoadingDialog != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadingDialog.dismiss();
-                }
-            }, 1500);
+            mLoadingDialog.dismiss();
         }
     }
 

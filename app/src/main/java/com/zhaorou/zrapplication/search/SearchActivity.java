@@ -258,12 +258,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
             mSwipeRefreshLayout.setRefreshing(false);
         }
         if (mLoadingDialog != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadingDialog.dismiss();
-                }
-            }, 1500);
+            mLoadingDialog.dismiss();
         }
     }
 

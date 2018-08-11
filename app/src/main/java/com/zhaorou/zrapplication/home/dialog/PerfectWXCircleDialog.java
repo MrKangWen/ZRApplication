@@ -601,12 +601,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     @Override
     public void onHideLoading() {
         if (mLoadingDialog != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadingDialog.dismiss();
-                }
-            }, 1500);
+            mLoadingDialog.dismiss();
         }
     }
 

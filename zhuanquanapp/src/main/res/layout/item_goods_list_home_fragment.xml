@@ -83,19 +83,34 @@
                     android:textSize="13sp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/item_goods_list_coupon_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/shape_rect_graybg_corners10"
-                android:gravity="center_vertical"
-                android:paddingBottom="2dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="2dp"
-                android:textColor="@color/colorGray_999999"
-                android:textSize="12sp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/item_goods_list_coupon_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/shape_rect_graybg_corners10"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="2dp"
+                    android:textColor="@color/colorGray_999999"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/item_goods_list_remainder_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorGray_999999"
+                    android:textSize="12sp"/>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -127,10 +142,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:orientation="horizontal">
+                android:visibility="gone">
 
                 <TextView
-                    android:visibility="gone"
                     android:id="@+id/item_goods_list_rate_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -140,7 +154,6 @@
                     android:textSize="12sp"/>
 
                 <TextView
-                    android:id="@+id/item_goods_list_remainder_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"

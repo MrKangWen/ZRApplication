@@ -256,12 +256,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             mSwipeRefreshLayout.setRefreshing(false);
         }
         if (mLoadingDialog != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadingDialog.dismiss();
-                }
-            }, 1500);
+            mLoadingDialog.dismiss();
         }
     }
 
