@@ -76,7 +76,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
     }
 
     public void fetchGoodsList(Map<String, String> params) {
-        mView.onShowLoading();
+//        mView.onShowLoading();
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.GET_DGOODS_LIST, params);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -109,13 +109,13 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                mView.onHideLoading();
+//                mView.onHideLoading();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 mView.onLoadFail("网络请求失败");
-                mView.onHideLoading();
+//                mView.onHideLoading();
             }
         });
     }
