@@ -40,6 +40,7 @@ public class BindPidDialog extends BaseDialog implements View.OnClickListener, D
         mBtnOk = findViewById(R.id.bind_dialog_btn_ok);
         mBtnOk.setOnClickListener(this);
         mEditText = findViewById(R.id.bind_dialog_content_et);
+        mEditText.setHint("请输入pid");
         setOnShowListener(this);
     }
 

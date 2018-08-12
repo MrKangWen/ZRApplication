@@ -32,7 +32,6 @@
             android:layout_height="wrap_content"
             android:background="@drawable/shape_rect_graybg_corners10"
             android:gravity="left|top"
-            android:hint="请输入pid"
             android:padding="10dp"
             android:textColor="@color/colorBlack_333333"
             android:textSize="14sp"/>

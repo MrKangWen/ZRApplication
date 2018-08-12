@@ -41,7 +41,7 @@ public class BindTaoSessionDialog extends BaseDialog implements View.OnClickList
         mBtnOk.setOnClickListener(this);
 
         mEditText = findViewById(R.id.bind_dialog_content_et);
-
+        mEditText.setHint("请输入session");
         setOnShowListener(this);
 
     }
