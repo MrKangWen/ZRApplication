@@ -50,6 +50,8 @@
         </activity>
         <activity android:name=".user.WebViewActivity">
         </activity>
+        <activity android:name=".login.LoginByAccountActivity">
+        </activity>
     </application>
 
 </manifest>

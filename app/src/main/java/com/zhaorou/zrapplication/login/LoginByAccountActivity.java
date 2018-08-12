@@ -1,6 +1,5 @@
 package com.zhaorou.zrapplication.login;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,10 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
-import com.zhaorou.zrapplication.base.BaseApplication;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
@@ -22,7 +19,6 @@ import com.zhaorou.zrapplication.utils.GsonHelper;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,9 +34,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends BaseActivity {
-
-    private static final String TAG = "LoginActivity";
+public class LoginByAccountActivity extends BaseActivity {
+    @BindView(R.id.phone_login_activity)
+    EditText mPhoneEt;
+    @BindView(R.id.password_login_activity)
+    EditText mPasswordEt;
     @BindView(R.id.icon_left_layout_title_iv)
     ImageView mTitleLeftIconIv;
     @BindView(R.id.text_right_layout_title_tv)
@@ -51,47 +49,30 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_by_account);
         ButterKnife.bind(this);
-        EventBus.getDefault().register(this);
         mLoadingDialog = new LoadingDialog(this);
         initTitleBar();
     }
 
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
 
-
-    @OnClick({R.id.btn_left_layout_title_rl, R.id.activity_login_btn_wx, R.id.btn_login_other_ways})
-    protected void onClick(View v) {
-        switch (v.getId()) {
+    @OnClick({R.id.btn_left_layout_title_rl, R.id.btn_login_login_activity})
+    protected void onClick(View view) {
+        switch (view.getId()) {
             case R.id.btn_left_layout_title_rl:
                 finish();
                 break;
-            case R.id.activity_login_btn_wx:
-                requestWechatAuth();
+            case R.id.btn_login_login_activity:
+                String phone = mPhoneEt.getText().toString();
+                String password = mPasswordEt.getText().toString();
+                if (TextUtils.isEmpty(phone)) {
+                    Toast.makeText(this, "用户名不能为空", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
+                } else {
+                    accountLogin(phone, password);
+                }
                 break;
-            case R.id.btn_login_other_ways:
-                Intent intent = new Intent(LoginActivity.this, LoginByAccountActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Subscribe
-    public void onMessageEvent(MessageEvent event) {
-        String action = event.getCommand();
-        if (TextUtils.equals(action, ZRDConstants.EventCommand.COMMAND_LOGIN)) {
-            String code = (String) event.getData();
-            wxLogin(code);
-        }
-        if (TextUtils.equals("login_success", action)) {
-            finish();
         }
     }
 
@@ -102,24 +83,12 @@ public class LoginActivity extends BaseActivity {
 //        mTitleRightTextTv.setVisibility(View.VISIBLE);
     }
 
-    private void requestWechatAuth() {
-        if (BaseApplication.getWXAPI().isWXAppInstalled()) {
-            SendAuth.Req req = new SendAuth.Req();
-            req.scope = "snsapi_userinfo";
-            req.state = "wechat_sdk_zrd_login";
-            BaseApplication.getWXAPI().sendReq(req);
-        } else {
-            Toast.makeText(this, "您还未安装微信客户端", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private void wxLogin(String code) {
+    private void accountLogin(String phone, String password) {
         mLoadingDialog.show();
         Map<String, String> params = new HashMap<>();
-        params.put("code", code);
-        params.put("state", "STATE");
-        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.WX_LOGIN, params);
+        params.put("telephone", phone);
+        params.put("password", password);
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.LOGIN, params);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -132,17 +101,20 @@ public class LoginActivity extends BaseActivity {
                             WXUserInfoModel wxUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
                             if (wxUserInfoModel != null && wxUserInfoModel.getCode() == 200) {
                                 String token = wxUserInfoModel.getData().getToken();
-                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
+                                SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
                                 String pid = wxUserInfoModel.getData().getUser().getPid();
-                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
+                                SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
                                 String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
-                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
-                                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
+                                Toast.makeText(LoginByAccountActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                MessageEvent<String> message = new MessageEvent<>();
+                                message.setCommand("login_success");
+                                EventBus.getDefault().post(message);
                                 finish();
                             }
                         } else {
                             String data = jsonObj.optString("data");
-                            Toast.makeText(LoginActivity.this, data, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginByAccountActivity.this, data, Toast.LENGTH_SHORT).show();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -155,7 +127,7 @@ public class LoginActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginByAccountActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
                 mLoadingDialog.dismiss();
             }
         });

@@ -491,7 +491,12 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
-            GlideApp.with(getContext()).asBitmap().override(50).load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl).into(mMarketImgIv);
+            GlideApp.with(getContext()).asBitmap()
+                    .override(50)
+                    .load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl)
+                    .placeholder(R.drawable.img_pre_load)
+                    .error(R.drawable.img_load_error)
+                    .into(mMarketImgIv);
             String image = entityBean.getImage();
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
@@ -628,12 +633,15 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ImagesViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ImagesViewHolder holder, final int position) {
             String imageUrl = mImagesList.get(position);
             if (TextUtils.equals(imageFrom, "server")) {
                 imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageUrl;
             }
-            GlideApp.with(getContext()).asBitmap().override(50).load(imageUrl).into(holder.mImageView);
+            GlideApp.with(getContext()).load(imageUrl).override(50)
+                    .placeholder(R.drawable.img_pre_load)
+                    .error(R.drawable.img_load_error)
+                    .into(holder.mImageView);
             holder.mImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -641,6 +649,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     mMultipleImageAdapter = new MultipleImageAdapter(mImagesList);
                     mPreviewMultipleImageVp.setAdapter(mMultipleImageAdapter);
                     mPreviewImgLayout.setVisibility(View.VISIBLE);
+                    mPreviewMultipleImageVp.setCurrentItem(position);
                 }
             });
         }
@@ -674,7 +683,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             final String imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageList.get(position);
             View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
             ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
-            GlideApp.with(getContext()).asBitmap().load(imageUrl).override(500, 500).into(imageView);
+            GlideApp.with(getContext()).asBitmap().load(imageUrl).into(imageView);
             TextView btnSaveImage = view.findViewById(R.id.iv_multiple_preview_item_btn_save_image);
             btnSaveImage.setOnClickListener(new View.OnClickListener() {
                 @Override
