@@ -2,14 +2,15 @@ package com.zhaorou.zrapplication.home;
 
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,6 +37,8 @@ import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
+import com.zhaorou.zrapplication.utils.AccessibilityUtils;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
@@ -81,6 +84,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private String mTaoword;
     private String mTkl;
     private LoadingDialog mLoadingDialog;
+    private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
     public HomeVPItemFragment() {
     }
@@ -109,6 +113,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         mUnbinder.unbind();
         mPresenter.detachView();
     }
+
 
     @Override
     public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
@@ -529,9 +534,15 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
-        perfectWXCircleDialog.show();
-        perfectWXCircleDialog.setGoodsInfo(goodsBean);
+        mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
+        mPerfectWXCircleDialog.show();
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {

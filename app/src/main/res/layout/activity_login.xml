@@ -31,8 +31,8 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:src="@drawable/icon_wx"/>
 
                 <TextView
@@ -41,13 +41,12 @@
                     android:layout_marginTop="6dp"
                     android:text="微信登录"
                     android:textColor="@color/colorGray_666666"
-                    android:textSize="18sp"/>
+                    android:textSize="20sp"/>
 
                 <TextView
                     android:id="@+id/btn_login_other_ways"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="16dp"
                     android:text="其他方式登录"
                     android:textColor="@color/colorGray_666666"
@@ -67,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="64dp"
+            android:layout_marginBottom="80dp"
             android:gravity="center"
             android:text="*微信登录后请到个人中心绑定账号"/>
     </FrameLayout>

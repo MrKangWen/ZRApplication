@@ -37,6 +37,8 @@
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@null"
+            android:maxLines="1"
+            android:maxLength="11"
             android:gravity="center_vertical"
             android:hint="用户名/手机号"
             android:textSize="14sp"/>
@@ -73,6 +75,7 @@
             android:background="@null"
             android:gravity="center_vertical"
             android:hint="密码"
+            android:maxLines="1"
             android:textSize="14sp"/>
     </LinearLayout>
 

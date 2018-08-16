@@ -1,5 +1,8 @@
 package com.zhaorou.zhuanquanapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +17,8 @@ import com.zhaorou.zhuanquanapp.base.BaseActivity;
 import com.zhaorou.zhuanquanapp.eventbus.MessageEvent;
 import com.zhaorou.zhuanquanapp.home.HomeFragment;
 import com.zhaorou.zhuanquanapp.user.UserFragment;
+import com.zhaorou.zhuanquanapp.utils.AccessibilityUtils;
+import com.zhaorou.zhuanquanapp.utils.AssistantService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -65,12 +70,31 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         setSelectedTab(mTabHomeIv, mTabHomeTv);
         initViewPager();
         EventBus.getDefault().register(this);
+        if (!AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), this)) {
+            new AlertDialog.Builder(this).setMessage("打开【设置——>辅助功能/无障碍——>找肉单——>开启】开启分享朋友圈自动粘贴文字功能")
+                    .setNegativeButton("取消", null)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            AccessibilityUtils.openAccessibility(AssistantService.class.getName(), MainActivity.this);
+                        }
+                    }).create().show();
+        }
     }
 
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        MessageEvent<Object> message = new MessageEvent<>();
+        message.setCommand(requestCode + "");
+        message.setData(data);
+        EventBus.getDefault().post(message);
     }
 
     @OnClick({R.id.activity_main_tab_home_iv, R.id.activity_main_tab_home_tv,

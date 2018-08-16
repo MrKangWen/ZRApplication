@@ -519,6 +519,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     } catch (Exception e) {
                     }
 
+
                 }
             });
         }
@@ -533,6 +534,11 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         perfectWXCircleDialog.show();
         perfectWXCircleDialog.setGoodsInfo(goodsBean);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {

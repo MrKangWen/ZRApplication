@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_title_ll"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
+    android:layout_height="48dp"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/btn_left_layout_title_rl"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:padding="8dp">
 
         <ImageView
@@ -30,8 +30,8 @@
 
     <RelativeLayout
         android:id="@+id/btn_right_layout_title_rl"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:padding="8dp">
 
         <ImageView

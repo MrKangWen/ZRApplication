@@ -78,6 +78,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     private String mTaoword;
     private String mTkl;
     private LoadingDialog mLoadingDialog;
+    private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -508,9 +509,17 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     }
 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(this);
-        perfectWXCircleDialog.show();
-        perfectWXCircleDialog.setGoodsInfo(goodsBean);
+        mPerfectWXCircleDialog = new PerfectWXCircleDialog(this);
+        mPerfectWXCircleDialog.show();
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            mPerfectWXCircleDialog.onPictureSelectedResult(requestCode, resultCode, data);
+        }
     }
 
     private class SearchViewHolder extends RecyclerView.ViewHolder {

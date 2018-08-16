@@ -18,6 +18,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,8 +44,10 @@ import com.zhaorou.zhuanquanapp.home.model.GoodsListModel;
 import com.zhaorou.zhuanquanapp.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zhuanquanapp.network.HttpRequestUtil;
 import com.zhaorou.zhuanquanapp.recyclerview.CustomRecyclerView;
+import com.zhaorou.zhuanquanapp.utils.ActivityController;
 import com.zhaorou.zhuanquanapp.utils.DataStorageDirectoryHelper;
 import com.zhaorou.zhuanquanapp.utils.FileUtils;
+import com.zhaorou.zhuanquanapp.utils.PhotoCapturer;
 import com.zhaorou.zhuanquanapp.utils.SPreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -125,6 +128,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private FrameLayout mPreviewImgLayout;
     private FriendPopDetailModel.DataBean.EntityBean mEntityBean;
     private LoadingDialog mLoadingDialog;
+    private ArrayList<ImageModel> imageModelList = new ArrayList<>();
 
 
     public PerfectWXCircleDialog(@NonNull Context context) {
@@ -148,21 +152,36 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         initViews();
     }
 
+    public void onPictureSelectedResult(int requestCode, int resultCode, Intent data) {
+        String imgPath = PhotoCapturer.newInstance(mContext).handleImageFromAlbum(data);
+        if (requestCode == 0x01 && data != null) {
+            GlideApp.with(getContext()).asBitmap().load(imgPath).into(mMarketImgIv);
+            mMarketImageUrl = imgPath;
+        }
+        if (requestCode == 0x11 && data != null) {
+            if (!mImagesList.contains(imgPath)) {
+                mImagesList.add(imgPath);
+                mImagesAdapter.notifyDataSetChanged("picker");
+            }
+        }
+        if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
+            mBtnSubmit.setEnabled(false);
+            mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
+        } else {
+            mBtnSubmit.setEnabled(true);
+            mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
+        }
+
+    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.perfect_wx_circle_dialog_btn_add_main_image:
-                Intent intent = new Intent(getContext(), SelectPictureActivity.class);
-                intent.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE);
-                intent.putExtra("image", mMarketImageUrl);
-                mContext.startActivity(intent);
+                PhotoCapturer.newInstance(mContext).selectFromAlbum(ActivityController.getCurrentActivity(), 0x01);
                 break;
             case R.id.perfect_wx_circle_dialog_btn_add_images:
-                Intent intent1 = new Intent(getContext(), SelectPictureActivity.class);
-                intent1.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES);
-                intent1.putStringArrayListExtra("images", mImagesList);
-                mContext.startActivity(intent1);
+                PhotoCapturer.newInstance(mContext).selectFromAlbum(ActivityController.getCurrentActivity(), 0x11);
                 break;
             case R.id.perfect_wx_circle_dialog_btn_cancel:
                 dismiss();
@@ -211,31 +230,15 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     }
 
     @Subscribe
-    public void onMessageEvent(MessageEvent<ArrayList<ImageModel>> event) {
+    public void onMessageEvent(MessageEvent<Intent> event) {
         String command = event.getCommand();
-        ArrayList<ImageModel> imageModelList = event.getData();
-        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE)) {
-            ImageModel imageModel = imageModelList.get(imageModelList.size() - 1);
-            String path = imageModel.getPath();
-            mMarketImageUrl = path;
-            GlideApp.with(getContext()).asBitmap().load(path).into(mMarketImgIv);
+        Intent data = event.getData();
+        Log.e(TAG, "onMessageEvent: data: " + command);
+        if (TextUtils.equals(command, "1")) {
+            onPictureSelectedResult(0x01, -1, data);
         }
-        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
-            mImagesList.clear();
-            for (ImageModel imageModel : imageModelList) {
-                String path = imageModel.getPath();
-                if (!mImagesList.contains(path)) {
-                    mImagesList.add(path);
-                }
-            }
-            if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
-                mBtnSubmit.setEnabled(false);
-                mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
-            } else {
-                mBtnSubmit.setEnabled(true);
-                mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
-            }
-            mImagesAdapter.notifyDataSetChanged("picker");
+        if (TextUtils.equals(command, "17")) {
+            onPictureSelectedResult(0x11, -1, data);
         }
     }
 
@@ -439,7 +442,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mMarketImgIv.setOnClickListener(this);
         findViewById(R.id.preview_img_btn_back).setOnClickListener(this);
 
-        setOnDismissListener(new DialogInterface.OnDismissListener() {
+        setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 mPresenter.detachView();
@@ -616,6 +619,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
     }
 
+
     private class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
 
         String imageFrom;
@@ -660,6 +664,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             return mImagesList.size();
         }
     }
+
 
     private class ImagesViewHolder extends RecyclerView.ViewHolder {
 

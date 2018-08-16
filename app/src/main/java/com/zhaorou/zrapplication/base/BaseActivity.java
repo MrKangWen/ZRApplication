@@ -31,10 +31,14 @@ public class BaseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_base);
 
         ActivityController.addActivity(this);
-        ActivityController.setCurrentActivity(this);
         initActionBar();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActivityController.setCurrentActivity(this);
+    }
 
     @Override
     protected void onDestroy() {
