@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -16,6 +17,7 @@ import com.zhaorou.zhuanquanapp.constants.ZRDConstants;
 import com.zhaorou.zhuanquanapp.home.dialog.LoadingDialog;
 import com.zhaorou.zhuanquanapp.login.LoginActivity;
 import com.zhaorou.zhuanquanapp.network.HttpRequestUtil;
+import com.zhaorou.zhuanquanapp.utils.ApplicationUtils;
 import com.zhaorou.zhuanquanapp.utils.SPreferenceUtil;
 
 import org.json.JSONException;
@@ -37,6 +39,8 @@ public class SettingsActivity extends BaseActivity {
 
     @BindView(R.id.activity_settings_btn_link_taoword)
     ImageView mBtnLinkTao;
+    @BindView(R.id.activity_settings_version_info_tv)
+    TextView mVersionInfo;
 
     private String mLinkTao;
     private LoadingDialog mLoadingDialog;
@@ -53,6 +57,8 @@ public class SettingsActivity extends BaseActivity {
         } else if (TextUtils.equals(mLinkTao, "1")) {
             mBtnLinkTao.setImageResource(R.drawable.icon_toggle_off);
         }
+        String versionName = ApplicationUtils.getVersionName();
+        mVersionInfo.setText(versionName);
     }
 
     @OnClick({R.id.activity_settings_layout_title_left_btn_rl, R.id.activity_settings_btn_link_taoword,
