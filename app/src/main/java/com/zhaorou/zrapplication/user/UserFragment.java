@@ -51,7 +51,6 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     private Unbinder mUnbinder;
     private UserFragmentPresenter mPresenter = new UserFragmentPresenter();
     private BindPidDialog mBindPidDialog;
-    private BindTaoSessionDialog mBindTaoSessionDialog;
     private LoadingDialog mLoadingDialog;
 
     public UserFragment() {
@@ -86,12 +85,12 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll, R.id.fragment_use_setting_ll,
             R.id.fragment_user_get_tao_session, R.id.fragment_user_bind_tao_session})
     protected void onClick(View v) {
+        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         switch (v.getId()) {
             case R.id.fragment_user_user_info_ll:
                 setUserInfoOrLogin();
                 break;
             case R.id.fragment_user_bind_pid_ll:
-                String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                 if (TextUtils.isEmpty(token)) {
                     toLogin();
                 } else {
@@ -102,18 +101,12 @@ public class UserFragment extends Fragment implements IUserFragmentView {
                 }
                 break;
             case R.id.fragment_user_get_tao_session:
-                Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
-                startActivityForResult(webViewIntent, 0);
-                break;
-            case R.id.fragment_user_bind_tao_session:
-                String token1 = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                if (TextUtils.isEmpty(token1)) {
+                if (TextUtils.isEmpty(token)) {
+                    Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
                     toLogin();
                 } else {
-                    if (mBindTaoSessionDialog == null) {
-                        mBindTaoSessionDialog = new BindTaoSessionDialog(getContext(), mPresenter);
-                    }
-                    mBindTaoSessionDialog.show();
+                    Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
+                    startActivityForResult(webViewIntent, 0);
                 }
                 break;
             case R.id.fragment_use_setting_ll:
@@ -152,9 +145,6 @@ public class UserFragment extends Fragment implements IUserFragmentView {
 
     @Override
     public void onUpdatedTaoSession(String taoSession) {
-        SPreferenceUtil.put(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, taoSession);
-        Toast.makeText(getContext(), "淘session绑定成功", Toast.LENGTH_SHORT).show();
-        mBindTaoSessionDialog.dismiss();
     }
 
     @Override

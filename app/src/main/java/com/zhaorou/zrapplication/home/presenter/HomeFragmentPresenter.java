@@ -28,7 +28,9 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
     private static final String TAG = "HomeFragmentPresenter";
 
     public void fetchClassList() {
-        mView.onShowLoading();
+        if (mView != null) {
+            mView.onShowLoading();
+        }
         final List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_CLASS_LIST);
         call.enqueue(new Callback<ResponseBody>() {
@@ -51,10 +53,14 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                                     }
                                 }
                             }
-                            mView.onFetchedClassList(mClassList);
+                            if (mView != null) {
+                                mView.onFetchedClassList(mClassList);
+                            }
                         } else {
                             String data = jsonObj.optString("data");
-                            mView.onLoadFail(data);
+                            if (mView != null) {
+                                mView.onLoadFail(data);
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -62,13 +68,17 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mView.onLoadFail("网络请求失败");
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onLoadFail("网络请求失败");
+                    mView.onHideLoading();
+                }
             }
 
         });
@@ -80,7 +90,9 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
                 try {
                     if (response != null && response.body() != null) {
                         String responseStr = response.body().string();
@@ -92,15 +104,21 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                                 if (data != null) {
                                     List<GoodsListModel.DataBean.ListBean> list = data.getList();
                                     if (list != null && list.size() > 0) {
-                                        mView.onFetchDtkGoodsList(list);
+                                        if (mView != null) {
+                                            mView.onFetchDtkGoodsList(list);
+                                        }
                                     } else {
-                                        mView.onLoadMore(false);
+                                        if (mView != null) {
+                                            mView.onLoadMore(false);
+                                        }
                                     }
                                 }
                             }
                         } else {
                             String data = jsonObj.optString("data");
-                            mView.onLoadFail(data);
+                            if (mView != null) {
+                                mView.onLoadFail(data);
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -113,14 +131,18 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mView.onLoadFail("网络请求失败");
+                if (mView != null) {
+                    mView.onLoadFail("网络请求失败");
+                }
 //                mView.onHideLoading();
             }
         });
     }
 
     public void getFriendPopDetail(Map<String, String> params) {
-        mView.onShowLoading();
+        if (mView != null) {
+            mView.onShowLoading();
+        }
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_FRIENDPOP_DETAIL, params);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -135,12 +157,16 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                                 FriendPopDetailModel.DataBean data = friendPopDetailModel.getData();
                                 if (data != null) {
                                     FriendPopDetailModel.DataBean.EntityBean entity = data.getEntity();
-                                    mView.onGetFriendPopDetail(entity);
+                                    if (mView != null) {
+                                        mView.onGetFriendPopDetail(entity);
+                                    }
                                 }
                             }
                         } else {
                             String data = jsonObj.optString("data");
-                            mView.onLoadFail(data);
+                            if (mView != null) {
+                                mView.onLoadFail(data);
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -148,19 +174,25 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                         e.printStackTrace();
                     }
                 }
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mView.onLoadFail("网络请求失败");
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onLoadFail("网络请求失败");
+                    mView.onHideLoading();
+                }
             }
         });
     }
 
     public void getTaobaoTbkTpwd(Map<String, String> params) {
-        mView.onShowLoading();
+        if (mView != null) {
+            mView.onShowLoading();
+        }
         Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_TAOBAO_TBK_TPWD, params);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -175,12 +207,16 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                                 TaowordsModel.DataBeanX data = taowordsModel.getData();
                                 if (data != null) {
                                     String tkl = data.getTkl();
-                                    mView.onGetTaowords(tkl);
+                                    if (mView != null) {
+                                        mView.onGetTaowords(tkl);
+                                    }
                                 }
                             }
                         } else if (!jsonObj.isNull("data")) {
                             String message = jsonObj.optString("data");
-                            mView.onLoadFail(message);
+                            if (mView != null) {
+                                mView.onLoadFail(message);
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -188,13 +224,17 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                         e.printStackTrace();
                     }
                 }
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mView.onLoadFail("网络请求失败");
-                mView.onHideLoading();
+                if (mView != null) {
+                    mView.onLoadFail("网络请求失败");
+                    mView.onHideLoading();
+                }
             }
         });
     }

@@ -151,14 +151,15 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void shareFriendPopToWx(FriendPopDetailModel.DataBean.EntityBean entityBean) {
+        if (entityBean == null || TextUtils.isEmpty(entityBean.getImage())) {
+            Toast.makeText(getContext(), "请先完善朋友圈文案", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String tklType = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
-        String content = mGoodsBean.getQuan_guid_content();
-        if (entityBean != null) {
-            content = entityBean.getContent();
-        }
+        String content = entityBean.getContent();
 
         if (TextUtils.equals(mShareType, "WX")) {
             mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
@@ -203,7 +204,9 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             public void run() {
                 for (String imgUrl : list) {
                     File file = FileUtils.saveImageToSdCard(getContext().getExternalCacheDir(), imgUrl);
-                    fileList.add(file);
+                    if (file != null) {
+                        fileList.add(file);
+                    }
                 }
                 Intent intent = new Intent();
                 ComponentName comp = null;

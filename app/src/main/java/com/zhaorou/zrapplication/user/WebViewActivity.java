@@ -1,21 +1,32 @@
 package com.zhaorou.zrapplication.user;
 
-import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.net.http.SslError;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseActivity;
+import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class WebViewActivity extends BaseActivity {
 
-    private static final String url = "https://oauth.taobao.com/authorize?response_type=token&client_id=23196777&state=1212&view=web";
+    private static final String TAG = "WebViewActivity";
+    private String url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=http://app.zhaoroudan.com/taobaoAuth?token=";
 
     @BindView(R.id.web_view)
     WebView mWebView;
@@ -25,22 +36,54 @@ public class WebViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
+        String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+        url = url + token + "&state=1212&view=web";
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        mWebView.setWebChromeClient(new WebChromeClient());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
         mWebView.setNetworkAvailable(true);
-        mWebView.setWebViewClient(new WebViewClient());
         mWebView.loadUrl(url);
         mWebView.zoomIn();
+        mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+            }
 
-        new AlertDialog.Builder(this).setTitle("提示")
-                .setMessage("使用淘宝账号登录获取淘session，长按复制后关闭界面，返回设置淘session")
-                .setPositiveButton("确定", null)
-                .create()
-                .show();
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                super.onReceivedHttpError(view, request, errorResponse);
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
+            }
+        });
+
     }
 }
