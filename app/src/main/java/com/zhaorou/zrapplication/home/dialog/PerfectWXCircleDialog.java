@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,10 +41,8 @@ import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
-import com.zhaorou.zrapplication.utils.ActivityController;
 import com.zhaorou.zrapplication.utils.DataStorageDirectoryHelper;
 import com.zhaorou.zrapplication.utils.FileUtils;
-import com.zhaorou.zrapplication.utils.PhotoCapturer;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
@@ -56,7 +53,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -152,36 +148,20 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         initViews();
     }
 
-    public void onPictureSelectedResult(int requestCode, int resultCode, Intent data) {
-        String imgPath = PhotoCapturer.newInstance(mContext).handleImageFromAlbum(data);
-        if (requestCode == 0x01 && data != null) {
-            GlideApp.with(getContext()).asBitmap().load(imgPath).into(mMarketImgIv);
-            mMarketImageUrl = imgPath;
-        }
-        if (requestCode == 0x11 && data != null) {
-            if (!mImagesList.contains(imgPath)) {
-                mImagesList.add(imgPath);
-                mImagesAdapter.notifyDataSetChanged("picker");
-            }
-        }
-        if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
-            mBtnSubmit.setEnabled(false);
-            mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
-        } else {
-            mBtnSubmit.setEnabled(true);
-            mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
-        }
-
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.perfect_wx_circle_dialog_btn_add_main_image:
-                PhotoCapturer.newInstance(mContext).selectFromAlbum(ActivityController.getCurrentActivity(), 0x01);
+                Intent intent = new Intent(getContext(), SelectPictureActivity.class);
+                intent.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE);
+                intent.putExtra("image", mMarketImageUrl);
+                mContext.startActivity(intent);
                 break;
             case R.id.perfect_wx_circle_dialog_btn_add_images:
-                PhotoCapturer.newInstance(mContext).selectFromAlbum(ActivityController.getCurrentActivity(), 0x11);
+                Intent intent1 = new Intent(getContext(), SelectPictureActivity.class);
+                intent1.putExtra("command", ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES);
+                intent1.putStringArrayListExtra("images", mImagesList);
+                mContext.startActivity(intent1);
                 break;
             case R.id.perfect_wx_circle_dialog_btn_cancel:
                 dismiss();
@@ -230,20 +210,48 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     }
 
     @Subscribe
-    public void onMessageEvent(MessageEvent<Intent> event) {
+    public void onMessageEvent(MessageEvent<ArrayList<ImageModel>> event) {
         String command = event.getCommand();
-        Intent data = event.getData();
-        if (TextUtils.equals(command, "1")) {
-            onPictureSelectedResult(0x01, -1, data);
+        ArrayList<ImageModel> imageModelList = event.getData();
+        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE)) {
+            ImageModel imageModel = imageModelList.get(imageModelList.size() - 1);
+            String path = imageModel.getPath();
+            mMarketImageUrl = path;
+            GlideApp.with(getContext()).asBitmap().load(path)
+                    .placeholder(R.drawable.img_pre_load)
+                    .error(R.drawable.img_load_error)
+                    .into(mMarketImgIv);
         }
-        if (TextUtils.equals(command, "17")) {
-            onPictureSelectedResult(0x11, -1, data);
+        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
+            mImagesList.clear();
+            for (ImageModel imageModel : imageModelList) {
+                String path = imageModel.getPath();
+                if (!mImagesList.contains(path)) {
+                    mImagesList.add(path);
+                }
+            }
+            if (TextUtils.isEmpty(mMarketImageUrl) || TextUtils.isEmpty(mContentEt.getText().toString()) || mImagesList.size() < 3) {
+                mBtnSubmit.setEnabled(false);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(R.color.colorGray_999999));
+            } else {
+                mBtnSubmit.setEnabled(true);
+                mBtnSubmit.setTextColor(mContext.getResources().getColor(android.R.color.white));
+            }
+            mImagesAdapter.notifyDataSetChanged("picker");
         }
     }
 
     private void uploadMarketImage() {
         if (!TextUtils.isEmpty(mMarketImageUrl)) {
             File file = new File(mMarketImageUrl);
+            Log.e(TAG, "uploadMarketImage: file: " + file.length());
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    File file = FileUtils.compressImage(mMarketImageUrl, 200);
+//                }
+//            }).start();
+
             if (file != null && file.exists()) {
                 RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                 MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
@@ -488,12 +496,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 mContentEt.setSelection(content.length());
             }
             mMarketImageUrl = entityBean.getMarket_image();
-            GlideApp.with(getContext()).asBitmap()
-                    .override(50)
-                    .load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl)
-                    .placeholder(R.drawable.img_pre_load)
-                    .error(R.drawable.img_load_error)
-                    .into(mMarketImgIv);
+            if (!TextUtils.isEmpty(mMarketImageUrl)) {
+                GlideApp.with(getContext()).asBitmap()
+                        .override(50)
+                        .load(ZRDConstants.HttpUrls.BASE_URL + mMarketImageUrl)
+                        .placeholder(R.drawable.img_pre_load)
+                        .error(R.drawable.img_load_error)
+                        .into(mMarketImgIv);
+            }
             String image = entityBean.getImage();
             if (!TextUtils.isEmpty(image)) {
                 if (image.contains("#")) {
@@ -682,7 +692,10 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             final String imageUrl = ZRDConstants.HttpUrls.BASE_URL + imageList.get(position);
             View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
             ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
-            GlideApp.with(getContext()).asBitmap().load(imageUrl).into(imageView);
+            GlideApp.with(getContext()).asBitmap().load(imageUrl)
+                    .placeholder(R.drawable.img_pre_load)
+                    .error(R.drawable.img_load_error)
+                    .into(imageView);
             TextView btnSaveImage = view.findViewById(R.id.iv_multiple_preview_item_btn_save_image);
             btnSaveImage.setOnClickListener(new View.OnClickListener() {
                 @Override

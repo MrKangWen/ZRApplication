@@ -1,10 +1,10 @@
 package com.zhaorou.zrapplication.utils;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,11 +49,30 @@ public class FileUtils {
     }
 
     //创建本地保存路径
-    public static File createStableImageFile(File fileDir) throws IOException {
+    public static File createStableImageFile(File fileDir) {
         i++;
         String imageFileName = IMAGE_NAME + i + ".jpg";
         File storageDir = fileDir;
         File image = new File(storageDir, imageFileName);
         return image;
+    }
+
+    public static File compressImage(String imagePath, long compressKbSize) {
+        File file = new File(imagePath);
+        if (file != null && file.exists()) {
+            long length = file.length();
+            if (length > compressKbSize) {
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+                    while (length > compressKbSize) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream);
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return file;
     }
 }

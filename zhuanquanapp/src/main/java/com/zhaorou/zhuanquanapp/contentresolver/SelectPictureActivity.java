@@ -32,29 +32,30 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectPictureActivity extends AppCompatActivity implements CustomRecyclerView.OnItemClickListener, View.OnClickListener, ViewPager.OnPageChangeListener {
+public class SelectPictureActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
     private static final String TAG = "SelectPictureActivity";
     public static final String RESULT_DATA = "com.lykevin.selectpicture.result_data";
-    private TextView mTitleCenterTextTv;
-    private TextView mTitleRightTextTv;
+    private ImageView mBtnGoBack;
+    private TextView mTitleTextTv;
+    private TextView mBtnChageAlbum;
     private CustomRecyclerView mImageListRv;
     private GridLayoutManager mImageListRvManager;
     private ImageListAdapter mImageListAdapter;
-    private List<ImageModel> mImageModelList = new ArrayList<>();
     private LinearLayout mPreviewLayoutLl;
     private ImageView mPreviewImageIv;
-    private float mPivotX;
-    private float mPivotY;
-    private float mItemViewWidth;
-    private float mItemViewHeight;
-    private TextView mTitleLeftText;
     private ImageModel mImageModel;
     private TextView mFooterCenterTextTv;
     private ViewPager mPreviewMultipleImageVp;
     private TextView mPreviewCenterText;
     private TextView mPreviewRightText;
     private MultipleImageAdapter mMultipleImageAdapter;
-    private String mImageUrl;
+    private float mPivotX;
+    private float mPivotY;
+    private float mItemViewWidth;
+    private float mItemViewHeight;
+    private ArrayList<ImageModel> mAdapterImageModelList = new ArrayList<>();
+    private ArrayList<ImageModel> mAllImageModelList = new ArrayList<>();
+    private ArrayList<ImageModel> mSelectedImageList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,95 +64,87 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
         setContentView(R.layout.activity_select_picture);
         getSupportActionBar().hide();
 
-        mTitleLeftText = findViewById(R.id.tv_layout_title_left_text);
-        mTitleLeftText.setText("取消");
-        mTitleLeftText.setVisibility(View.VISIBLE);
+        initTitleViews();
+        initImageListRv();
+        initFooterViews();
+        initPreviewViews();
+        getAllPictures();
+    }
 
-        mTitleCenterTextTv = findViewById(R.id.tv_layout_title_center_text);
-        mTitleCenterTextTv.setText("选择图片");
+    private void getAllPictures() {
+        List<ImageModel> imageModelList = ContentResolverHelper.queryImagesFromExternal(this);
+        mAdapterImageModelList.addAll(imageModelList);
+        mAllImageModelList.addAll(imageModelList);
+        mImageListAdapter.notifyDataSetChanged();
+    }
 
-        mTitleRightTextTv = findViewById(R.id.tv_layout_title_right_text);
-        mTitleRightTextTv.setText("全选");
-        mTitleRightTextTv.setVisibility(View.VISIBLE);
+    private void initFooterViews() {
+        mFooterCenterTextTv = findViewById(R.id.tv_select_count_activity_select_picture);
+    }
 
-        mFooterCenterTextTv = findViewById(R.id.tv_layout_footer_center_text);
-
-        mImageListRv = findViewById(R.id.rv_image_list);
-        mImageListRvManager = new GridLayoutManager(this, 4);
-        mImageListRv.setLayoutManager(mImageListRvManager);
-        mImageListAdapter = new ImageListAdapter();
-        mImageListRv.setAdapter(mImageListAdapter);
-        CustomItemDecoration customItemDecoration = new CustomItemDecoration(4, Color.WHITE);
-        mImageListRv.addItemDecoration(customItemDecoration);
-        mImageListRv.setOnItemClickListener(this);
-
+    private void initPreviewViews() {
         mPreviewCenterText = findViewById(R.id.tv_image_preview_center_text);
         mPreviewRightText = findViewById(R.id.tv_image_preview_right_text);
         mPreviewLayoutLl = findViewById(R.id.ll_layout_image_preview);
         mPreviewImageIv = findViewById(R.id.iv_image_preview_image);
         mPreviewMultipleImageVp = findViewById(R.id.vp_image_preview_multiple_image);
+    }
 
-        List<ImageModel> imageModelList = ContentResolverHelper.queryImagesFromExternal(this);
-        mImageModelList.addAll(imageModelList);
-        mImageListAdapter.notifyDataSetChanged();
+    private void initImageListRv() {
+        mImageListRv = findViewById(R.id.rv_image_list);
+        mImageListRvManager = new GridLayoutManager(this, 4);
+        mImageListRv.setLayoutManager(mImageListRvManager);
+        CustomItemDecoration itemDecoration = new CustomItemDecoration(1, Color.parseColor("#E5E5E5"));
+        mImageListRv.addItemDecoration(itemDecoration);
+        mImageListAdapter = new ImageListAdapter();
+        mImageListRv.setAdapter(mImageListAdapter);
+    }
 
-        Intent intent = getIntent();
-        String command = intent.getStringExtra("command");
-        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_MARKET_IMAGE)) {
-            String imagePath = intent.getStringExtra("image");
-            for (ImageModel imageModel : imageModelList) {
-                String path = imageModel.getPath();
-                if (TextUtils.equals(imagePath, path)) {
-                    imageModel.setSelected(true);
-                }
-            }
-            mImageListAdapter.notifyDataSetChanged();
-        }
-        if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
-            ArrayList<String> imageList = intent.getStringArrayListExtra("images");
-            for (ImageModel imageModel : imageModelList) {
-                String path = imageModel.getPath();
-                if (imageList.contains(path)) {
-                    imageModel.setSelected(true);
-                }
-            }
-            mImageListAdapter.notifyDataSetChanged();
-        }
+    private void initTitleViews() {
+        mBtnGoBack = findViewById(R.id.iv_layout_title_left_icon);
+        mBtnGoBack.setImageResource(R.drawable.ic_back);
+        mBtnGoBack.setVisibility(View.VISIBLE);
+        mBtnGoBack.setOnClickListener(this);
+
+        mTitleTextTv = findViewById(R.id.tv_layout_title_center_text);
+        mTitleTextTv.setText("所有图片");
+
+        mBtnChageAlbum = findViewById(R.id.tv_layout_title_right_text);
+        mBtnChageAlbum.setText("切换相册");
+        mBtnChageAlbum.setVisibility(View.VISIBLE);
+        mBtnChageAlbum.setOnClickListener(this);
     }
 
     @Override
-    public void OnItemClick(ViewGroup parent, View view, int position) {
-        mImageModel = mImageModelList.get(position);
-        boolean selected = mImageModel.isSelected();
-        if (selected) {
-            mImageModel.setSelected(false);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            ArrayList<ImageModel> imageModelList = data.getParcelableArrayListExtra(RESULT_DATA);
+            mAdapterImageModelList.clear();
+            mAdapterImageModelList.addAll(imageModelList);
             mImageListAdapter.notifyDataSetChanged();
-        } else {
-            String imagePath = mImageModel.getPath();
-            GlideApp.with(SelectPictureActivity.this).asBitmap().load(imagePath).into(mPreviewImageIv);
-            mPreviewMultipleImageVp.setVisibility(View.GONE);
-            mPreviewCenterText.setVisibility(View.INVISIBLE);
-            mPreviewRightText.setVisibility(View.VISIBLE);
-            mPreviewImageIv.setVisibility(View.VISIBLE);
-            mPreviewLayoutLl.setVisibility(View.VISIBLE);
-            mPivotX = view.getX();
-            mPivotY = view.getY();
-            mItemViewWidth = view.getMeasuredWidth();
-            mItemViewHeight = view.getMeasuredHeight();
-            ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, mPivotX + mItemViewWidth / 2, mPivotY + mItemViewHeight);
-            scaleAnimation.setDuration(200);
-            mPreviewLayoutLl.startAnimation(scaleAnimation);
+            selectedCount();
         }
-        selectedCount();
     }
+
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.tv_layout_title_left_text) {
+        if (v.getId() == R.id.iv_layout_title_left_icon) {
+            finish();
+        }
+        if (v.getId() == R.id.tv_layout_title_right_text) {
+            Intent intent = new Intent(SelectPictureActivity.this, AlbumListActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList(RESULT_DATA, mAllImageModelList);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 0);
+        }
+        if (v.getId() == R.id.btn_cancel_activity_select_picture) {
             selectAll(false);
             selectedCount();
         }
-        if (v.getId() == R.id.tv_layout_title_right_text) {
+        if (v.getId() == R.id.btn_select_all_activity_select_picture) {
             selectAll(true);
             selectedCount();
         }
@@ -159,23 +152,15 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             hidePreviewLayout();
         }
         if (v.getId() == R.id.tv_image_preview_right_text) {
-            String path = mImageModel.getPath();
-            File file = new File(path);
-            if (file.exists()) {
-                long length = file.length();
-                if (length >= 1024 * 1024) {
-                    Toast.makeText(this, "单张图片大小不超过1M，所有图片总大小不超过5M", Toast.LENGTH_SHORT).show();
-                } else {
-                    mImageModel.setSelected(true);
-                    mImageListAdapter.notifyDataSetChanged();
-                    hidePreviewLayout();
-                    selectedCount();
-                }
-            }
+            mImageModel.setSelected(true);
+            refreshAllPictureList(mImageModel, true);
+            mImageListAdapter.notifyDataSetChanged();
+            hidePreviewLayout();
+            selectedCount();
         }
-        if (v.getId() == R.id.tv_layout_footer_left_text) {
+        if (v.getId() == R.id.btn_preview_activity_select_picture) {
             List<ImageModel> selectedImageList = new ArrayList<>();
-            for (ImageModel imageModel : mImageModelList) {
+            for (ImageModel imageModel : mAdapterImageModelList) {
                 boolean selected = imageModel.isSelected();
                 if (selected) {
                     selectedImageList.add(imageModel);
@@ -199,12 +184,12 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             scaleAnimation.setDuration(200);
             mPreviewLayoutLl.startAnimation(scaleAnimation);
         }
-        if (v.getId() == R.id.tv_layout_footer_right_text) {
-            ArrayList<ImageModel> selectedImageList = new ArrayList<>();
-            for (ImageModel imageModel : mImageModelList) {
+        if (v.getId() == R.id.btn_complete_activity_select_picture) {
+
+            for (ImageModel imageModel : mAllImageModelList) {
                 boolean selected = imageModel.isSelected();
-                if (selected && !selectedImageList.contains(imageModel)) {
-                    selectedImageList.add(imageModel);
+                if (selected && !mSelectedImageList.contains(imageModel)) {
+                    mSelectedImageList.add(imageModel);
                 }
             }
             Intent intent = getIntent();
@@ -212,82 +197,43 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
             if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
                 ArrayList<String> imageList = intent.getStringArrayListExtra("images");
                 if (imageList != null && imageList.size() > 0) {
-                    for (int i = 0; i < selectedImageList.size(); i++) {
+                    for (int i = 0; i < mSelectedImageList.size(); i++) {
                         if (i >= imageList.size()) {
                             break;
                         }
-                        String path = selectedImageList.get(i).getPath();
+                        String path = mSelectedImageList.get(i).getPath();
                         if (!imageList.contains(path)) {
                             ImageModel imageModel = new ImageModel();
                             imageModel.setPath(imageList.get(i));
-                            selectedImageList.add(imageModel);
+                            mSelectedImageList.add(imageModel);
                         }
                     }
                 }
             }
-            if (selectedImageList.size() > 9) {
+            if (mSelectedImageList.size() > 9) {
                 Toast.makeText(this, "最多只能选择9张图片", Toast.LENGTH_SHORT).show();
             } else {
-                long singleSize = 0;
-                long totalSize = 0;
-                for (ImageModel imageModel : selectedImageList) {
-                    String path = imageModel.getPath();
-                    File file = new File(path);
-                    long length = file.length();
-                    if (length >= 1024 * 1024) {
-                        singleSize = length;
-                        break;
-                    } else {
-                        totalSize += length;
-                    }
-                }
-                if (singleSize >= 1) {
-                    Toast.makeText(this, "单张图片大小不能超过1M", Toast.LENGTH_SHORT).show();
-                } else if (totalSize > 5 * 1024 * 1024) {
-                    Toast.makeText(this, "所有图片总大小不能超过5M", Toast.LENGTH_SHORT).show();
-                } else {
-                    MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
-                    event.setCommand(command);
-                    event.setData(selectedImageList);
-                    EventBus.getDefault().post(event);
-                }
-//            Intent intent = new Intent();
-//            Bundle bundle = new Bundle();
-//            bundle.putParcelableArrayList(RESULT_DATA, selectedImageList);
-//            intent.putExtras(bundle);
-//            setResult(0, intent);
+                MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
+                event.setCommand(command);
+                event.setData(mSelectedImageList);
+                EventBus.getDefault().post(event);
                 finish();
             }
-
         }
     }
 
-    private void selectAll(boolean b) {
-        if (b) {
-            for (ImageModel imageModel : mImageModelList) {
-                imageModel.setSelected(b);
-            }
-        } else {
-            Intent intent = getIntent();
-            if (intent != null) {
-                String command = intent.getStringExtra("command");
-                if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
-                    ArrayList<String> imageList = intent.getStringArrayListExtra("images");
-                    for (ImageModel imageModel : mImageModelList) {
-                        String path = imageModel.getPath();
-                        if (!imageList.contains(path)) {
-                            imageModel.setSelected(false);
-                        }
-                    }
-                }
-            }
+    private void selectAll(boolean selected) {
+        for (ImageModel imageModel : mAdapterImageModelList) {
+            imageModel.setSelected(selected);
+            refreshAllPictureList(imageModel, selected);
         }
+
         mImageListAdapter.notifyDataSetChanged();
     }
 
     private void selectedCount() {
         int count = 0;
-        for (ImageModel imageModel : mImageModelList) {
+        for (ImageModel imageModel : mAdapterImageModelList) {
             boolean selected = imageModel.isSelected();
             if (selected) {
                 count++;
@@ -339,19 +285,67 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
 
         @Override
         public void onBindViewHolder(@NonNull ImageListHolder holder, final int position) {
-            String imagePath = mImageModelList.get(position).getPath();
+            String imagePath = mAdapterImageModelList.get(position).getPath();
             GlideApp.with(SelectPictureActivity.this).asBitmap().load(imagePath).override(500, 500).into(holder.mImageIv);
-            final boolean selected = mImageModelList.get(position).isSelected();
+            final boolean selected = mAdapterImageModelList.get(position).isSelected();
             if (selected) {
                 holder.mSelectedStateIv.setImageResource(R.drawable.ic_select);
             } else {
                 holder.mSelectedStateIv.setImageResource(R.drawable.ic_not_select);
             }
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mImageModel = mAdapterImageModelList.get(position);
+                    String path = mImageModel.getPath();
+                    boolean selected1 = mImageModel.isSelected();
+                    if (!selected1) {
+                        GlideApp.with(SelectPictureActivity.this).asBitmap().load(path).into(mPreviewImageIv);
+                        mPreviewMultipleImageVp.setVisibility(View.GONE);
+                        mPreviewCenterText.setVisibility(View.INVISIBLE);
+                        mPreviewRightText.setVisibility(View.VISIBLE);
+                        mPreviewImageIv.setVisibility(View.VISIBLE);
+                        mPreviewLayoutLl.setVisibility(View.VISIBLE);
+                        mPivotX = v.getX();
+                        mPivotY = v.getY();
+                        mItemViewWidth = v.getMeasuredWidth();
+                        mItemViewHeight = v.getMeasuredHeight();
+                        ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, mPivotX + mItemViewWidth / 2, mPivotY + mItemViewHeight);
+                        scaleAnimation.setDuration(200);
+                        mPreviewLayoutLl.startAnimation(scaleAnimation);
+                    } else {
+                        mImageModel.setSelected(false);
+                        refreshAllPictureList(mImageModel, false);
+                        mImageListAdapter.notifyDataSetChanged();
+                    }
+                    selectedCount();
+                }
+            });
+            holder.mSelectedStateIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mImageModel = mAdapterImageModelList.get(position);
+                    boolean selected1 = mImageModel.isSelected();
+                    mImageModel.setSelected(!selected1);
+                    refreshAllPictureList(mImageModel, !selected1);
+                    mImageListAdapter.notifyDataSetChanged();
+                    selectedCount();
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
-            return mImageModelList.size();
+            return mAdapterImageModelList.size();
+        }
+    }
+
+    private void refreshAllPictureList(ImageModel comparedImageModel, boolean selected) {
+        for (ImageModel imageModel : mAllImageModelList) {
+            String id = imageModel.getId();
+            if (TextUtils.equals(id, comparedImageModel.getId())) {
+                imageModel.setSelected(selected);
+            }
         }
     }
 
@@ -378,7 +372,7 @@ public class SelectPictureActivity extends AppCompatActivity implements CustomRe
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
             ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
-            GlideApp.with(SelectPictureActivity.this).asBitmap().load(imageList.get(position).getPath()).override(500, 500).into(imageView);
+            GlideApp.with(SelectPictureActivity.this).asBitmap().load(imageList.get(position).getPath()).into(imageView);
             container.addView(view);
             return view;
         }

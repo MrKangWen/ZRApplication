@@ -509,14 +509,6 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            mPerfectWXCircleDialog.onPictureSelectedResult(requestCode, resultCode, data);
-        }
-    }
-
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(this);
         mPerfectWXCircleDialog.show();

@@ -516,14 +516,6 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            mPerfectWXCircleDialog.onPictureSelectedResult(requestCode, resultCode, data);
-        }
-    }
-
     private class SearchViewHolder extends RecyclerView.ViewHolder {
         private FrameLayout mRankingFl;
         private ImageView mGoodsImageIv;

@@ -496,13 +496,6 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            mPerfectWXCircleDialog.onPictureSelectedResult(requestCode, resultCode, data);
-        }
-    }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {
         private FrameLayout mRankingFl;
