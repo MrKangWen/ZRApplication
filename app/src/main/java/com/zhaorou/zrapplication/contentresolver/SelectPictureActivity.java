@@ -29,6 +29,7 @@ import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class SelectPictureActivity extends AppCompatActivity implements View.OnC
     private float mItemViewHeight;
     private ArrayList<ImageModel> mAdapterImageModelList = new ArrayList<>();
     private ArrayList<ImageModel> mAllImageModelList = new ArrayList<>();
-    private ArrayList<ImageModel> mSelectedImageList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,11 +153,20 @@ public class SelectPictureActivity extends AppCompatActivity implements View.OnC
             hidePreviewLayout();
         }
         if (v.getId() == R.id.tv_image_preview_right_text) {
-            mImageModel.setSelected(true);
-            refreshAllPictureList(mImageModel, true);
-            mImageListAdapter.notifyDataSetChanged();
-            hidePreviewLayout();
-            selectedCount();
+            String path = mImageModel.getPath();
+            File file = new File(path);
+            if (file.exists()) {
+                long length = file.length();
+                if (length >= 1024 * 1024) {
+                    Toast.makeText(this, "单张图片大小不超过1M，所有图片总大小不超过5M", Toast.LENGTH_SHORT).show();
+                } else {
+                    mImageModel.setSelected(true);
+                    refreshAllPictureList(mImageModel, true);
+                    mImageListAdapter.notifyDataSetChanged();
+                    hidePreviewLayout();
+                    selectedCount();
+                }
+            }
         }
         if (v.getId() == R.id.btn_preview_activity_select_picture) {
             List<ImageModel> selectedImageList = new ArrayList<>();
@@ -185,11 +195,11 @@ public class SelectPictureActivity extends AppCompatActivity implements View.OnC
             mPreviewLayoutLl.startAnimation(scaleAnimation);
         }
         if (v.getId() == R.id.btn_complete_activity_select_picture) {
-
+            ArrayList<ImageModel> selectedImageList = new ArrayList<>();
             for (ImageModel imageModel : mAllImageModelList) {
                 boolean selected = imageModel.isSelected();
-                if (selected && !mSelectedImageList.contains(imageModel)) {
-                    mSelectedImageList.add(imageModel);
+                if (selected && !selectedImageList.contains(imageModel)) {
+                    selectedImageList.add(imageModel);
                 }
             }
             Intent intent = getIntent();
@@ -197,27 +207,46 @@ public class SelectPictureActivity extends AppCompatActivity implements View.OnC
             if (TextUtils.equals(command, ZRDConstants.EventCommand.COMMAND_SELECT_IMAGES)) {
                 ArrayList<String> imageList = intent.getStringArrayListExtra("images");
                 if (imageList != null && imageList.size() > 0) {
-                    for (int i = 0; i < mSelectedImageList.size(); i++) {
+                    for (int i = 0; i < selectedImageList.size(); i++) {
                         if (i >= imageList.size()) {
                             break;
                         }
-                        String path = mSelectedImageList.get(i).getPath();
+                        String path = selectedImageList.get(i).getPath();
                         if (!imageList.contains(path)) {
                             ImageModel imageModel = new ImageModel();
                             imageModel.setPath(imageList.get(i));
-                            mSelectedImageList.add(imageModel);
+                            selectedImageList.add(imageModel);
                         }
                     }
                 }
             }
-            if (mSelectedImageList.size() > 9) {
+            if (selectedImageList.size() > 9) {
                 Toast.makeText(this, "最多只能选择9张图片", Toast.LENGTH_SHORT).show();
             } else {
-                MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
-                event.setCommand(command);
-                event.setData(mSelectedImageList);
-                EventBus.getDefault().post(event);
-                finish();
+                long singleSize = 0;
+                long totalSize = 0;
+                for (ImageModel imageModel : selectedImageList) {
+                    String path = imageModel.getPath();
+                    File file = new File(path);
+                    long length = file.length();
+                    if (length >= 1024 * 1024) {
+                        singleSize = length;
+                        break;
+                    } else {
+                        totalSize += length;
+                    }
+                }
+                if (singleSize >= 1) {
+                    Toast.makeText(this, "单张图片大小不能超过1M", Toast.LENGTH_SHORT).show();
+                } else if (totalSize > 5 * 1024 * 1024) {
+                    Toast.makeText(this, "所有图片总大小不能超过5M", Toast.LENGTH_SHORT).show();
+                } else {
+                    MessageEvent<ArrayList<ImageModel>> event = new MessageEvent<>();
+                    event.setCommand(command);
+                    event.setData(selectedImageList);
+                    EventBus.getDefault().post(event);
+                    finish();
+                }
             }
         }
     }
@@ -326,6 +355,18 @@ public class SelectPictureActivity extends AppCompatActivity implements View.OnC
                 public void onClick(View v) {
                     mImageModel = mAdapterImageModelList.get(position);
                     boolean selected1 = mImageModel.isSelected();
+                    if (!selected1) {
+                        String path = mImageModel.getPath();
+                        File file = new File(path);
+                        if (file.exists()) {
+                            long length = file.length();
+                            if (length >= 1024 * 1024) {
+                                Toast.makeText(SelectPictureActivity.this, "单张图片大小不超过1M，所有图片总大小不超过5M", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+
+                    }
                     mImageModel.setSelected(!selected1);
                     refreshAllPictureList(mImageModel, !selected1);
                     mImageListAdapter.notifyDataSetChanged();

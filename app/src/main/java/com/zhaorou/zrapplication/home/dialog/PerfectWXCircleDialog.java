@@ -17,7 +17,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -103,6 +102,9 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             switch (msg.what) {
                 case 0:
                     Toast.makeText(getContext(), "文案提交成功，请等待审核", Toast.LENGTH_SHORT).show();
+                    if (mLoadingDialog != null) {
+                        mLoadingDialog.dismiss();
+                    }
                     dismiss();
                     break;
                 case 1:
@@ -124,7 +126,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private FrameLayout mPreviewImgLayout;
     private FriendPopDetailModel.DataBean.EntityBean mEntityBean;
     private LoadingDialog mLoadingDialog;
-    private ArrayList<ImageModel> imageModelList = new ArrayList<>();
 
 
     public PerfectWXCircleDialog(@NonNull Context context) {
@@ -244,14 +245,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private void uploadMarketImage() {
         if (!TextUtils.isEmpty(mMarketImageUrl)) {
             File file = new File(mMarketImageUrl);
-            Log.e(TAG, "uploadMarketImage: file: " + file.length());
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    File file = FileUtils.compressImage(mMarketImageUrl, 200);
-//                }
-//            }).start();
-
             if (file != null && file.exists()) {
                 RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                 MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
@@ -693,8 +686,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
             View view = getLayoutInflater().inflate(R.layout.layout_multiple_preview_item, null);
             ImageView imageView = view.findViewById(R.id.iv_multiple_preview_item_image);
             GlideApp.with(getContext()).asBitmap().load(imageUrl)
-                    .placeholder(R.drawable.img_pre_load)
-                    .error(R.drawable.img_load_error)
                     .into(imageView);
             TextView btnSaveImage = view.findViewById(R.id.iv_multiple_preview_item_btn_save_image);
             btnSaveImage.setOnClickListener(new View.OnClickListener() {

@@ -82,6 +82,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private String mTaoword;
     private String mTkl;
     private LoadingDialog mLoadingDialog;
+    private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
     public HomeVPItemFragment() {
     }
@@ -110,6 +111,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         mUnbinder.unbind();
         mPresenter.detachView();
     }
+
 
     @Override
     public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
@@ -157,7 +159,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-
         if (TextUtils.equals(mShareType, "WX")) {
             mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
                     price_after_coupons + "\n" +
@@ -201,7 +202,9 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             public void run() {
                 for (String imgUrl : list) {
                     File file = FileUtils.saveImageToSdCard(getContext().getExternalCacheDir(), imgUrl);
-                    fileList.add(file);
+                    if (file != null) {
+                        fileList.add(file);
+                    }
                 }
                 Intent intent = new Intent();
                 ComponentName comp = null;
@@ -221,6 +224,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 }
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
                 startActivity(intent);
+
             }
         }).start();
     }
@@ -521,7 +525,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     } catch (Exception e) {
                     }
 
-
                 }
             });
         }
@@ -533,14 +536,15 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     }
 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        PerfectWXCircleDialog perfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
-        perfectWXCircleDialog.show();
-        perfectWXCircleDialog.setGoodsInfo(goodsBean);
+        mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
+        mPerfectWXCircleDialog.show();
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {

@@ -26,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tencent.mm.opensdk.modelmsg.WXImageObject;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
@@ -226,6 +228,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 }
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
                 startActivity(intent);
+
             }
         }).start();
     }
