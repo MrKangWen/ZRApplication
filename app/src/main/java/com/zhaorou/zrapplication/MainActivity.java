@@ -234,7 +234,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
                         intent.putExtra(UpdateAppService.TipsInstall, true);
                         intent.putExtra(UpdateAppService.APP_URL, apkUrl);
                         //md5
-                        intent.putExtra(UpdateAppService.MD5_KEY, apkMd5);
+                        intent.putExtra(UpdateAppService.MD5_KEY, apkMd5.toUpperCase());
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             startForegroundService(intent);

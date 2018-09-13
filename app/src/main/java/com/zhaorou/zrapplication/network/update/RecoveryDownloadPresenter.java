@@ -103,7 +103,7 @@ public class RecoveryDownloadPresenter {
         }
         d("--url----" + url);
         d("-----------========任务在下载中=======-------");
-        this.mFileMd5 = fileMd5.toUpperCase();
+        this.mFileMd5 = fileMd5;
         mIsDownloading = true;
         isCancelDownload = false;
 
