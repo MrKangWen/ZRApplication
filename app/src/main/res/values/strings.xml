@@ -3,6 +3,7 @@
 
     <string-array name="fragment_home_tab">
         <item>实时排行</item>
+        <item>精选</item>
         <item>聚划算</item>
         <item>大牌推荐</item>
         <item>全部商品</item>
@@ -10,6 +11,7 @@
 
     <string-array name="goods_list_type">
         <item>shishi</item>
+        <item>jx_good_list</item>
         <item>jhs</item>
         <item>dapai</item>
         <item>www_lingquan</item>

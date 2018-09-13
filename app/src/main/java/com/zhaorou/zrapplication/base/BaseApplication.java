@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Build;
 import android.os.StrictMode;
 
+import com.facebook.stetho.Stetho;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
@@ -25,6 +26,8 @@ public class BaseApplication extends Application {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+
+        Stetho.initializeWithDefaults(this);
     }
 
     private void initWXAPI() {

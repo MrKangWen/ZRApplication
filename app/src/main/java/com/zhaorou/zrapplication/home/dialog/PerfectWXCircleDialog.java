@@ -38,6 +38,7 @@ import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.DataStorageDirectoryHelper;
@@ -527,6 +528,11 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     @Override
     public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
+
+    }
+
+    @Override
+    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
 
     }
 

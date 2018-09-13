@@ -19,6 +19,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">
@@ -80,6 +81,8 @@
 
         <activity android:name=".contentresolver.AlbumListActivity">
         </activity>
+
+        <service android:name=".network.update.UpdateAppService" />
     </application>
 
 </manifest>

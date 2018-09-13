@@ -31,6 +31,7 @@ import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
@@ -101,6 +102,12 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         mGoodsList.addAll(list);
         mGoodsAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
+
+    }
+
 
     @Override
     public void onLoadMore(boolean loadMore) {

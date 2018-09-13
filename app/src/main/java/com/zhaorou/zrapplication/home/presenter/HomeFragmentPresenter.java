@@ -1,13 +1,20 @@
 package com.zhaorou.zrapplication.home.presenter;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.util.Log;
+
 import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
+import com.zhaorou.zrapplication.home.api.HomeApi;
+import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
 import com.zhaorou.zrapplication.utils.GsonHelper;
 
 import org.json.JSONException;
@@ -15,6 +22,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,6 +147,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         });
     }
 
+
     public void getFriendPopDetail(Map<String, String> params) {
         if (mView != null) {
             mView.onShowLoading();
@@ -238,4 +247,37 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
             }
         });
     }
+
+
+    public void getJxListData(Map<String, String> params) {
+
+        if (mView != null) {
+            mView.onShowLoading();
+        }
+        HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params).enqueue(new AbsZCallback<JxListModel>() {
+            @Override
+            public void onSuccess(Call<JxListModel> call, Response<JxListModel> response) {
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
+
+                JxListModel body = response.body();
+                Log.d("mytest", body.getData().getList().get(0).getGoods_id());
+
+            }
+
+            @Override
+            public void onFail(Call<JxListModel> call, Throwable t) {
+                if (mView != null) {
+                    mView.onHideLoading();
+                }
+
+            }
+        });
+
+    }
+
+
+
+
 }

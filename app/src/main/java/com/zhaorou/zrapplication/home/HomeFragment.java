@@ -31,6 +31,7 @@ import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
+import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
@@ -86,7 +87,7 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     private Handler mHandler = new Handler();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private LoadingDialog mLoadingDialog;
-
+    private List<ClassListModel.DataBean.ListBean> mJxList = new ArrayList<>();
     public HomeFragment() {
     }
 
@@ -144,6 +145,11 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         mClassList.clear();
         mClassList.addAll(list);
         mClassListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
+
     }
 
     @Override

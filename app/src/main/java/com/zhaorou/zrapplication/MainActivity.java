@@ -1,8 +1,10 @@
 package com.zhaorou.zrapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +19,11 @@ import android.widget.TextView;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeFragment;
+import com.zhaorou.zrapplication.home.api.HomeApi;
+import com.zhaorou.zrapplication.home.model.AppUpdateModel;
+import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
+import com.zhaorou.zrapplication.network.update.UpdateAppService;
 import com.zhaorou.zrapplication.user.UserFragment;
 import com.zhaorou.zrapplication.utils.AccessibilityUtils;
 import com.zhaorou.zrapplication.utils.AssistantService;
@@ -32,6 +39,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements ViewPager.OnPageChangeListener {
 
@@ -72,6 +81,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         setSelectedTab(mTabHomeIv, mTabHomeTv);
         initViewPager();
         EventBus.getDefault().register(this);
+        appUpdate();
+
         if (!AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), this)) {
             new AlertDialog.Builder(this).setMessage("打开【设置——>辅助功能/无障碍——>找肉单——>开启】开启分享朋友圈自动粘贴文字功能")
                     .setNegativeButton("取消", null)
@@ -179,5 +190,59 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         public int getCount() {
             return mFragmentList.size();
         }
+    }
+
+
+    public void appUpdate() {
+
+        HttpRequestUtil.getRetrofitService(HomeApi.class).appUpdate().enqueue(new AbsZCallback<AppUpdateModel>() {
+            @Override
+            public void onSuccess(Call<AppUpdateModel> call, Response<AppUpdateModel> response) {
+
+                if (response.body().getData() == null) {
+                    return;
+                }
+
+                AppUpdateModel.DataBean.EntityBean data = response.body().getData().getEntity();
+
+                if (data == null) {
+                    return;
+                }
+                showAppUpdateDialog(data.getUpdate_tip(), data.getDownload_url(), data.getMd5());
+            }
+
+            @Override
+            public void onFail(Call<AppUpdateModel> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private void showAppUpdateDialog(String msg, final String apkUrl, final String apkMd5) {
+        new AlertDialog.Builder(this)
+                .setMessage(msg)
+                .setTitle("更新")
+                .setNegativeButton("取消", null)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), UpdateAppService.class);
+                        //wifi下
+                        intent.putExtra(UpdateAppService.IsNeedWifiDownloading, false);
+                        //是否进行安装
+                        intent.putExtra(UpdateAppService.TipsInstall, true);
+                        intent.putExtra(UpdateAppService.APP_URL, apkUrl);
+                        //md5
+                        intent.putExtra(UpdateAppService.MD5_KEY, apkMd5);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(intent);
+                        } else {
+                            startService(intent);
+                        }
+
+                    }
+                }).create().show();
     }
 }
