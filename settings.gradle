@@ -1,1 +1,1 @@
-include ':app',  ':zhuanquanapp', ':zrecyclerview'
+include ':app',  ':zhuanquanapp'

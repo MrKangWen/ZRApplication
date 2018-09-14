@@ -440,7 +440,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
                 @Override
                 public void onClick(View v) {
                     JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-
+                    mGoodsBean=goodsBean;
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
                     String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
