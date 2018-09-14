@@ -31,7 +31,7 @@ import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.JxListModel;
+
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.search.SearchActivity;
 import com.zhaorou.zrapplication.widget.recyclerview.CustomRecyclerView;
@@ -82,12 +82,13 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
     private Unbinder mUnbinder;
     private ClassListAdapter mClassListAdapter;
     private ViewPagerAdapter mPagerAdapter;
-    private List<HomeVPItemFragment> mFragmentList = new ArrayList<>();
+    private List<BaseFragment> mFragmentList = new ArrayList<>();
     private List<ClassListModel.DataBean.ListBean> mClassList = new ArrayList<>();
     private Handler mHandler = new Handler();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private LoadingDialog mLoadingDialog;
     private List<ClassListModel.DataBean.ListBean> mJxList = new ArrayList<>();
+
     public HomeFragment() {
     }
 
@@ -107,6 +108,12 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         mPresenter.fetchClassList();
         return mView;
     }
+
+    @Override
+    public void initData() {
+
+    }
+
 
     @Override
     public void onDestroy() {
@@ -147,10 +154,6 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
         mClassListAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
-
-    }
 
     @Override
     public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
@@ -241,12 +244,23 @@ public class HomeFragment extends BaseFragment implements ViewPager.OnPageChange
 
     private void initViewPager() {
         for (int i = 0; i < mTabsTitleArray.length; i++) {
-            HomeVPItemFragment homeVPItemFragment = new HomeVPItemFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("goods_type", mGoodsTypeKeys[i]);
-            homeVPItemFragment.setArguments(bundle);
-            mFragmentList.add(homeVPItemFragment);
+
+            if (i == 1) {
+                HomeJxFragment jxFragment=new HomeJxFragment();
+                mFragmentList.add(jxFragment);
+            } else {
+                HomeVPItemFragment homeVPItemFragment = new HomeVPItemFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("goods_type", mGoodsTypeKeys[i]);
+                homeVPItemFragment.setArguments(bundle);
+                mFragmentList.add(homeVPItemFragment);
+
+            }
+
+
         }
+
+
         FragmentManager fm = getActivity().getSupportFragmentManager();
         mPagerAdapter = new ViewPagerAdapter(fm);
         mViewPager.setAdapter(mPagerAdapter);

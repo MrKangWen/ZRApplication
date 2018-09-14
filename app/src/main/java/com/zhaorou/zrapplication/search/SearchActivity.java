@@ -512,7 +512,8 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(this);
         mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
+                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
     }
 
     private class SearchViewHolder extends RecyclerView.ViewHolder {

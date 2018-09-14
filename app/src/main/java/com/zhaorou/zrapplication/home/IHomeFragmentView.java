@@ -4,7 +4,7 @@ import com.zhaorou.zrapplication.base.IBaseMvpView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.JxListModel;
+
 
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface IHomeFragmentView extends IBaseMvpView {
     void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list);
 
     void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list);
-    void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list);
+
     void onLoadMore(boolean loadMore);
 
     void onGetFriendPopDetail(FriendPopDetailModel.DataBean.EntityBean entityBean);

@@ -3,7 +3,6 @@ package com.zhaorou.zrapplication.home;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.arch.lifecycle.Observer;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -13,7 +12,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,11 +34,10 @@ import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
-import com.zhaorou.zrapplication.home.model.AppUpdateModel;
+
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.utils.AccessibilityUtils;
@@ -66,7 +63,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks {
+public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks  {
 
     private static final String TAG = "HomeVPItemFragment";
     @BindView(R.id.goods_list_fragment_home_vp_item_rv)
@@ -81,7 +78,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private Unbinder mUnbinder;
     private LinearLayoutManager mLayoutManager;
     private GoodsAdapter mGoodsAdapter;
-    private List<Object> mGoodsList = new ArrayList();
+    private List<GoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private String mGoodsType;
     private int page = 1;
@@ -95,7 +92,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     public HomeVPItemFragment() {
     }
 
-    private  final  String JX_Good_List="jx_good_list";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -134,11 +130,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         }
         mGoodsList.addAll(list);
         mGoodsAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
-
     }
 
     @Override
@@ -343,65 +334,30 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         });
     }
 
+
+    @Override
     public void initData() {
         page = 1;
-        Map<String, String> params = new HashMap<>(5);
-
-
-        params.put("page", page + "");
-
-        if(mGoodsType.equals(JX_Good_List)){
-            //精选
-            // {"cid":"0","type":1,"flag":1,"page":1,"keyword":"","pageSize":20}
-            params.put("cid", "0");
-            params.put("type", "1");
-            params.put("flag", "1");
-            params.put("keyword", "");
-            mPresenter.getJxListData(params);
-        }else {
-            if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
-                params.put("flag", mGoodsType);
-            } else {
-                params.put("type", mGoodsType);
-            }
-
-            mPresenter.fetchGoodsList(params);
-
+        Map<String, String> params = new HashMap<>();
+        if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
+            params.put("flag", mGoodsType);
+        } else {
+            params.put("type", mGoodsType);
         }
-
-
+        params.put("page", page + "");
+        mPresenter.fetchGoodsList(params);
     }
 
     private void doLoadMore() {
         page++;
-
-
-        Map<String, String> params = new HashMap<>(5);
-
-
-        params.put("page", page + "");
-
-        if(mGoodsType.equals(JX_Good_List)){
-            //精选
-            // {"cid":"0","type":1,"flag":1,"page":1,"keyword":"","pageSize":20}
-            params.put("cid", "0");
-            params.put("type", "1");
-            params.put("flag", "1");
-            params.put("keyword", "");
-            mPresenter.getJxListData(params);
-        }else {
-            if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
-                params.put("flag", mGoodsType);
-            } else {
-                params.put("type", mGoodsType);
-            }
-
-            mPresenter.fetchGoodsList(params);
-
+        Map<String, String> params = new HashMap<>();
+        if (TextUtils.equals(mGoodsType, mGoodsTypeKeys[0])) {
+            params.put("flag", mGoodsType);
+        } else {
+            params.put("type", mGoodsType);
         }
-
-
-
+        params.put("page", page + "");
+        mPresenter.fetchGoodsList(params);
     }
 
     public int getLastCompleteVisiblePosition() {
@@ -425,7 +381,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
 
         @Override
         public void onBindViewHolder(@NonNull GoodsViewHolder holder, final int position) {
-            GoodsListModel.DataBean.ListBean goodsBean = (GoodsListModel.DataBean.ListBean) mGoodsList.get(position);
+            GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
             mGoodsBean = goodsBean;
             String title = goodsBean.getGoods_name();
             holder.mTitleTv.setText(title);
@@ -484,7 +440,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GoodsListModel.DataBean.ListBean goodsBean = (GoodsListModel.DataBean.ListBean) mGoodsList.get(position);
+                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                     mGoodsBean = goodsBean;
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
@@ -503,12 +459,13 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                     }
                 }
             });
+
             holder.mBtnCopyWords.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
                         mShareType = "TKL";
-                        GoodsListModel.DataBean.ListBean goodsBean = (GoodsListModel.DataBean.ListBean) mGoodsList.get(position);
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                         mGoodsBean = goodsBean;
                         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                         String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
@@ -533,7 +490,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 public void onClick(View v) {
                     try {
                         mShareType = "WX";
-                        GoodsListModel.DataBean.ListBean goodsBean = (GoodsListModel.DataBean.ListBean) mGoodsList.get(position);
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                         mGoodsBean = goodsBean;
                         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                         String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
@@ -557,7 +514,7 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                 public void onClick(View v) {
                     try {
                         mShareType = "WX_CIRCLE";
-                        GoodsListModel.DataBean.ListBean goodsBean = (GoodsListModel.DataBean.ListBean) mGoodsList.get(position);
+                        GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
                         mGoodsBean = goodsBean;
 
                         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
@@ -574,7 +531,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
                             mPresenter.getTaobaoTbkTpwd(params);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
                     }
 
                 }
@@ -590,7 +546,8 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean);
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
+                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
     }
 
     @Override

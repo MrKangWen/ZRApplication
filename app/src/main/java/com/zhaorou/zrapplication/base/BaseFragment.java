@@ -12,7 +12,7 @@ import com.zhaorou.zrapplication.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
 
     public BaseFragment() {
@@ -25,4 +25,6 @@ public class BaseFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_base, container, false);
     }
 
+
+    abstract  public void initData();
 }

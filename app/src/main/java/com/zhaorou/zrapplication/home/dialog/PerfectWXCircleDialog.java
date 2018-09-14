@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseDialog;
+import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.contentresolver.ImageModel;
@@ -71,7 +72,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private static final String TAG = "PerfectWXCircleDialog";
 
     private Context mContext;
-    private HomeVPItemFragment mFragment;
+    private BaseFragment mFragment;
 
     private TextView mUrlTv;
     private TextView mTitleTv;
@@ -112,12 +113,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     Bundle bundle = msg.getData();
                     if (bundle != null) {
                         String data = bundle.getString("data");
-                        mFragment.onLoadFail(data);
+                   //     mFragment.onLoadFail(data);
+                        Toast.makeText(getContext(), data, Toast.LENGTH_SHORT).show();
                     }
                     dismiss();
                     break;
                 case 2:
-                    mFragment.onLoadFail("网络请求失败");
+                    Toast.makeText(getContext(), "网络请求失败", Toast.LENGTH_SHORT).show();
+                  //  mFragment.onLoadFail("网络请求失败");
                     break;
             }
         }
@@ -134,7 +137,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         mContext = context;
     }
 
-    public PerfectWXCircleDialog(@NonNull Context context, HomeVPItemFragment fragment) {
+    public PerfectWXCircleDialog(@NonNull Context context, BaseFragment fragment) {
         super(context);
         mContext = context;
         mFragment = fragment;
@@ -445,20 +448,20 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     }
 
-    public void setGoodsInfo(GoodsListModel.DataBean.ListBean goodsBean) {
-        mGoodsBean = goodsBean;
-        String goodsId = goodsBean.getGoods_id();
+    public void setGoodsInfo(String goodsId,  String quanGuidContent,int isFriendpop, String goodsName ) {
+       // mGoodsBean = goodsBean;
+      //  String goodsId = goodsBean.getGoods_id();
 
-        String quanGuidContent = goodsBean.getQuan_guid_content();
+    //    String quanGuidContent = goodsBean.getQuan_guid_content();
         mContentEt.setText(quanGuidContent);
 
-        int isFriendpop = goodsBean.getIs_friendpop();
+     //   int isFriendpop = goodsBean.getIs_friendpop();
         if (isFriendpop == 0) {
             mDialogTitle.setText("完善朋友圈文案");
             mUrlTv.setVisibility(View.VISIBLE);
             mUrlTv.setText("https://detail.tmall.com/item.html?id=" + goodsId);
 
-            String goodsName = goodsBean.getGoods_name();
+       //     String goodsName = goodsBean.getGoods_name();
             mTitleTv.setVisibility(View.VISIBLE);
             mTitleTv.setText(goodsName);
 
@@ -528,11 +531,6 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     @Override
     public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
-
-    }
-
-    @Override
-    public void onFetchJxGoodsList(List<JxListModel.DataBean.ListBean> list) {
 
     }
 

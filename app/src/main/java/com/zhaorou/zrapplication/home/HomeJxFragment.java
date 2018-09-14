@@ -1,19 +1,24 @@
 package com.zhaorou.zrapplication.home;
 
+
 import android.Manifest;
+import android.arch.lifecycle.Observer;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -21,13 +26,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.zhaorou.zrapplication.R;
-import com.zhaorou.zrapplication.base.BaseActivity;
+import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
+
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
@@ -46,48 +51,67 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import butterknife.Unbinder;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class CategoryActivity extends BaseActivity implements IHomeFragmentView {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks  {
 
-    @BindView(R.id.activity_category_swip_refresh_layout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.activity_category_layout_title_center_tv)
-    TextView mLayoutTitleTv;
-    @BindView(R.id.activity_category_goods_list)
+    private static final String TAG = "HomeVPItemFragment";
+    @BindView(R.id.goods_list_fragment_home_vp_item_rv)
     CustomRecyclerView mRecyclerView;
 
-    private LinearLayoutManager mLayoutManager;
-    private String mCategoryName;
-    private String mCategoryId;
-    private int page = 1;
-    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
-    private List<GoodsListModel.DataBean.ListBean> mGoodsList = new ArrayList<>();
-    private GoodsAdapter mGoodsAdapter;
+    @BindArray(R.array.goods_list_type)
+    String[] mGoodsTypeKeys;
 
-    private GoodsListModel.DataBean.ListBean mGoodsBean;
+
+    private View mView;
+
+    private Unbinder mUnbinder;
+    private LinearLayoutManager mLayoutManager;
+    private GoodsAdapter mGoodsAdapter;
+    private List<JxListModel.DataBean.ListBean> mGoodsList = new ArrayList<>();
+    private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
+    private String mGoodsType;
+    private int page = 1;
+    private JxListModel.DataBean.ListBean mGoodsBean;
     private String mShareType;
     private String mTaoword;
     private String mTkl;
     private LoadingDialog mLoadingDialog;
     private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_category);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        if (mView == null) {
+            mView = inflater.inflate(R.layout.fragment_home_vpitem, container, false);
+            mUnbinder = ButterKnife.bind(this, mView);
+            initRecyclerView();
+        }
         mPresenter.attachView(this);
-        mLoadingDialog = new LoadingDialog(this);
-        initIntent();
-        initLayoutTitle();
-        initSwipLayout();
-        initRecyclerView();
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mGoodsType = arguments.getString("goods_type");
+        }
+        mLoadingDialog = new LoadingDialog(getContext());
         initData();
+        return mView;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mUnbinder.unbind();
+        mPresenter.detachView();
+    }
+
 
     @Override
     public void onFetchedClassList(List<ClassListModel.DataBean.ListBean> list) {
@@ -96,14 +120,8 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
 
     @Override
     public void onFetchDtkGoodsList(List<GoodsListModel.DataBean.ListBean> list) {
-        if (page == 1) {
-            mGoodsList.clear();
-        }
-        mGoodsList.addAll(list);
-        mGoodsAdapter.notifyDataSetChanged();
+
     }
-
-
 
     @Override
     public void onLoadMore(boolean loadMore) {
@@ -111,7 +129,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             doLoadMore();
         } else {
             if (page > 1) {
-                Toast.makeText(this, "没有更多了~", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "没有更多了~", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -121,12 +139,17 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         shareFriendPopToWx(entityBean);
     }
 
+    @Override
+    public void onLoadFail(String str) {
+        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+    }
+
     private void shareFriendPopToWx(FriendPopDetailModel.DataBean.EntityBean entityBean) {
         if (entityBean == null || TextUtils.isEmpty(entityBean.getImage())) {
-            Toast.makeText(this, "请先完善朋友圈文案", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "请先完善朋友圈文案", Toast.LENGTH_SHORT).show();
             return;
         }
-        String tklType = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+        String tklType = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
@@ -146,10 +169,10 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         } else {
             mTaoword = content;
         }
-        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
-        Toast.makeText(this, "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
 
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
@@ -174,8 +197,10 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             @Override
             public void run() {
                 for (String imgUrl : list) {
-                    File file = FileUtils.saveImageToSdCard(getExternalCacheDir(), imgUrl);
-                    fileList.add(file);
+                    File file = FileUtils.saveImageToSdCard(getContext().getExternalCacheDir(), imgUrl);
+                    if (file != null) {
+                        fileList.add(file);
+                    }
                 }
                 Intent intent = new Intent();
                 ComponentName comp = null;
@@ -195,6 +220,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
                 }
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUriList);
                 startActivity(intent);
+
             }
         }).start();
     }
@@ -202,7 +228,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
     @Override
     public void onGetTaowords(String tkl) {
         mTkl = tkl;
-        String tklType = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+        String tklType = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
@@ -224,7 +250,6 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         mPresenter.getFriendPopDetail(params);
     }
 
-
     private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 
         String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
@@ -237,68 +262,47 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             String str = "https://wenan001.kuaizhan.com/?taowords=";
             taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
         }
-        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("tkl", taoword);
         cm.setPrimaryClip(clipData);
-        Toast.makeText(this, "淘口令已复制", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLoadFail(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "淘口令已复制", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onShowLoading() {
-        mLoadingDialog.show();
+        HomeFragment.startRefresh();
+     //   mLoadingDialog.show();
     }
 
     @Override
     public void onHideLoading() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-        if (mLoadingDialog != null) {
+        HomeFragment.finishRefresh();
+    /*    if (mLoadingDialog != null) {
             mLoadingDialog.dismiss();
-        }
+        }*/
     }
 
-    @OnClick({R.id.activity_category_layout_title_left_btn_rl})
-    protected void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.activity_category_layout_title_left_btn_rl:
-                finish();
-                break;
-            default:
-                break;
-        }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        showDialog(mGoodsBean);
     }
 
-    private void initIntent() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            mCategoryName = intent.getStringExtra("category_name");
-            mCategoryId = intent.getStringExtra("category_id");
-        }
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+
     }
 
-    private void initLayoutTitle() {
-        mLayoutTitleTv.setText(mCategoryName);
-    }
-
-    private void initSwipLayout() {
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                initData();
-            }
-        });
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     private void initRecyclerView() {
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        CustomItemDecoration itemDecoration = new CustomItemDecoration(DisplayUtil.dip2px(this, 10), getResources().getColor(R.color.colorGray_F5F5F5));
+        CustomItemDecoration itemDecoration = new CustomItemDecoration(DisplayUtil.dip2px(getContext(), 10), getResources().getColor(R.color.colorGray_F5F5F5));
         mRecyclerView.addItemDecoration(itemDecoration);
         mGoodsAdapter = new GoodsAdapter();
         mRecyclerView.setAdapter(mGoodsAdapter);
@@ -311,6 +315,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+
                 int lastCompleteVisiblePosition = getLastCompleteVisiblePosition();
                 int dataCount = getDataCount();
                 if (lastCompleteVisiblePosition == dataCount - 1) {
@@ -320,22 +325,50 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         });
     }
 
-    private void initData() {
+
+
+    @Override
+    public void initData() {
         page = 1;
-        Map<String, String> params = new HashMap<>();
-        params.put("type", "classify");
-        params.put("cid", mCategoryId);
+        Map<String, Object> params = new HashMap<>(7);
+
+        // {cid: "0", type: 1, flag: 1, page: 1, keyword: "", pageSize: 20}
+
+        params.put("cid", "0");
+        params.put("type", 1);
+        params.put("flag", 1);
+        params.put("keyword", "");
         params.put("page", page + "");
-        mPresenter.fetchGoodsList(params);
+        mPresenter.getJxListData().observe(this, new Observer<List<JxListModel.DataBean.ListBean>>() {
+            @Override
+            public void onChanged(@Nullable List<JxListModel.DataBean.ListBean> listBeans) {
+                if (page == 1) {
+                    mGoodsList.clear();
+                }
+                mGoodsList.addAll(listBeans);
+                mGoodsAdapter.notifyDataSetChanged();
+            }
+        });
+        mPresenter.getJxListData(params);
     }
 
+    /**
+     * 加载更多
+     */
     private void doLoadMore() {
         page++;
-        Map<String, String> params = new HashMap<>();
-        params.put("type", "classify");
-        params.put("cid", mCategoryId);
+
+        Map<String, Object> params = new HashMap<>(7);
+        // {cid: "0", type: 1, flag: 1, page: 1, keyword: "", pageSize: 20}
+        params.put("cid", "0");
+        params.put("type", 1);
+        params.put("flag", 1);
+        params.put("keyword", "");
         params.put("page", page + "");
-        mPresenter.fetchGoodsList(params);
+
+
+        mPresenter.getJxListData(params);
+
     }
 
     public int getLastCompleteVisiblePosition() {
@@ -352,32 +385,27 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         @NonNull
         @Override
         public GoodsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.item_goods_list_home_fragment, parent, false);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_goods_list_home_fragment, parent, false);
             GoodsViewHolder goodsViewHolder = new GoodsViewHolder(view);
             return goodsViewHolder;
         }
 
         @Override
         public void onBindViewHolder(@NonNull GoodsViewHolder holder, final int position) {
-            GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-            mGoodsBean = goodsBean;
+            JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+
             String title = goodsBean.getGoods_name();
             holder.mTitleTv.setText(title);
 
+
             String pic = goodsBean.getPic();
-            GlideApp.with(CategoryActivity.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
 
-            String isTmall = goodsBean.getIsTmall();
-            if (TextUtils.equals(isTmall, "1")) {
-                holder.mPlatformTv.setText("天猫");
-                holder.mPlatformTv.setVisibility(View.VISIBLE);
+            if(!pic.startsWith("http")){
+                pic= ZRDConstants.HttpUrls.BASE_URL+pic;
             }
 
-            String jhs = goodsBean.getJhs();
-            if (TextUtils.equals(jhs, "1")) {
-                holder.mPlatformTv.setText("聚");
-                holder.mPlatformTv.setVisibility(View.VISIBLE);
-            }
+            GlideApp.with(HomeJxFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
+
 
             String price = goodsBean.getPrice_after_coupons();
             holder.mPriceTv.setText("￥" + price);
@@ -394,7 +422,6 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             String quan_shengyu = goodsBean.getQuan_shengyu();
             holder.mRemainderTv.setText("剩余：" + quan_shengyu);
 
-            holder.mRankingFl.setVisibility(View.GONE);
 
             int isFriendpop = goodsBean.getIs_friendpop();
             if (isFriendpop == 0) {
@@ -407,82 +434,115 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
                 holder.mBtnPerfectWXCircle.setText("显示朋友圈");
             }
 
+
+            //完善朋友圈 显示朋友圈
             holder.mBtnPerfectWXCircle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean = goodsBean;
-                    String token = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                    JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+
+                    String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                    String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
+                    String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
                     if (TextUtils.isEmpty(token)) {
-                        Toast.makeText(CategoryActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(CategoryActivity.this, LoginActivity.class));
+                        Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
                     } else {
                         String[] permissons = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                        boolean hasPermissions = EasyPermissions.hasPermissions(CategoryActivity.this, permissons);
+                        boolean hasPermissions = EasyPermissions.hasPermissions(getContext(), permissons);
                         if (hasPermissions) {
                             showDialog(goodsBean);
                         } else {
-                            EasyPermissions.requestPermissions(CategoryActivity.this, "需要读取储存权限", 0, permissons);
+                            EasyPermissions.requestPermissions(HomeJxFragment.this, "需要读取储存权限", 0, permissons);
                         }
                     }
                 }
             });
+
+
             holder.mBtnCopyWords.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "TKL";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean = goodsBean;
-                    String token = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    if (TextUtils.isEmpty(token)) {
-                        Toast.makeText(CategoryActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(CategoryActivity.this, LoginActivity.class));
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "TKL";
+                        JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        mGoodsBean = goodsBean;
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
+                        String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
+
+                        if (TextUtils.isEmpty(token)) {
+                            Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
                     }
 
                 }
             });
+
+
             holder.mBtnShareWXTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "WX";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean = goodsBean;
-                    String token = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    String pid = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_PID, "");
-                    String tao_session = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
-                    if (TextUtils.isEmpty(pid) || TextUtils.isEmpty(tao_session) || TextUtils.isEmpty(token)) {
-                        Intent intent = new Intent(CategoryActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "WX";
+                        JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        mGoodsBean = goodsBean;
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
+                        String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
+
+                        if (TextUtils.isEmpty(pid) || TextUtils.isEmpty(tao_session) || TextUtils.isEmpty(token)) {
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });
+
+
+
             holder.mBtnShareWXRl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mShareType = "WX_CIRCLE";
-                    GoodsListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    String token = SPreferenceUtil.getString(CategoryActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    if (TextUtils.isEmpty(token)) {
-                        Intent intent = new Intent(CategoryActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id", goodsBean.getGoods_id());
-                        params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                    try {
+                        mShareType = "WX_CIRCLE";
+                        JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
+                        mGoodsBean = goodsBean;
+
+                        String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                        String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
+                        String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
+
+                        if (TextUtils.isEmpty(token)) {
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("id", goodsBean.getGoods_id());
+                            params.put("token", token);
+                            mPresenter.getTaobaoTbkTpwd(params);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+
                 }
             });
+
         }
 
         @Override
@@ -491,16 +551,22 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         }
     }
 
-    private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
-        mPerfectWXCircleDialog = new PerfectWXCircleDialog(CategoryActivity.this);
+    private void showDialog(JxListModel.DataBean.ListBean goodsBean) {
+        mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
                 goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
 
     private class GoodsViewHolder extends RecyclerView.ViewHolder {
         private FrameLayout mRankingFl;
+        private TextView mRankingTv;
         private ImageView mGoodsImageIv;
         private TextView mPlatformTv;
         private TextView mTitleTv;
@@ -509,14 +575,15 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         private TextView mPayNumberTv;
         private TextView mRateTv;
         private TextView mRemainderTv;
-        private RelativeLayout mBtnShareWXRl;
         private TextView mBtnPerfectWXCircle;
         private TextView mBtnCopyWords;
+        private RelativeLayout mBtnShareWXRl;
         private TextView mBtnShareWXTv;
 
         public GoodsViewHolder(View itemView) {
             super(itemView);
             mRankingFl = itemView.findViewById(R.id.item_goods_list_ranking_fl);
+            mRankingTv = itemView.findViewById(R.id.item_goods_list_ranking_tv);
             mGoodsImageIv = itemView.findViewById(R.id.item_goods_list_goods_image_iv);
             mPlatformTv = itemView.findViewById(R.id.item_goods_list_platform_tv);
             mTitleTv = itemView.findViewById(R.id.item_goods_list_title_tv);

@@ -7,7 +7,7 @@ import com.zhaorou.zrapplication.base.BasePresenter;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.api.HomeApi;
-import com.zhaorou.zrapplication.home.model.AppUpdateModel;
+
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
@@ -22,7 +22,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -249,7 +248,16 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
     }
 
 
-    public void getJxListData(Map<String, String> params) {
+    private MutableLiveData<List<JxListModel.DataBean.ListBean>> mJxListData;
+
+    public MutableLiveData<List<JxListModel.DataBean.ListBean>> getJxListData() {
+        if (mJxListData == null) {
+            mJxListData = new MutableLiveData<>();
+        }
+        return mJxListData;
+    }
+
+    public void getJxListData(Map<String, Object> params) {
 
         if (mView != null) {
             mView.onShowLoading();
@@ -263,6 +271,11 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
                 JxListModel body = response.body();
                 Log.d("mytest", body.getData().getList().get(0).getGoods_id());
+                if(mJxListData!=null){
+                    mJxListData.setValue(body.getData().getList());
+                }
+
+
 
             }
 
@@ -276,8 +289,6 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
         });
 
     }
-
-
 
 
 }

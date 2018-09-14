@@ -21,7 +21,7 @@ public interface HomeApi {
      */
     @FormUrlEncoded
     @POST("api/get_rou_goods_list")
-    Call<JxListModel> getJxList(@FieldMap Map<String, String> params);
+    Call<JxListModel> getJxList(@FieldMap Map<String, Object> params);
 
     /**
      * 升级

@@ -1,6 +1,7 @@
 package com.zhaorou.zrapplication.network.retrofit;
 
 import com.zhaorou.zrapplication.base.BaseModel;
+import com.zhaorou.zrapplication.network.imp.HttpDialogLoading;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -12,6 +13,13 @@ import retrofit2.Response;
 public abstract class AbsZCallback<T extends BaseModel> implements Callback<T> {
 
     private final static int HTTP_STATUS_SUCCESS = 200;
+    public AbsZCallback() {
+
+    }
+
+    public AbsZCallback(HttpDialogLoading httpDialogLoading) {
+
+    }
 
     @Override
     public void onResponse(Call<T> call, Response<T> response) {

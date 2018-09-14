@@ -208,7 +208,14 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
                 if (data == null) {
                     return;
                 }
-                showAppUpdateDialog(data.getUpdate_tip(), data.getDownload_url(), data.getMd5());
+
+                int code = Integer.valueOf(data.getCodeX());
+                //int code = Integer.valueOf("3");
+                if (BuildConfig.VERSION_CODE <code) {
+                    showAppUpdateDialog(data.getUpdate_tip(), data.getDownload_url(), data.getMd5());
+                }
+
+
             }
 
             @Override
