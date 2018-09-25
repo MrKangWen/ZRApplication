@@ -21,6 +21,7 @@ import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.settings.SettingsActivity;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
+import com.zhaorou.zrapplication.user.msg.MsgActivity;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
@@ -66,6 +67,22 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         }
         mPresenter.attachView(this);
         mLoadingDialog = new LoadingDialog(getContext());
+
+        mView.findViewById(R.id.fragment_use_help_ll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
+                webViewIntent.putExtra("URL","https://www.kancloud.cn/zhaoroudanapp/help/722292");
+                startActivity(webViewIntent);
+            }
+        });
+        mView.findViewById(R.id.fragment_use_msg_ll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MsgActivity.class);
+                startActivity(intent);
+            }
+        });
         return mView;
     }
 

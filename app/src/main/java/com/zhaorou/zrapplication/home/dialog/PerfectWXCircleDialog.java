@@ -39,7 +39,6 @@ import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
-import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.DataStorageDirectoryHelper;
@@ -88,7 +87,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     private ArrayList<String> mImagesList = new ArrayList<>();
     private String mMarketImageUrl = "";
     private ImageView mMarketImgIv;
-    private GoodsListModel.DataBean.ListBean mGoodsBean;
+    //   private GoodsListModel.DataBean.ListBean mGoodsBean;
     private LinearLayout mHasFriendPopLl;
     private LinearLayout mNoFriendPop;
     private TextView mBtnCopyWords;
@@ -113,14 +112,14 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                     Bundle bundle = msg.getData();
                     if (bundle != null) {
                         String data = bundle.getString("data");
-                   //     mFragment.onLoadFail(data);
+                        //     mFragment.onLoadFail(data);
                         Toast.makeText(getContext(), data, Toast.LENGTH_SHORT).show();
                     }
                     dismiss();
                     break;
                 case 2:
                     Toast.makeText(getContext(), "网络请求失败", Toast.LENGTH_SHORT).show();
-                  //  mFragment.onLoadFail("网络请求失败");
+                    //  mFragment.onLoadFail("网络请求失败");
                     break;
             }
         }
@@ -348,7 +347,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
     }
 
     private void saveFriendPop(List<String> uploadList) {
-        String goodsId = mGoodsBean.getGoods_id();
+        String goodsId = mGoodsId;
         String goodsTitle = mTitleTv.getText().toString();
         String content = mContentEt.getText().toString();
         String image = "";
@@ -367,6 +366,13 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         params.put("image", image);
         params.put("token", token);
         params.put("market_image", mMarketImageUrl);
+
+        if(mType.equals("shishi")){
+            params.put("type", "dtk");
+        }else {
+            params.put("type", "tkjd");
+        }
+
 
         Call<ResponseBody> call1 = HttpRequestUtil.getRetrofitService().executePost(ZRDConstants.HttpUrls.ADD_FRIEND_POP, params);
         call1.enqueue(new Callback<ResponseBody>() {
@@ -448,20 +454,31 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
 
     }
 
-    public void setGoodsInfo(String goodsId,  String quanGuidContent,int isFriendpop, String goodsName ) {
-       // mGoodsBean = goodsBean;
-      //  String goodsId = goodsBean.getGoods_id();
+    private String mGoodsId;
+    private String mPic;
+    private String mType="tkjd";
 
-    //    String quanGuidContent = goodsBean.getQuan_guid_content();
+    public void setGoodsInfo(String goodsId, String quanGuidContent, int isFriendpop, String goodsName, String pic) {
+        setGoodsInfo(goodsId, quanGuidContent, isFriendpop, goodsName, pic, null);
+    }
+
+    public void setGoodsInfo(String goodsId, String quanGuidContent, int isFriendpop, String goodsName, String pic, String type) {
+        // mGoodsBean = goodsBean;
+        //  String goodsId = goodsBean.getGoods_id();
+        this.mType = type;
+
+        mGoodsId = goodsId;
+        mPic = pic;
+        //    String quanGuidContent = goodsBean.getQuan_guid_content();
         mContentEt.setText(quanGuidContent);
 
-     //   int isFriendpop = goodsBean.getIs_friendpop();
+        //   int isFriendpop = goodsBean.getIs_friendpop();
         if (isFriendpop == 0) {
             mDialogTitle.setText("完善朋友圈文案");
             mUrlTv.setVisibility(View.VISIBLE);
             mUrlTv.setText("https://detail.tmall.com/item.html?id=" + goodsId);
 
-       //     String goodsName = goodsBean.getGoods_name();
+            //     String goodsName = goodsBean.getGoods_name();
             mTitleTv.setVisibility(View.VISIBLE);
             mTitleTv.setText(goodsName);
 
@@ -569,7 +586,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
                 }
             }
         } else {
-            list.add(mGoodsBean.getPic());
+            list.add(mPic);
         }
 
         final List<File> fileList = new ArrayList<>();

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeFragment;
+import com.zhaorou.zrapplication.home.RdFragment;
 import com.zhaorou.zrapplication.home.api.HomeApi;
 import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
@@ -55,6 +56,12 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     @BindView(R.id.activity_main_tab_user_tv)
     TextView mTabUserTv;
 
+    @BindView(R.id.activity_main_tab_rd_iv)
+    ImageView mTabRdIv;
+    @BindView(R.id.activity_main_tab_rd_tv)
+    TextView mTabRdTv;
+
+
     private VPAdapter mVPAdapter;
 
     private List<ImageView> mTabIconList;
@@ -68,14 +75,17 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         ButterKnife.bind(this);
         mTabIconList = new ArrayList<ImageView>() {{
             add(mTabHomeIv);
+            add(mTabRdIv);
             add(mTabUserIv);
         }};
         mTabTextList = new ArrayList<TextView>() {{
             add(mTabHomeTv);
+            add(mTabRdTv);
             add(mTabUserTv);
         }};
         mFragmentList = new ArrayList<Fragment>() {{
             add(new HomeFragment());
+            add(new RdFragment());
             add(new UserFragment());
         }};
         setSelectedTab(mTabHomeIv, mTabHomeTv);
@@ -103,6 +113,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     }
 
     @OnClick({R.id.activity_main_tab_home_iv, R.id.activity_main_tab_home_tv,
+            R.id.activity_main_tab_rd_iv, R.id.activity_main_tab_rd_tv,
             R.id.activity_main_tab_user_iv, R.id.activity_main_tab_user_tv})
     protected void onClick(View v) {
         switch (v.getId()) {
@@ -111,10 +122,15 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
                 setSelectedTab(mTabHomeIv, mTabHomeTv);
                 mViewPager.setCurrentItem(0);
                 break;
+            case R.id.activity_main_tab_rd_iv:
+            case R.id.activity_main_tab_rd_tv:
+                setSelectedTab(mTabRdIv, mTabRdTv);
+                mViewPager.setCurrentItem(1);
+                break;
             case R.id.activity_main_tab_user_iv:
             case R.id.activity_main_tab_user_tv:
                 setSelectedTab(mTabUserIv, mTabUserTv);
-                mViewPager.setCurrentItem(1);
+                mViewPager.setCurrentItem(2);
                 break;
             default:
                 break;
@@ -211,7 +227,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
                 int code = Integer.valueOf(data.getCodeX());
                 //int code = Integer.valueOf("3");
-                if (BuildConfig.VERSION_CODE <code) {
+                if (BuildConfig.VERSION_CODE < code) {
                     showAppUpdateDialog(data.getUpdate_tip(), data.getDownload_url(), data.getMd5());
                 }
 

@@ -13,7 +13,7 @@ public class AssistantService extends AccessibilityService {
      * 助手服务是否正在运行
      */
     public static boolean isAssistantRunning = false;
-
+    public static String mMoments = "";
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
@@ -35,11 +35,13 @@ public class AssistantService extends AccessibilityService {
 
                     List<AccessibilityNodeInfo> edt = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        edt = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/djk");
+                        edt = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dp0");
                     }
                     if (edt.size() > 0) {
+
+                     //   ClipboardManager cm = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
                         Bundle arguments = new Bundle();
-                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,"test");
+                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,mMoments);
                         AccessibilityNodeInfo edtView = edt.get(0);
 
                         edtView.performAction(AccessibilityNodeInfo.FOCUS_INPUT);

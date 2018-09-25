@@ -5,6 +5,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -14,6 +15,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
@@ -27,7 +29,7 @@ import butterknife.ButterKnife;
 public class WebViewActivity extends BaseActivity {
 
     private static final String TAG = "WebViewActivity";
-    private String url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=http://app.zhaoroudan.com/taobaoAuth?token=";
+
 
     @BindView(R.id.web_view)
     WebView mWebView;
@@ -37,8 +39,13 @@ public class WebViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
-        String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-        url = url + token + "&state=1212&view=web";
+
+        String url = getIntent().getStringExtra("URL");
+        if (TextUtils.isEmpty(url)) {
+            String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+            url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=http://app.zhaoroudan.com/taobaoAuth?token=" + token + "&state=1212&view=web";
+        }
+
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setBuiltInZoomControls(true);

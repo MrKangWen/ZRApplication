@@ -513,7 +513,7 @@ public class SearchActivity extends BaseActivity implements ISearchView {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(this);
         mPerfectWXCircleDialog.show();
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
+                goodsBean.getIs_friendpop(),goodsBean.getGoods_name(),goodsBean.getPic());
     }
 
     private class SearchViewHolder extends RecyclerView.ViewHolder {

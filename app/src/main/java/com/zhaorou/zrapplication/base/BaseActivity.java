@@ -4,7 +4,9 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -32,6 +34,18 @@ public class BaseActivity extends AppCompatActivity {
 
         ActivityController.addActivity(this);
         initActionBar();
+    }
+
+
+    protected void setTitle(String title) {
+        TextView titleView = findViewById(R.id.title_layout_title_tv);
+        titleView.setText(title);
+        findViewById(R.id.btn_left_layout_title_rl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override

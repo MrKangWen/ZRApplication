@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.GlideApp;
@@ -60,7 +61,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks  {
+public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "HomeVPItemFragment";
     @BindView(R.id.goods_list_fragment_home_vp_item_rv)
@@ -271,7 +272,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
     @Override
     public void onShowLoading() {
         HomeFragment.startRefresh();
-     //   mLoadingDialog.show();
+        //   mLoadingDialog.show();
     }
 
     @Override
@@ -324,7 +325,6 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             }
         });
     }
-
 
 
     @Override
@@ -400,8 +400,8 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
 
             String pic = goodsBean.getPic();
 
-            if(!pic.startsWith("http")){
-                pic= ZRDConstants.HttpUrls.BASE_URL+pic;
+            if (!pic.startsWith("http")) {
+                pic = ZRDConstants.HttpUrls.BASE_URL + pic;
             }
 
             GlideApp.with(HomeJxFragment.this).asBitmap().load(pic).into(holder.mGoodsImageIv);
@@ -440,7 +440,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
                 @Override
                 public void onClick(View v) {
                     JxListModel.DataBean.ListBean goodsBean = mGoodsList.get(position);
-                    mGoodsBean=goodsBean;
+                    mGoodsBean = goodsBean;
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                     String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
                     String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
@@ -514,7 +514,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             });
 
 
-
+            //share to moments
             holder.mBtnShareWXRl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -554,8 +554,8 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
     private void showDialog(JxListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(), goodsBean.getQuan_guid_content(),
+                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(),goodsBean.getPic());
     }
 
     @Override

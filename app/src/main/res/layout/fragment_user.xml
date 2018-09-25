@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,7 +23,7 @@
             android:id="@+id/fragment_user_avatar_iv"
             android:layout_width="55dp"
             android:layout_height="55dp"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@mipmap/ic_launcher" />
 
         <LinearLayout
             android:id="@+id/fragment_user_user_info_ll"
@@ -39,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:text="点击登录/注册"
                 android:textColor="@color/colorBlack_333333"
-                android:textSize="15sp"/>
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/fragment_user_tip_text_tv"
@@ -49,14 +48,14 @@
                 android:text="查看并编辑资料"
                 android:textColor="@color/colorGray_999999"
                 android:textSize="11sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -74,7 +73,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/icon_level"/>
+                android:src="@drawable/icon_level" />
 
             <TextView
                 android:id="@+id/fragment_user_level_tv"
@@ -85,13 +84,13 @@
                 android:paddingTop="10dp"
                 android:text="Lv.0"
                 android:textColor="@color/colorBlack_333333"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGray_F5F5F5"/>
+            android:background="@color/colorGray_F5F5F5" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -108,7 +107,7 @@
                 android:paddingTop="10dp"
                 android:text="积分：0"
                 android:textColor="@color/colorBlack_333333"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
 
         </LinearLayout>
     </LinearLayout>
@@ -116,13 +115,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <LinearLayout
         android:id="@+id/fragment_user_get_tao_session"
@@ -137,26 +136,26 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icon_get_tao_session"/>
+            android:src="@drawable/icon_get_tao_session" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="12dp"
-            android:text="获取淘session"
-            android:textColor="@color/colorBlack_333333"/>
+            android:text="高佣金授权登录"
+            android:textColor="@color/colorBlack_333333" />
 
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/icon_next"/>
+            android:src="@drawable/icon_next" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <LinearLayout
         android:id="@+id/fragment_user_bind_tao_session"
@@ -172,7 +171,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icon_set_tao_session"/>
+            android:src="@drawable/icon_set_tao_session" />
 
         <TextView
             android:layout_width="0dp"
@@ -180,18 +179,18 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:text="设置淘session"
-            android:textColor="@color/colorBlack_333333"/>
+            android:textColor="@color/colorBlack_333333" />
 
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/icon_next"/>
+            android:src="@drawable/icon_next" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <LinearLayout
         android:id="@+id/fragment_user_bind_pid_ll"
@@ -206,7 +205,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icon_bind_pid"/>
+            android:src="@drawable/icon_bind_pid" />
 
         <TextView
             android:layout_width="0dp"
@@ -214,18 +213,18 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:text="绑定PID"
-            android:textColor="@color/colorBlack_333333"/>
+            android:textColor="@color/colorBlack_333333" />
 
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/icon_next"/>
+            android:src="@drawable/icon_next" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
 
     <LinearLayout
         android:id="@+id/fragment_use_setting_ll"
@@ -240,7 +239,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icon_settings"/>
+            android:src="@drawable/icon_settings" />
 
         <TextView
             android:layout_width="0dp"
@@ -248,16 +247,81 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:text="设置"
-            android:textColor="@color/colorBlack_333333"/>
+            android:textColor="@color/colorBlack_333333" />
 
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/icon_next"/>
+            android:src="@drawable/icon_next" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5"/>
+        android:background="@color/colorGray_F5F5F5" />
+
+
+    <LinearLayout
+        android:id="@+id/fragment_use_help_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/icon_settings" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="帮助中心"
+            android:textColor="@color/colorBlack_333333" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/icon_next" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray_F5F5F5" />
+
+
+    <LinearLayout
+        android:id="@+id/fragment_use_msg_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/icon_settings" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="系统消息"
+            android:textColor="@color/colorBlack_333333" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/icon_next" />
+    </LinearLayout>
 </LinearLayout>

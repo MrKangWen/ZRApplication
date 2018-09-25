@@ -63,7 +63,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks  {
+public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentView, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "HomeVPItemFragment";
     @BindView(R.id.goods_list_fragment_home_vp_item_rv)
@@ -164,24 +164,25 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-        if (TextUtils.equals(mShareType, "WX")) {
-            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                    price_after_coupons + "\n" +
-                    "--------抢购方式--------" + "\n";
-            if (TextUtils.equals(tklType, "1")) {
-                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
-            } else if (TextUtils.equals(tklType, "2")) {
-                String pic = mGoodsBean.getPic();
-                String str = "https://wenan001.kuaizhan.com/?taowords=";
-                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
-            }
-        } else {
-            mTaoword = content;
+
+        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                price_after_coupons + "\n" +
+                "--------抢购方式--------" + "\n";
+        if (TextUtils.equals(tklType, "1")) {
+            mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
+        } else if (TextUtils.equals(tklType, "2")) {
+            String pic = mGoodsBean.getPic();
+            String str = "https://wenan001.kuaizhan.com/?taowords=";
+            mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
         }
+
+
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
+        AssistantService.mMoments = content;
 
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
@@ -241,7 +242,6 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
-
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
         }
@@ -546,8 +546,8 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(), goodsBean.getQuan_guid_content(),
+                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(), goodsBean.getPic(),mGoodsType);
     }
 
     @Override

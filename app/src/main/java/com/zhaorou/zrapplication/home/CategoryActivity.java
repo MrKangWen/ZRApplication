@@ -495,7 +495,7 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(CategoryActivity.this);
         mPerfectWXCircleDialog.show();
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(),goodsBean.getGoods_name());
+                goodsBean.getIs_friendpop(),goodsBean.getGoods_name(),goodsBean.getPic());
     }
 
 

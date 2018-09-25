@@ -1,9 +1,13 @@
 package com.zhaorou.zrapplication.utils;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
+
+import org.w3c.dom.Text;
 
 public class AccessibilityUtils {
 
@@ -50,4 +54,5 @@ public class AccessibilityUtils {
             context.startActivity(intent);
         }
     }
+
 }
