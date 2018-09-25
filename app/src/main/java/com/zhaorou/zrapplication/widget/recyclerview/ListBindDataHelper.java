@@ -44,7 +44,7 @@ public class ListBindDataHelper<T extends BaseModel, D> {
     private boolean isPostIng = false;//是否在请求中
 
 
-    private static final String mPage = "curPage";
+    private static final String mPage = "page";
     private static final String mPagesize = "pageSize";
 
     private HttpDialogLoading httpDialogLoading;

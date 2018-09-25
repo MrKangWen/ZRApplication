@@ -1,18 +1,22 @@
 package com.zhaorou.zrapplication.widget.recyclerview;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.base.BaseModel;
 
 /**
  * @author kang
  */
-public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends BaseFragment implements ListBindDataInterface<T, D> {
+public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends BaseFragment implements ListBindDataInterface<T, D>, SwipeRefreshLayout.OnRefreshListener {
 
     protected View mView;
 
@@ -25,15 +29,26 @@ public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends B
         return mView;
     }
 
-    ListBindDataHelper<T, D> helper;
+    private ListBindDataHelper<T, D> helper;
 
     @Override
     public void initData() {
 
-        RecyclerView recyclerView = mView.findViewById(getRecyclerViewId());
+
+        final SwipeRefreshLayout swipeRefreshLayout = mView.findViewById(R.id.baseSwipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        RecyclerView recyclerView = getRecyclerViewId(mView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         helper = new ListBindDataHelper<>(getActivity(), recyclerView, getAdapterLayoutId(), this);
         helper.startPostData(getCall(helper.getMap()));
+        helper.setListRefreshListener(new ListRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
         //  helper.setNeedLoadMore(false);
     }
 
@@ -42,8 +57,26 @@ public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends B
         return helper;
     }
 
-    protected abstract int getLayoutId();
+    protected int getLayoutId() {
 
-    protected abstract int getRecyclerViewId();
+        return R.layout.base_list_view;
+    }
 
+    public RecyclerView getRecyclerViewId(View view) {
+
+        FrameLayout frameLayout = view.findViewById(R.id.baseListFlView);
+        //动态添加
+        RecyclerView recyclerView = new RecyclerView(this.getActivity());
+        recyclerView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT));
+        frameLayout.addView(recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        return recyclerView;
+
+    }
+
+    @Override
+    public void onRefresh() {
+
+        getHelper().onRefreshData();
+    }
 }

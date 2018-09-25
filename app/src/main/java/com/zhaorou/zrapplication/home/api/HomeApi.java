@@ -21,7 +21,7 @@ import retrofit2.http.Query;
 public interface HomeApi {
 
     /**
-     * 精选商品
+     * 1精选商品 2 预告 3 常规
      */
     @FormUrlEncoded
     @POST("api/get_rou_goods_list")

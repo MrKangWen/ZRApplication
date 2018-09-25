@@ -36,24 +36,12 @@ public class SystemMsgFragment extends BaseListBindDataFragment<SystemMsgModel, 
         // Required empty public constructor
     }
 
-
-
     @Override
     public void initData() {
         super.initData();
-
         getHelper().setNeedLoadMore(false);
     }
 
-    @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_system_msg;
-    }
-
-    @Override
-    protected int getRecyclerViewId() {
-        return R.id.msgSystemRecyclerView;
-    }
 
     @Override
     public int getAdapterLayoutId() {

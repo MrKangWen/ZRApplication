@@ -1,7 +1,6 @@
 package com.zhaorou.zrapplication;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -10,8 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.EventLog;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +16,7 @@ import android.widget.TextView;
 import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeFragment;
-import com.zhaorou.zrapplication.home.RdFragment;
+import com.zhaorou.zrapplication.home.rd.RdFragment;
 import com.zhaorou.zrapplication.home.api.HomeApi;
 import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
@@ -28,7 +25,6 @@ import com.zhaorou.zrapplication.network.update.UpdateAppService;
 import com.zhaorou.zrapplication.user.UserFragment;
 import com.zhaorou.zrapplication.utils.AccessibilityUtils;
 import com.zhaorou.zrapplication.utils.AssistantService;
-import com.zhaorou.zrapplication.utils.StatusBarUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

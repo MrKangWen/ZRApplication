@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.module.GlideModule;
+import com.zhaorou.zrapplication.base.GlideApp;
+import com.zhaorou.zrapplication.home.HomeVPItemFragment;
 
 
 public class CombinationViewHolder extends RecyclerView.ViewHolder {
@@ -50,7 +53,7 @@ public class CombinationViewHolder extends RecyclerView.ViewHolder {
      */
     public ImageView setImageView(Context context, int id, String imageUrl) {
         ImageView imageView = getView(id);
-      //  ImageLoader.getInstance().displayImage(context, imageUrl, imageView);
+        GlideApp.with(context).asBitmap().load(imageUrl).into(imageView);
         return imageView;
     }
 

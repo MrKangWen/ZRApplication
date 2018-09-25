@@ -30,7 +30,7 @@ public class MsgActivity extends BaseActivity {
     private void initView() {
         setTitle("消息中心");
         List<Fragment> listFragment = new ArrayList<>();
-        listFragment.add(new MsgFragment());
+        listFragment.add(new UnReadFragment());
         listFragment.add(new HasReadFragment());
         listFragment.add(new SystemMsgFragment());
         List<String> listTitle = new ArrayList<>();

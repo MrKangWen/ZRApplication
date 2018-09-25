@@ -3,6 +3,7 @@ package com.zhaorou.zrapplication.base;
 import android.app.Application;
 import android.os.Build;
 import android.os.StrictMode;
+import android.text.TextUtils;
 
 import com.facebook.stetho.Stetho;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
@@ -10,6 +11,9 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.utils.ApplicationUtils;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
+
+import cn.jpush.android.api.JPushInterface;
 
 public class BaseApplication extends Application {
 
@@ -28,6 +32,14 @@ public class BaseApplication extends Application {
         }
 
         Stetho.initializeWithDefaults(this);
+        JPushInterface.setDebugMode(false);
+        JPushInterface.init(this);
+        String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+        if(!TextUtils.isEmpty(token)){
+            JPushInterface.setAlias(this, 0, token);
+        }
+
+
     }
 
     private void initWXAPI() {

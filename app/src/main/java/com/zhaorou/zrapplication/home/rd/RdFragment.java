@@ -1,4 +1,4 @@
-package com.zhaorou.zrapplication.home;
+package com.zhaorou.zrapplication.home.rd;
 
 
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseFragment;
 import com.zhaorou.zrapplication.user.msg.HasReadFragment;
-import com.zhaorou.zrapplication.user.msg.MsgFragment;
 import com.zhaorou.zrapplication.user.msg.SystemMsgFragment;
 import com.zhaorou.zrapplication.widget.recyclerview.TabLayoutPagerAdapter;
 
@@ -46,9 +45,8 @@ public class RdFragment extends BaseFragment {
 
     private void initView(View view) {
         List<Fragment> listFragment = new ArrayList<>();
-        listFragment.add(new HasReadFragment());
-        listFragment.add(new SystemMsgFragment());
-
+        listFragment.add(new PreviewFragment());
+        listFragment.add(new CommonFragment());
         List<String> listTitle = new ArrayList<>();
         listTitle.add("预告版");
         listTitle.add("常规版");
