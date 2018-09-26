@@ -18,6 +18,7 @@ public class CombinationViewHolder extends RecyclerView.ViewHolder {
     private View mView;
     private SparseArray<View> mViewArray;
 
+
     public CombinationViewHolder(View itemView) {
         super(itemView);
         mView = itemView;

@@ -40,10 +40,14 @@ public class WebViewActivity extends BaseActivity {
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
 
+        /**
+         *
+         */
         String url = getIntent().getStringExtra("URL");
         if (TextUtils.isEmpty(url)) {
             String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-            url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=http://app.zhaoroudan.com/taobaoAuth?token=" + token + "&state=1212&view=web";
+            url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=" +
+                    "http://app.zhaoroudan.com/taobaoAuth?token=" + token + "&state=1212&view=web";
         }
 
         WebSettings settings = mWebView.getSettings();

@@ -1,9 +1,11 @@
 package com.zhaorou.zrapplication.user.msg;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -54,10 +56,34 @@ public class SystemMsgFragment extends BaseListBindDataFragment<SystemMsgModel, 
     }
 
     @Override
-    public void bindData(CombinationViewHolder holder, SystemMsgModel.DataBean.ListBean t, int position) {
+    public void bindData(CombinationViewHolder holder, final SystemMsgModel.DataBean.ListBean t, int position) {
 
-        holder.setText(R.id.title,t.getTitle());
-        holder.setText(R.id.date,t.getPublish_time());
+        holder.setText(R.id.title, t.getTitle());
+        holder.setText(R.id.date, t.getPublish_time());
+
+        holder.getView(R.id.msgSystemRl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showDialog(t.getTitle(),t.getContent());
+            }
+        });
+    }
+
+
+    private void showDialog(String title, String msg) {
+
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+        builder.setTitle(title);
+        builder.setMessage(msg);
+        builder.setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
     }
 
     @Override

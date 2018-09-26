@@ -78,16 +78,16 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
     private GoodsAdapter mGoodsAdapter;
     private List<JxListModel.DataBean.ListBean> mGoodsList = new ArrayList<>();
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
-    private String mGoodsType;
+
     private int page = 1;
     private JxListModel.DataBean.ListBean mGoodsBean;
     private String mShareType;
     private String mTaoword;
     private String mTkl;
-    private LoadingDialog mLoadingDialog;
+
     private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
-
+    private LoadingDialog mLoadingDialog;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -97,10 +97,8 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             initRecyclerView();
         }
         mPresenter.attachView(this);
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            mGoodsType = arguments.getString("goods_type");
-        }
+
+
         mLoadingDialog = new LoadingDialog(getContext());
         initData();
         return mView;

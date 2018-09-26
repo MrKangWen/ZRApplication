@@ -31,6 +31,7 @@
             android:src="@drawable/icon_user_name"/>
 
         <EditText
+            android:text="13877799665"
             android:id="@+id/phone_login_activity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -86,7 +86,7 @@
                 android:id="@+id/activity_main_tab_rd_iv"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="@drawable/selector_main_tab_home_iv"
+                android:background="@drawable/selector_main_tab_rd_iv"
                 android:scaleType="fitXY" />
 
             <TextView
@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="肉单"
-                android:textColor="@color/colorGray_666666"
+                android:textColor="@drawable/selector_main_tab_tv"
                 android:textSize="12sp" />
         </LinearLayout>
 

@@ -105,9 +105,19 @@ public class UserInfoModel {
             private Object telephone;
             private int score;
             private String tao_session;
+
             private String tkl_type;
             private IsDeleteBean is_delete;
 
+            public String getTao_session_valid_time() {
+                return tao_session_valid_time;
+            }
+
+            public void setTao_session_valid_time(String tao_session_valid_time) {
+                this.tao_session_valid_time = tao_session_valid_time;
+            }
+
+            private String tao_session_valid_time;
             public int getId() {
                 return id;
             }

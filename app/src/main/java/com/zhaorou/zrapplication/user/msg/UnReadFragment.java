@@ -1,9 +1,10 @@
 package com.zhaorou.zrapplication.user.msg;
 
 
-
-
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.view.View;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.home.api.HomeApi;
@@ -41,7 +42,7 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
 
     @Override
     public int getAdapterLayoutId() {
-        return R.layout.item_msg_has_read;
+        return R.layout.item_msg_un_read;
     }
 
     @Override
@@ -50,9 +51,38 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
     }
 
     @Override
-    public void bindData(CombinationViewHolder holder, UnReadMsgModel.DataBean.ListBean t, int position) {
+    public void bindData(CombinationViewHolder holder, final UnReadMsgModel.DataBean.ListBean t, int position) {
         holder.setText(R.id.title, t.getContent());
         holder.setText(R.id.date, t.getCreate_time());
+
+        holder.getView(R.id.msgUnReadRl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(t.getId());
+            }
+        });
+    }
+
+
+    private void showDialog(int msgId) {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("是否标记为已读");
+        builder.setPositiveButton("标记为已读", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
     }
 
     @Override

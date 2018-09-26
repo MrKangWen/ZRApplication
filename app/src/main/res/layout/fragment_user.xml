@@ -8,59 +8,54 @@
     tools:context=".user.UserFragment">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="48dp">
+        android:background="#d03a36">
 
         <ImageView
-            android:id="@+id/fragment_user_avatar_iv"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:src="@mipmap/ic_launcher" />
+            android:id="@+id/userIvMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_msg" />
 
         <LinearLayout
             android:id="@+id/fragment_user_user_info_ll"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:orientation="vertical">
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <ImageView
+                android:id="@+id/fragment_user_avatar_iv"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:src="@mipmap/ic_launcher" />
 
             <TextView
                 android:id="@+id/fragment_user_user_info_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="点击登录/注册"
-                android:textColor="@color/colorBlack_333333"
+                android:textColor="@android:color/white"
                 android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/fragment_user_tip_text_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="查看并编辑资料"
-                android:textColor="@color/colorGray_999999"
-                android:textSize="11sp"
-                android:visibility="gone" />
         </LinearLayout>
-    </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorGray_F5F5F5" />
+
+    </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="#d03a36"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -83,14 +78,10 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="Lv.0"
-                android:textColor="@color/colorBlack_333333"
+                android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/colorGray_F5F5F5" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -106,7 +97,7 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="积分：0"
-                android:textColor="@color/colorBlack_333333"
+                android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -145,6 +136,19 @@
             android:padding="12dp"
             android:text="高佣金授权登录"
             android:textColor="@color/colorBlack_333333" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="过期时间："
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/userTValidDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2018"
+            android:textSize="12sp" />
 
         <ImageView
             android:layout_width="15dp"
@@ -296,32 +300,4 @@
         android:background="@color/colorGray_F5F5F5" />
 
 
-    <LinearLayout
-        android:id="@+id/fragment_use_msg_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/icon_settings" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="12dp"
-            android:text="系统消息"
-            android:textColor="@color/colorBlack_333333" />
-
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/icon_next" />
-    </LinearLayout>
 </LinearLayout>

@@ -20,14 +20,15 @@
 
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0px"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:padding="8dp">
 
 
             <TextView
-                android:id="@+id/preview_title"
+                android:id="@+id/common_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
@@ -46,7 +47,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/preview_coupon"
+                    android:id="@+id/common_coupon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -56,7 +57,7 @@
 
 
                 <TextView
-                    android:id="@+id/preview_shengyu"
+                    android:id="@+id/common_shengyu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -73,7 +74,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/preview_pay_price"
+                    android:id="@+id/common_pay_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -83,7 +84,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/preview_sales"
+                    android:id="@+id/common_sales"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -97,7 +98,7 @@
         </LinearLayout>
 
         <RelativeLayout
-            android:id="@+id/preview_share_wx_moments"
+            android:id="@+id/common_share_wx_moments"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@color/colorRed_FF2200"
@@ -126,7 +127,7 @@
 
 
         <TextView
-            android:id="@+id/item_goods_list_btn_perfect_wx_circle"
+            android:id="@+id/common_perfect_wx_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/selector_rect_whitebg_blackbor1_cor4"
@@ -140,7 +141,7 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/preview_set_remind"
+            android:id="@+id/common_copy_tkl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -155,7 +156,7 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/preview_share_wx"
+            android:id="@+id/common_share_wx"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"

@@ -41,12 +41,13 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     LinearLayout mUserInfoLl;
     @BindView(R.id.fragment_user_user_info_name)
     TextView mNameTv;
-    @BindView(R.id.fragment_user_tip_text_tv)
-    TextView mTipTv;
+
     @BindView(R.id.fragment_user_level_tv)
     TextView mLevelTv;
     @BindView(R.id.fragment_user_score_tv)
     TextView mScoreTv;
+    @BindView(R.id.userTValidDate)
+    TextView mUserTValidDate;
 
     private View mView;
     private Unbinder mUnbinder;
@@ -72,17 +73,28 @@ public class UserFragment extends Fragment implements IUserFragmentView {
             @Override
             public void onClick(View v) {
                 Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
-                webViewIntent.putExtra("URL","https://www.kancloud.cn/zhaoroudanapp/help/722292");
+                webViewIntent.putExtra("URL", "https://www.kancloud.cn/zhaoroudanapp/help/722292");
                 startActivity(webViewIntent);
             }
         });
-        mView.findViewById(R.id.fragment_use_msg_ll).setOnClickListener(new View.OnClickListener() {
+
+
+        mView.findViewById(R.id.userIvMsg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MsgActivity.class);
-                startActivity(intent);
+                String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+                if (TextUtils.isEmpty(token)) {
+
+                    toLogin();
+
+                } else {
+                    Intent intent = new Intent(getActivity(), MsgActivity.class);
+                    startActivity(intent);
+                }
+
             }
         });
+
         return mView;
     }
 
@@ -187,7 +199,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         if (TextUtils.isEmpty(token)) {
             GlideApp.with(this).load(R.mipmap.ic_launcher).circleCrop().into(mAvatarIv);
             mNameTv.setText("点击登录/注册");
-            mTipTv.setVisibility(View.GONE);
+
         } else {
             mPresenter.fetchUserInfo(token);
         }
@@ -196,8 +208,8 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     private void setUserInfo(UserInfoModel.DataBean.UserBean userBean) {
         String nickname = userBean.getNickname();
         mNameTv.setText(nickname);
-        mTipTv.setVisibility(View.VISIBLE);
 
+        mUserTValidDate.setText(userBean.getTao_session_valid_time());
         String headimgurl = userBean.getHeadimgurl();
         GlideApp.with(this).load(headimgurl).circleCrop().into(mAvatarIv);
 

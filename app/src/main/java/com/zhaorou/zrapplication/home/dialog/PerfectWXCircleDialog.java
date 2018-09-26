@@ -367,7 +367,7 @@ public class PerfectWXCircleDialog extends BaseDialog implements IHomeFragmentVi
         params.put("token", token);
         params.put("market_image", mMarketImageUrl);
 
-        if(mType.equals("shishi")){
+        if("shishi".equals(mType)){
             params.put("type", "dtk");
         }else {
             params.put("type", "tkjd");

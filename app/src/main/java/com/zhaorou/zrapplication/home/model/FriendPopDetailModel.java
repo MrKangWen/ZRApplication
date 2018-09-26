@@ -1,6 +1,8 @@
 package com.zhaorou.zrapplication.home.model;
 
-public class FriendPopDetailModel {
+import com.zhaorou.zrapplication.base.BaseModel;
+
+public class FriendPopDetailModel  extends BaseModel{
 
     /**
      * data : {"entity":{"id":78,"content":"文案内容","market_image":"营销图片","image":"产品图片1#产品图片2#产品图片3"}}
@@ -8,7 +10,7 @@ public class FriendPopDetailModel {
      */
 
     private DataBean data;
-    private int code;
+
 
     public DataBean getData() {
         return data;
@@ -18,13 +20,6 @@ public class FriendPopDetailModel {
         this.data = data;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public static class DataBean {
         /**
