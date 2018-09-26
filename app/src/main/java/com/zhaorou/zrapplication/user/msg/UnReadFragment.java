@@ -51,20 +51,21 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
     }
 
     @Override
-    public void bindData(CombinationViewHolder holder, final UnReadMsgModel.DataBean.ListBean t, int position) {
+    public void bindData(CombinationViewHolder holder, final UnReadMsgModel.DataBean.ListBean t, final int position) {
         holder.setText(R.id.title, t.getContent());
         holder.setText(R.id.date, t.getCreate_time());
 
         holder.getView(R.id.msgUnReadRl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(t.getId());
+                showDialog(t.getId(),position);
             }
         });
     }
 
 
-    private void showDialog(int msgId) {
+    private void showDialog(int msgId,final int position) {
+
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -72,6 +73,8 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
         builder.setPositiveButton("标记为已读", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+                getHelper().removeData(position);
 
             }
         });

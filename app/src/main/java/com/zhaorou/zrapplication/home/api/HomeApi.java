@@ -1,5 +1,6 @@
 package com.zhaorou.zrapplication.home.api;
 
+import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.JxListModel;
@@ -39,7 +40,7 @@ public interface HomeApi {
 
 
     /**
-     *  unread massage
+     * unread massage
      */
     @GET("api/get_unread_msg_list")
     Call<UnReadMsgModel> getUnReadList(@Query("token") String token);
@@ -52,13 +53,21 @@ public interface HomeApi {
     Call<HasReadMsgModel> getReadList(@Query("token") String token);
 
     /**
-     *  massage of system
+     * massage of system
      */
     @GET("api/get_system_notice_list")
     Call<SystemMsgModel> getSystemMsgList(@Query("token") String token);
 
     @GET
     Call<FriendPopDetailModel> getFriendPopDetail(@Url String url, @QueryMap Map<String, String> params);
+
+    /**
+     * 设置提醒
+     * 【post】/api/add_push_record
+     */
+    @FormUrlEncoded
+    @POST("api/add_push_record")
+    Call<BaseModel> setPushRecord(@FieldMap Map<String, Object> params);
 
 
 }

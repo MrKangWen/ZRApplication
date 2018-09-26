@@ -14,9 +14,11 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
+import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.api.HomeApi;
@@ -28,6 +30,7 @@ import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
@@ -40,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +74,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
     }
 
     @Override
-    public void bindData(CombinationViewHolder holder, final JxListModel.DataBean.ListBean t, final  int position) {
+    public void bindData(CombinationViewHolder holder, final JxListModel.DataBean.ListBean t, final int position) {
 
         String pic = t.getPic();
 
@@ -83,6 +87,24 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         holder.setText(R.id.preview_live_time, "直播时间:" + t.getZhibo_time());
         holder.setText(R.id.preview_pay_price, "卷后价:" + t.getPrice_after_coupons());
 
+        TextView preview_set_remind = holder.getView(R.id.preview_set_remind);
+        if (t.getReminded() == 0) {
+            preview_set_remind.setBackgroundResource(R.drawable.selector_rect_whitebg_blackbor1_cor4);
+            preview_set_remind.setTextColor(getResources().getColor(R.color.colorBlack_333333));
+            preview_set_remind.setText("已提醒");
+
+        } else {
+            preview_set_remind.setBackgroundResource(R.drawable.selector_rect_whitebg_redbor1_cor4);
+            preview_set_remind.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
+            preview_set_remind.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setPushRecord(t.getId());
+
+                }
+            });
+            preview_set_remind.setText("设置提醒");
+        }
 
 
         holder.getView(R.id.preview_share_wx).setOnClickListener(new View.OnClickListener() {
@@ -110,8 +132,6 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
                 }
             }
         });
-
-
 
 
         //share to moments
@@ -264,11 +284,13 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             getFriendPop();
         }
     }
+
     private void getFriendPop() {
         Map<String, String> params = new HashMap<>();
         params.put("goods_id", mGoodsBean.getGoods_id());
         mPresenter.getFriendPopDetail(params);
     }
+
     private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 
         String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
@@ -296,6 +318,26 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
 
     }
 
+
+    private void setPushRecord(int id) {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("rou_goods_id", id);
+        map.put("token", getToken());
+        HttpRequestUtil.getRetrofitService(HomeApi.class).setPushRecord(map).enqueue(new AbsZCallback<BaseModel>() {
+            @Override
+            public void onSuccess(Call<BaseModel> call, Response<BaseModel> response) {
+
+                Toast.makeText(getContext(), "设置成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFail(Call<BaseModel> call, Throwable t) {
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
     @Override
     public void onDestroy() {
