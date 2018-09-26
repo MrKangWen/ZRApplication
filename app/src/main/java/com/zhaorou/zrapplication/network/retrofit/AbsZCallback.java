@@ -12,7 +12,7 @@ import retrofit2.Response;
  */
 public abstract class AbsZCallback<T extends BaseModel> implements Callback<T> {
 
-    private final static int HTTP_STATUS_SUCCESS = 200;
+    public final static int HTTP_STATUS_SUCCESS = 200;
     public AbsZCallback() {
 
     }

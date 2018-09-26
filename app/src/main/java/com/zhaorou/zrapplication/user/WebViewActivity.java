@@ -39,7 +39,7 @@ public class WebViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
-
+        setTitle("网页");
         /**
          *
          */
@@ -48,10 +48,12 @@ public class WebViewActivity extends BaseActivity {
             String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
             url = "https://oauth.taobao.com/authorize?response_type=code&client_id=25035976&redirect_uri=" +
                     "http://app.zhaoroudan.com/taobaoAuth?token=" + token + "&state=1212&view=web";
+
         }
 
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
         settings.setUseWideViewPort(true);
@@ -72,6 +74,8 @@ public class WebViewActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                setTitle(  view.getTitle());
+
 
             }
 
@@ -97,6 +101,7 @@ public class WebViewActivity extends BaseActivity {
                 handler.proceed();
             }
         });
+
 
     }
 }

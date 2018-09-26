@@ -1,5 +1,6 @@
 package com.zhaorou.zrapplication.home.api;
 
+import com.zhaorou.zrapplication.base.BaseDataModel;
 import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
@@ -68,6 +69,19 @@ public interface HomeApi {
     @FormUrlEncoded
     @POST("api/add_push_record")
     Call<BaseModel> setPushRecord(@FieldMap Map<String, Object> params);
+
+    /**
+     * 消息更新为已读
+     {
+     field:"is_read"
+     id:2580
+     token:"d6e3627378f896f9e2a6e44e796c2e26"
+     val:1
+     }
+     */
+    @FormUrlEncoded
+    @POST("api/upd_system_msg_status")
+    Call<BaseDataModel> updateMsgStatus(@FieldMap Map<String, Object> params);
 
 
 }

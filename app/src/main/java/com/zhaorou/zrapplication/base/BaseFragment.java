@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.network.imp.HttpDialogLoading;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment implements HttpDialogLoading {
 
 
     public BaseFragment() {
@@ -50,6 +51,31 @@ public abstract class BaseFragment extends Fragment {
         return token;
     }
     abstract public void initData();
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void dismissLoading() {
+
+    }
+
+    @Override
+    public void goToLogin() {
+
+    }
+
+    @Override
+    public void showToast(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showTipsDialog(String msg) {
+
+    }
 
 /*    private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 

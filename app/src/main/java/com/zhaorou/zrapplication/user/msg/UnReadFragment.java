@@ -7,8 +7,11 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.zhaorou.zrapplication.R;
+import com.zhaorou.zrapplication.base.BaseDataModel;
+import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.home.api.HomeApi;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
 import com.zhaorou.zrapplication.user.model.UnReadMsgModel;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
 import com.zhaorou.zrapplication.widget.recyclerview.CombinationViewHolder;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
 
 /**
@@ -58,14 +62,13 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
         holder.getView(R.id.msgUnReadRl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(t.getId(),position);
+                showDialog(t.getId(), position);
             }
         });
     }
 
 
-    private void showDialog(int msgId,final int position) {
-
+    private void showDialog(final int msgId, final int position) {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -73,8 +76,8 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
         builder.setPositiveButton("标记为已读", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                updateMsgStatus(msgId, position);
 
-                getHelper().removeData(position);
 
             }
         });
@@ -86,6 +89,32 @@ public class UnReadFragment extends BaseListBindDataFragment<UnReadMsgModel, UnR
             }
         });
         builder.show();
+    }
+
+    private void updateMsgStatus(int id, final int position) {
+        Map<String, Object> map = getTokenMap();
+        map.put("id", id);
+        map.put("field", "is_read");
+        map.put("val", 1);
+        HttpRequestUtil.getRetrofitService(HomeApi.class).updateMsgStatus(map).enqueue(new AbsZCallback<BaseDataModel>() {
+            @Override
+            public void onSuccess(Call<BaseDataModel> call, Response<BaseDataModel> response) {
+
+                if (response.body().getCode() == AbsZCallback.HTTP_STATUS_SUCCESS) {
+                    getHelper().removeData(position);
+                } else {
+                    showToast(response.body().getData());
+
+                }
+
+            }
+
+            @Override
+            public void onFail(Call<BaseDataModel> call, Throwable t) {
+
+            }
+        });
+
     }
 
     @Override
