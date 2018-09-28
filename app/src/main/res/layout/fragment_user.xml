@@ -138,16 +138,10 @@
             android:textColor="@color/colorBlack_333333" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="过期时间："
-            android:textSize="12sp" />
-
-        <TextView
             android:id="@+id/userTValidDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2018"
+            android:text=""
             android:textSize="12sp" />
 
         <ImageView

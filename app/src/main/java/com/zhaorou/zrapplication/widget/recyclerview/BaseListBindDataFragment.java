@@ -37,10 +37,10 @@ public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends B
 
         final SwipeRefreshLayout swipeRefreshLayout = mView.findViewById(R.id.baseSwipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
-        RecyclerView recyclerView = getRecyclerViewId(mView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        helper = new ListBindDataHelper<>(getActivity(), recyclerView, getAdapterLayoutId(), this);
-        helper.startPostData(getCall(helper.getMap()));
+        RecyclerView mRecyclerView = getRecyclerViewId(mView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        helper = new ListBindDataHelper<>(getActivity(), mRecyclerView, getAdapterLayoutId(), this);
+        startGetData();
         helper.setListRefreshListener(new ListRefreshListener() {
             @Override
             public void onRefresh() {
@@ -50,6 +50,19 @@ public abstract class BaseListBindDataFragment<T extends BaseModel, D> extends B
 
 
         //  helper.setNeedLoadMore(false);
+    }
+
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
+    public void startGetData() {
+        if (helper != null) {
+            helper.startPostData(getCall(helper.getMap()));
+        }
     }
 
     public ListBindDataHelper<T, D> getHelper() {

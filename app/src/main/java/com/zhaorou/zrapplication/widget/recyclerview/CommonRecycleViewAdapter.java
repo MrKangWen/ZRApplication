@@ -6,9 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.zhaorou.zrapplication.R;
 
@@ -62,6 +64,12 @@ public abstract class CommonRecycleViewAdapter<T> extends RecyclerView.Adapter<C
             } else {
                 //默认为空时显示的视图
                 view = LayoutInflater.from(getContext()).inflate(R.layout.view_list_emptyview, parent, false);
+
+                if(!TextUtils.isEmpty(mEmptyViewText)){
+                    TextView empty_tv_tips = view.findViewById(R.id.empty_tv_tips);
+                    empty_tv_tips.setText(mEmptyViewText);
+                }
+
                 mEmptyView = view;
 
 
@@ -179,6 +187,18 @@ public abstract class CommonRecycleViewAdapter<T> extends RecyclerView.Adapter<C
      */
     public void setEmptyView(View mEmptyView) {
         this.mEmptyView = mEmptyView;
+    }
+
+    private String mEmptyViewText;
+
+    /**
+     * 空时显示的视图
+     *
+     * @param
+     */
+    public void setEmptyViewText(String mEmptyViewText) {
+
+        this.mEmptyViewText=mEmptyViewText;
     }
     @Override
     public int getItemViewType(int position) {

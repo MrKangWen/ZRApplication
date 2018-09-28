@@ -2,6 +2,7 @@ package com.zhaorou.zrapplication.home.api;
 
 import com.zhaorou.zrapplication.base.BaseDataModel;
 import com.zhaorou.zrapplication.base.BaseModel;
+import com.zhaorou.zrapplication.goods.GoodsDetailModel;
 import com.zhaorou.zrapplication.home.model.AppUpdateModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.JxListModel;
@@ -68,20 +69,26 @@ public interface HomeApi {
      */
     @FormUrlEncoded
     @POST("api/add_push_record")
-    Call<BaseModel> setPushRecord(@FieldMap Map<String, Object> params);
+    Call<BaseDataModel> setPushRecord(@FieldMap Map<String, Object> params);
 
     /**
      * 消息更新为已读
-     {
-     field:"is_read"
-     id:2580
-     token:"d6e3627378f896f9e2a6e44e796c2e26"
-     val:1
-     }
+     * {
+     * field:"is_read"
+     * id:2580
+     * token:"d6e3627378f896f9e2a6e44e796c2e26"
+     * val:1
+     * }
      */
     @FormUrlEncoded
     @POST("api/upd_system_msg_status")
     Call<BaseDataModel> updateMsgStatus(@FieldMap Map<String, Object> params);
 
-
+    /**
+     * http://app.zhaoroudan.com/api/get_rou_goods_detail?id=949&token=6c6808e17379e57309f76f13be68866f
+     * <p>
+     * goods detail
+     */
+    @GET("api/get_rou_goods_detail")
+    Call<GoodsDetailModel> getGoodsDetail(@Query("id") int goodsId);
 }

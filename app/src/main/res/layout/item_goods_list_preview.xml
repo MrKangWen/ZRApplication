@@ -20,7 +20,8 @@
 
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/previewDetailLl"
+            android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -34,7 +35,6 @@
                 android:layout_marginLeft="6dp"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
-                android:maxLines="2"
                 android:text="牛奶滋润补水沐浴露800ml"
                 android:textColor="@color/colorBlack_333333"
                 android:textSize="13sp" />

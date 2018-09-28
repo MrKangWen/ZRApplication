@@ -18,11 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
-import com.zhaorou.zrapplication.base.BaseModel;
+import com.zhaorou.zrapplication.base.BaseDataModel;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.goods.GoodsDetailActivity;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.api.HomeApi;
-import com.zhaorou.zrapplication.home.dialog.PerfectWXCircleDialog;
 import com.zhaorou.zrapplication.home.model.ClassListModel;
 import com.zhaorou.zrapplication.home.model.FriendPopDetailModel;
 import com.zhaorou.zrapplication.home.model.GoodsListModel;
@@ -56,7 +56,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
     private String mTaoword;
     private String mTkl;
 
-    private PerfectWXCircleDialog mPerfectWXCircleDialog;
+    //  private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
     public PreviewFragment() {
         // Required empty public constructor
@@ -82,13 +82,23 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             pic = ZRDConstants.HttpUrls.BASE_URL + pic;
         }
         holder.setImageView(getActivity(), R.id.preview_img, pic);
-        holder.setText(R.id.preview_title, t.getGoods_name());
+        holder.setText(R.id.preview_title, t.getYugao_introd());
         holder.setText(R.id.preview_commission, "佣金：" + t.getRate() + "%");
         holder.setText(R.id.preview_live_time, "直播时间:" + t.getZhibo_time());
-        holder.setText(R.id.preview_pay_price, "卷后价:" + t.getPrice_after_coupons());
+        holder.setText(R.id.preview_pay_price, "劵后价:" + t.getPrice_after_coupons());
+
+        holder.getView(R.id.previewDetailLl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
+                intent.putExtra("ID", t.getId());
+                startActivity(intent);
+            }
+        });
+
 
         TextView preview_set_remind = holder.getView(R.id.preview_set_remind);
-        if (t.getReminded() == 0) {
+        if (t.getReminded() == 1) {
             preview_set_remind.setBackgroundResource(R.drawable.selector_rect_whitebg_blackbor1_cor4);
             preview_set_remind.setTextColor(getResources().getColor(R.color.colorBlack_333333));
             preview_set_remind.setText("已提醒");
@@ -174,6 +184,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         params.put("type", 2);
         params.put("flag", 1);
         params.put("page", 1);
+        params.put("token", getToken());
         params.put("pagesize", 15);
         return HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params);
     }
@@ -324,15 +335,20 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         Map<String, Object> map = new HashMap<>();
         map.put("rou_goods_id", id);
         map.put("token", getToken());
-        HttpRequestUtil.getRetrofitService(HomeApi.class).setPushRecord(map).enqueue(new AbsZCallback<BaseModel>() {
+        HttpRequestUtil.getRetrofitService(HomeApi.class).setPushRecord(map).enqueue(new AbsZCallback<BaseDataModel>() {
             @Override
-            public void onSuccess(Call<BaseModel> call, Response<BaseModel> response) {
+            public void onSuccess(Call<BaseDataModel> call, Response<BaseDataModel> response) {
 
-                Toast.makeText(getContext(), "设置成功", Toast.LENGTH_SHORT).show();
+                if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
+                    showToast("设置成功");
+                } else {
+                    showToast(response.body().getData());
+                }
+
             }
 
             @Override
-            public void onFail(Call<BaseModel> call, Throwable t) {
+            public void onFail(Call<BaseDataModel> call, Throwable t) {
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

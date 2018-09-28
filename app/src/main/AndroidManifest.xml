@@ -28,21 +28,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".base.BaseActivity"></activity>
+        <activity android:name=".base.BaseActivity" />
         <activity
             android:name=".login.LoginActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask" />
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"></activity>
-        <activity android:name=".search.SearchActivity"></activity>
-        <activity android:name=".home.CategoryActivity"></activity>
-        <activity android:name=".contentresolver.SelectPictureActivity"></activity>
-        <activity android:name=".settings.SettingsActivity"></activity>
-        <activity android:name=".user.WebViewActivity"></activity>
-        <activity android:name=".login.LoginByAccountActivity"></activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name=".search.SearchActivity" />
+        <activity android:name=".home.CategoryActivity" />
+        <activity android:name=".contentresolver.SelectPictureActivity" />
+        <activity android:name=".settings.SettingsActivity" />
+        <activity android:name=".user.WebViewActivity" />
+        <activity android:name=".login.LoginByAccountActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -69,11 +69,12 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <activity android:name=".contentresolver.AlbumListActivity"></activity>
+        <activity android:name=".contentresolver.AlbumListActivity" />
 
         <service android:name=".network.update.UpdateAppService" />
 
-        <activity android:name=".user.msg.MsgActivity"></activity>
+        <activity android:name=".user.msg.MsgActivity" />
+        <activity android:name=".goods.GoodsDetailActivity"></activity>
     </application>
 
 </manifest>

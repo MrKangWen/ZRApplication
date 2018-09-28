@@ -270,7 +270,7 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                 }
 
                 JxListModel body = response.body();
-                Log.d("mytest", body.getData().getList().get(0).getGoods_id());
+//                Log.d("mytest", body.getData().getList().get(0).getGoods_id());
                 if(mJxListData!=null){
                     mJxListData.setValue(body.getData().getList());
                 }

@@ -209,7 +209,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         String nickname = userBean.getNickname();
         mNameTv.setText(nickname);
 
-        mUserTValidDate.setText(userBean.getTao_session_valid_time());
+        mUserTValidDate.setText("过期时间："+userBean.getTao_session_valid_time());
         String headimgurl = userBean.getHeadimgurl();
         GlideApp.with(this).load(headimgurl).circleCrop().into(mAvatarIv);
 

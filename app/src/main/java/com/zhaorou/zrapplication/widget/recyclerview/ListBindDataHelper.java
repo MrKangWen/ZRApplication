@@ -2,12 +2,14 @@ package com.zhaorou.zrapplication.widget.recyclerview;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.network.imp.HttpDialogLoading;
 import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
@@ -233,7 +235,13 @@ public class ListBindDataHelper<T extends BaseModel, D> {
             @Override
             public void onFail(Call<T> call, Throwable t) {
 
-                if (listRefreshListener != null && STATE_LOADING_RE_FRESH == mState) {
+                if (tempData == null) {
+                    tempData = new ArrayList<>();
+                    initAdapter(true);
+                }
+
+
+                if (listRefreshListener != null) {
                     listRefreshListener.onRefresh();
                 }
 
@@ -253,7 +261,14 @@ public class ListBindDataHelper<T extends BaseModel, D> {
                     mMap.put(mPage, page);
                 }
 
-                Toast.makeText(mActivity, t.getMessage(), Toast.LENGTH_LONG).show();
+                if (!TextUtils.isEmpty((CharSequence) mMap.get("token"))) {
+                    Toast.makeText(mActivity, t.getMessage(), Toast.LENGTH_LONG).show();
+                } else {
+
+                    adapter.setEmptyViewText("登录后，下拉刷新查看！");
+                    Toast.makeText(mActivity, "请先登录查看", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 

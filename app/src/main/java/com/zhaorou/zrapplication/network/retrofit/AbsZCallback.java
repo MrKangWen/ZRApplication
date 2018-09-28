@@ -33,12 +33,12 @@ public abstract class AbsZCallback<T extends BaseModel> implements Callback<T> {
 
         onSuccess(call, response);
 
-    /*    if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
+       if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
             onSuccess(call, response);
         } else {
             Throwable throwable = new Throwable("发生异常:" + response.body().getCode());
             onFail(call, throwable);
-        }*/
+        }
 
     }
 

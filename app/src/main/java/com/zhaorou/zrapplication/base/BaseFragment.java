@@ -44,12 +44,18 @@ public abstract class BaseFragment extends Fragment implements HttpDialogLoading
         map.put("token", token);
         return map;
     }
+
     protected String getToken() {
 
         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
 
         return token;
     }
+
+    protected boolean isLogin() {
+        return !TextUtils.isEmpty(getToken());
+    }
+
     abstract public void initData();
 
     @Override
@@ -69,7 +75,7 @@ public abstract class BaseFragment extends Fragment implements HttpDialogLoading
 
     @Override
     public void showToast(String msg) {
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -38,7 +38,7 @@ android {
 
             signingConfig signingConfigs.release
         }
-        debug{
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -72,4 +72,6 @@ dependencies {
     // 此处以JPush 3.1.6 版本为例。
     implementation 'cn.jiguang.sdk:jcore:1.2.5'
     // 此处以JCore 1.2.5 版本为例。
+
+    implementation 'com.tubb.smrv:swipemenu-recyclerview:5.4.7'
 }

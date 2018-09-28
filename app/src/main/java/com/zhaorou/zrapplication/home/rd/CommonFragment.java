@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
+import com.zhaorou.zrapplication.goods.GoodsDetailActivity;
 import com.zhaorou.zrapplication.home.HomeJxFragment;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
 import com.zhaorou.zrapplication.home.api.HomeApi;
@@ -48,7 +49,7 @@ import retrofit2.Call;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxListModel.DataBean.ListBean> implements IHomeFragmentView , EasyPermissions.PermissionCallbacks{
+public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxListModel.DataBean.ListBean> implements IHomeFragmentView, EasyPermissions.PermissionCallbacks {
     private HomeFragmentPresenter mPresenter = new HomeFragmentPresenter();
     private JxListModel.DataBean.ListBean mGoodsBean;
     private String mShareType;
@@ -84,20 +85,28 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
         holder.setText(R.id.common_title, t.getGoods_name());
         holder.setText(R.id.common_shengyu, "剩余：" + t.getQuan_shengyu());
         holder.setText(R.id.common_sales, "销量:" + t.getSales());
-        holder.setText(R.id.common_pay_price, "卷后价:" + t.getPrice_after_coupons());
+        holder.setText(R.id.common_pay_price, "劵后价:" + t.getPrice_after_coupons());
         holder.setText(R.id.common_coupon, "优惠券:" + t.getPrice_coupons());
 
+        holder.getView(R.id.commonDetailLl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
+                intent.putExtra("ID", t.getId());
+                startActivity(intent);
+            }
+        });
 
-        TextView common_perfect_wx_circle=holder.getView(R.id.common_perfect_wx_circle);
+        TextView common_perfect_wx_circle = holder.getView(R.id.common_perfect_wx_circle);
         int isFriendpop = t.getIs_friendpop();
         if (isFriendpop == 0) {
             common_perfect_wx_circle.setBackgroundResource(R.drawable.selector_rect_whitebg_blackbor1_cor4);
             common_perfect_wx_circle.setTextColor(getResources().getColor(R.color.colorBlack_333333));
             common_perfect_wx_circle.setText("完善朋友圈");
         } else if (isFriendpop == 1) {
-           common_perfect_wx_circle.setBackgroundResource(R.drawable.selector_rect_whitebg_redbor1_cor4);
-           common_perfect_wx_circle.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
-           common_perfect_wx_circle.setText("显示朋友圈");
+            common_perfect_wx_circle.setBackgroundResource(R.drawable.selector_rect_whitebg_redbor1_cor4);
+            common_perfect_wx_circle.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
+            common_perfect_wx_circle.setText("显示朋友圈");
         }
 
         //完善朋友圈 显示朋友圈
@@ -221,14 +230,16 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
         params.put("type", 3);
         params.put("flag", 1);
         params.put("page", 1);
+        params.put("token", getToken());
         params.put("pagesize", 15);
         return HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params);
     }
+
     private void showDialog(JxListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(), goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(),goodsBean.getPic());
+                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(), goodsBean.getPic());
     }
 
     @Override
