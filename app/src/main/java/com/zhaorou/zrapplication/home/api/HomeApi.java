@@ -69,7 +69,7 @@ public interface HomeApi {
      */
     @FormUrlEncoded
     @POST("api/add_push_record")
-    Call<BaseDataModel> setPushRecord(@FieldMap Map<String, Object> params);
+    Call<BaseModel> setPushRecord(@FieldMap Map<String, Object> params);
 
     /**
      * 消息更新为已读

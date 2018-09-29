@@ -128,12 +128,33 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/activity_main_tab_user_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/selector_main_tab_user_iv"
-                android:scaleType="fitXY" />
+
+            <RelativeLayout
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:clipChildren="false">
+
+                <ImageView
+                    android:id="@+id/activity_main_tab_user_iv"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/selector_main_tab_user_iv"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/mainMsgTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/shape_main_msg"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
 
             <TextView
                 android:id="@+id/activity_main_tab_user_tv"

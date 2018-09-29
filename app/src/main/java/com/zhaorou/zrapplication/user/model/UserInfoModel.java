@@ -109,6 +109,16 @@ public class UserInfoModel {
             private String tkl_type;
             private IsDeleteBean is_delete;
 
+            public String getUnread_msg_count() {
+                return unread_msg_count;
+            }
+
+            public void setUnread_msg_count(String unread_msg_count) {
+                this.unread_msg_count = unread_msg_count;
+            }
+
+            private String unread_msg_count;
+
             public String getTao_session_valid_time() {
                 return tao_session_valid_time;
             }

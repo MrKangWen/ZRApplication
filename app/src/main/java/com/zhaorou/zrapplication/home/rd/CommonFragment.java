@@ -32,6 +32,7 @@ import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
@@ -229,9 +230,10 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
         params.put("cid", "0");
         params.put("type", 3);
         params.put("flag", 1);
-        params.put("page", 1);
-        params.put("token", getToken());
-        params.put("pagesize", 15);
+        if (isLogin()) {
+            params.put("token", getToken());
+        }
+
         return HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params);
     }
 
@@ -258,37 +260,57 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-        if (TextUtils.equals(mShareType, "WX")) {
-            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                    price_after_coupons + "\n" +
-                    "--------抢购方式--------" + "\n";
-            if (TextUtils.equals(tklType, "1")) {
-                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
-            } else if (TextUtils.equals(tklType, "2")) {
-                String pic = mGoodsBean.getPic();
-                String str = "https://wenan001.kuaizhan.com/?taowords=";
-                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
-            }
-        } else {
-            mTaoword = content;
+
+        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                price_after_coupons + "\n" +
+                "--------抢购方式--------" + "\n";
+        if (TextUtils.equals(tklType, "1")) {
+            mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
+        } else if (TextUtils.equals(tklType, "2")) {
+            String pic = mGoodsBean.getPic();
+            String str = "https://wenan001.kuaizhan.com/?taowords=";
+            mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
         }
+
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
 
+        AssistantService.mMoments = content;
+
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
-            list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+
+            if (entityBean.getMarket_image() != null) {
+                if (startsWithHttp(entityBean.getMarket_image())) {
+                    list.add(entityBean.getMarket_image());
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+                }
+            }
+
+
             String imageStr = entityBean.getImage();
             if (!TextUtils.isEmpty(imageStr)) {
                 if (imageStr.contains("#")) {
                     String[] imageArray = imageStr.split("#");
                     for (String img : imageArray) {
-                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+
+                        if (startsWithHttp(img)) {
+                            list.add(img);
+                        } else {
+                            list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                        }
+
                     }
                 } else {
-                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    if (startsWithHttp(imageStr)) {
+                        list.add(imageStr);
+                    } else {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    }
+
                 }
             }
         } else {
@@ -339,14 +361,27 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
 
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
+            return;
         }
+
+        if (mGoodsBean.getIs_friendpop() == 0) {
+
+            FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getPic());
+            shareFriendPopToWx(bean);
+            return;
+        }
+
         if (TextUtils.equals(mShareType, "WX")) {
             getFriendPop();
         }
+
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
             getFriendPop();
         }
     }
+
 
     private void getFriendPop() {
         Map<String, String> params = new HashMap<>();

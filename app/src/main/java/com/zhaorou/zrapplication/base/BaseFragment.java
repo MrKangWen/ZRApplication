@@ -83,6 +83,10 @@ public abstract class BaseFragment extends Fragment implements HttpDialogLoading
 
     }
 
+    public boolean startsWithHttp(String url) {
+        return url.startsWith("http");
+    }
+
 /*    private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 
         String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +

@@ -30,6 +30,7 @@ import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
@@ -51,6 +52,8 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
     private String mTaoword;
     private String mTkl;
     private PerfectWXCircleDialog mPerfectWXCircleDialog;
+
+    private int mZhiBoIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +80,16 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
                 @Override
                 public void onClick(View v) {
 
-                    FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
-                    bean.setContent(detailModel.getZhibo_introd1());
-                    bean.setImage(detailModel.getZhibo_pic1());
-
-                    shareFriendPopToWx(bean);
+                    if (!isLogin()) {
+                        Toast.makeText(getApplicationContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(GoodsDetailActivity.this, LoginActivity.class));
+                    } else {
+                        mZhiBoIndex = 1;
+                        Map<String, String> params = new HashMap<>();
+                        params.put("id", detailModel.getGoods_id());
+                        params.put("token", getToken());
+                        mPresenter.getTaobaoTbkTpwd(params);
+                    }
                 }
             });
 
@@ -102,11 +110,16 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
                 @Override
                 public void onClick(View v) {
 
-                    FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
-                    bean.setContent(detailModel.getZhibo_introd2());
-                    bean.setImage(detailModel.getZhibo_pic2());
-
-                    shareFriendPopToWx(bean);
+                    if (!isLogin()) {
+                        Toast.makeText(getApplicationContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(GoodsDetailActivity.this, LoginActivity.class));
+                    } else {
+                        mZhiBoIndex = 2;
+                        Map<String, String> params = new HashMap<>();
+                        params.put("id", detailModel.getGoods_id());
+                        params.put("token", getToken());
+                        mPresenter.getTaobaoTbkTpwd(params);
+                    }
                 }
             });
 
@@ -126,11 +139,16 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
                 @Override
                 public void onClick(View v) {
 
-                    FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
-                    bean.setContent(detailModel.getZhibo_introd3());
-                    bean.setImage(detailModel.getZhibo_pic3());
-
-                    shareFriendPopToWx(bean);
+                    if (!isLogin()) {
+                        Toast.makeText(getApplicationContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(GoodsDetailActivity.this, LoginActivity.class));
+                    } else {
+                        mZhiBoIndex = 3;
+                        Map<String, String> params = new HashMap<>();
+                        params.put("id", detailModel.getGoods_id());
+                        params.put("token", getToken());
+                        mPresenter.getTaobaoTbkTpwd(params);
+                    }
                 }
             });
         } else {
@@ -140,10 +158,10 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
 
         ImageView detailIv4 = findViewById(R.id.detailIv4);
 
-        if(detailModel.getPic().startsWith("http")){
+        if (detailModel.getPic().startsWith("http")) {
             Glide.with(getApplicationContext()).
                     load(detailModel.getPic()).into(detailIv4);
-        }else {
+        } else {
             Glide.with(getApplicationContext()).
                     load(baseUrl + detailModel.getPic()).into(detailIv4);
         }
@@ -344,24 +362,25 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-        if (TextUtils.equals(mShareType, "WX")) {
-            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                    price_after_coupons + "\n" +
-                    "--------抢购方式--------" + "\n";
-            if (TextUtils.equals(tklType, "1")) {
-                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
-            } else if (TextUtils.equals(tklType, "2")) {
-                String pic = mGoodsBean.getPic();
-                String str = "https://wenan001.kuaizhan.com/?taowords=";
-                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
-            }
-        } else {
-            mTaoword = content;
+
+        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                price_after_coupons + "\n" +
+                "--------抢购方式--------" + "\n";
+        if (TextUtils.equals(tklType, "1")) {
+            mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
+        } else if (TextUtils.equals(tklType, "2")) {
+            String pic = mGoodsBean.getPic();
+            String str = "https://wenan001.kuaizhan.com/?taowords=";
+            mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
         }
+
         ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(this, "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
+
+        AssistantService.mMoments = content;
 
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
@@ -418,17 +437,55 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
     @Override
     public void onGetTaowords(String tkl) {
         mTkl = tkl;
-        String tklType = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+        String tklType = SPreferenceUtil.getString(getApplicationContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
 
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
+            return;
         }
+
+
+        FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+
+        if (mZhiBoIndex != 0) {
+            //分享直播内容
+            switch (mZhiBoIndex) {
+                case 1:
+                    bean.setContent(mGoodsBean.getZhibo_introd1());
+                    bean.setImage(mGoodsBean.getZhibo_pic1());
+                    break;
+                case 2:
+                    bean.setContent(mGoodsBean.getZhibo_introd2());
+                    bean.setImage(mGoodsBean.getZhibo_pic2());
+                    break;
+                case 3:
+                    bean.setContent(mGoodsBean.getZhibo_introd3());
+                    bean.setImage(mGoodsBean.getZhibo_pic3());
+                    break;
+                default:
+
+                    break;
+            }
+            mZhiBoIndex = 0;
+            shareFriendPopToWx(bean);
+            return;
+        }
+
+        if (mGoodsBean.getIs_friendpop() == 0) {
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getPic());
+            shareFriendPopToWx(bean);
+            return;
+        }
+
+
         if (TextUtils.equals(mShareType, "WX")) {
             getFriendPop();
         }
+
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
             getFriendPop();
         }

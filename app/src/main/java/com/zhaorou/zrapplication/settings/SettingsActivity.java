@@ -16,9 +16,11 @@ import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
+import com.zhaorou.zrapplication.user.model.UserMessageEvent;
 import com.zhaorou.zrapplication.utils.ApplicationUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,6 +60,8 @@ public class SettingsActivity extends BaseActivity {
         }
         String versionName = ApplicationUtils.getVersionName();
         mVersionInfo.setText(versionName);
+
+
     }
 
     @OnClick({R.id.activity_settings_layout_title_left_btn_rl, R.id.activity_settings_btn_link_taoword,
@@ -128,6 +132,9 @@ public class SettingsActivity extends BaseActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
+                                EventBus.getDefault().post(new UserMessageEvent("-1"));
+
                                 SPreferenceUtil.put(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                                 Toast.makeText(SettingsActivity.this, "已退出登录", Toast.LENGTH_SHORT).show();
                                 finish();
@@ -142,4 +149,9 @@ public class SettingsActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }

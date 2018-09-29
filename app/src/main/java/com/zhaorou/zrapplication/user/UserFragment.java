@@ -21,9 +21,12 @@ import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.settings.SettingsActivity;
 import com.zhaorou.zrapplication.user.model.UserInfoModel;
+import com.zhaorou.zrapplication.user.model.UserMessageEvent;
 import com.zhaorou.zrapplication.user.msg.MsgActivity;
 import com.zhaorou.zrapplication.user.presenter.UserFragmentPresenter;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +51,8 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     TextView mScoreTv;
     @BindView(R.id.userTValidDate)
     TextView mUserTValidDate;
+    @BindView(R.id.userMsgCountTv)
+    TextView mUserMsgCountTv;
 
     private View mView;
     private Unbinder mUnbinder;
@@ -95,6 +100,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
             }
         });
 
+
         return mView;
     }
 
@@ -109,6 +115,7 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         super.onDestroy();
         mUnbinder.unbind();
         mPresenter.detachView();
+
     }
 
     @OnClick({R.id.fragment_user_user_info_ll, R.id.fragment_user_bind_pid_ll, R.id.fragment_use_setting_ll,
@@ -197,8 +204,11 @@ public class UserFragment extends Fragment implements IUserFragmentView {
     private void getUserInfo() {
         String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
         if (TextUtils.isEmpty(token)) {
+            mUserMsgCountTv.setVisibility(View.GONE);
+            mScoreTv.setText("积分：0");
             GlideApp.with(this).load(R.mipmap.ic_launcher).circleCrop().into(mAvatarIv);
             mNameTv.setText("点击登录/注册");
+            mUserTValidDate.setVisibility(View.GONE);
 
         } else {
             mPresenter.fetchUserInfo(token);
@@ -209,11 +219,16 @@ public class UserFragment extends Fragment implements IUserFragmentView {
         String nickname = userBean.getNickname();
         mNameTv.setText(nickname);
 
-        mUserTValidDate.setText("过期时间："+userBean.getTao_session_valid_time());
+        mUserTValidDate.setVisibility(View.VISIBLE);
+        mUserTValidDate.setText("过期时间：" + userBean.getTao_session_valid_time());
         String headimgurl = userBean.getHeadimgurl();
         GlideApp.with(this).load(headimgurl).circleCrop().into(mAvatarIv);
 
         int score = userBean.getScore();
         mScoreTv.setText("积分：" + score);
+
+        mUserMsgCountTv.setText(userBean.getUnread_msg_count());
+        EventBus.getDefault().post(new UserMessageEvent(userBean.getUnread_msg_count()));
+
     }
 }

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.base.BaseDataModel;
+import com.zhaorou.zrapplication.base.BaseModel;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.goods.GoodsDetailActivity;
 import com.zhaorou.zrapplication.home.IHomeFragmentView;
@@ -31,6 +32,7 @@ import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
@@ -109,7 +111,13 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             preview_set_remind.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setPushRecord(t.getId());
+                    if (!isLogin()) {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(intent);
+                    } else {
+                        setPushRecord(t.getId());
+                    }
+
 
                 }
             });
@@ -184,7 +192,10 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         params.put("type", 2);
         params.put("flag", 1);
         params.put("page", 1);
-        params.put("token", getToken());
+        if (isLogin()) {
+            params.put("token", getToken());
+        }
+
         params.put("pagesize", 15);
         return HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params);
     }
@@ -206,7 +217,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-        if (TextUtils.equals(mShareType, "WX")) {
+     //   if (TextUtils.equals(mShareType, "WX")) {
             mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
                     price_after_coupons + "\n" +
                     "--------抢购方式--------" + "\n";
@@ -217,26 +228,47 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
                 String str = "https://wenan001.kuaizhan.com/?taowords=";
                 mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
             }
-        } else {
+      /*  } else {
             mTaoword = content;
-        }
+        }*/
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
 
+
+        AssistantService.mMoments = content;
+
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
-            list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+
+            if (entityBean.getMarket_image() != null) {
+                if (startsWithHttp(entityBean.getMarket_image())) {
+                    list.add(entityBean.getMarket_image());
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+                }
+            }
             String imageStr = entityBean.getImage();
             if (!TextUtils.isEmpty(imageStr)) {
                 if (imageStr.contains("#")) {
                     String[] imageArray = imageStr.split("#");
                     for (String img : imageArray) {
-                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+
+                        if (startsWithHttp(img)) {
+                            list.add(img);
+                        } else {
+                            list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                        }
+
                     }
                 } else {
-                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    if (startsWithHttp(imageStr)) {
+                        list.add(imageStr);
+                    } else {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    }
+
                 }
             }
         } else {
@@ -287,14 +319,27 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
 
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
+            return;
         }
+
+        if (mGoodsBean.getIs_friendpop() == 0) {
+
+            FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getPic());
+            shareFriendPopToWx(bean);
+            return;
+        }
+
         if (TextUtils.equals(mShareType, "WX")) {
             getFriendPop();
         }
+
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
             getFriendPop();
         }
     }
+
 
     private void getFriendPop() {
         Map<String, String> params = new HashMap<>();
@@ -335,20 +380,20 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         Map<String, Object> map = new HashMap<>();
         map.put("rou_goods_id", id);
         map.put("token", getToken());
-        HttpRequestUtil.getRetrofitService(HomeApi.class).setPushRecord(map).enqueue(new AbsZCallback<BaseDataModel>() {
+        HttpRequestUtil.getRetrofitService(HomeApi.class).setPushRecord(map).enqueue(new AbsZCallback<BaseModel>() {
             @Override
-            public void onSuccess(Call<BaseDataModel> call, Response<BaseDataModel> response) {
+            public void onSuccess(Call<BaseModel> call, Response<BaseModel> response) {
 
                 if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
                     showToast("设置成功");
                 } else {
-                    showToast(response.body().getData());
+                    showToast("设置失败");
                 }
 
             }
 
             @Override
-            public void onFail(Call<BaseDataModel> call, Throwable t) {
+            public void onFail(Call<BaseModel> call, Throwable t) {
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

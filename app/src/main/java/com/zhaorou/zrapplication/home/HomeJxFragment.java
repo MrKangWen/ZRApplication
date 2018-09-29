@@ -40,6 +40,7 @@ import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
@@ -88,6 +89,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
     private PerfectWXCircleDialog mPerfectWXCircleDialog;
 
     private LoadingDialog mLoadingDialog;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -154,7 +156,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-        if (TextUtils.equals(mShareType, "WX")) {
+     /*   if (TextUtils.equals(mShareType, "WX")) {*/
             mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
                     price_after_coupons + "\n" +
                     "--------抢购方式--------" + "\n";
@@ -165,31 +167,54 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
                 String str = "https://wenan001.kuaizhan.com/?taowords=";
                 mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
             }
-        } else {
+     /*   } else {
             mTaoword = content;
-        }
+        }*/
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
 
+        AssistantService.mMoments = content;
+
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
-            list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+
+            if (entityBean.getMarket_image() != null) {
+                if (startsWithHttp(entityBean.getMarket_image())) {
+                    list.add(entityBean.getMarket_image());
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+                }
+            }
+
+
             String imageStr = entityBean.getImage();
             if (!TextUtils.isEmpty(imageStr)) {
                 if (imageStr.contains("#")) {
                     String[] imageArray = imageStr.split("#");
                     for (String img : imageArray) {
-                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+
+                        if (startsWithHttp(img)) {
+                            list.add(img);
+                        } else {
+                            list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                        }
+
                     }
                 } else {
-                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    if (startsWithHttp(imageStr)) {
+                        list.add(imageStr);
+                    } else {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    }
+
                 }
             }
         } else {
             list.add(mGoodsBean.getPic());
         }
+
 
         final List<File> fileList = new ArrayList<>();
         new Thread(new Runnable() {
@@ -234,10 +259,22 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
 
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
+            return;
         }
+
+        if (mGoodsBean.getIs_friendpop() == 0) {
+
+            FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getPic());
+            shareFriendPopToWx(bean);
+            return;
+        }
+
         if (TextUtils.equals(mShareType, "WX")) {
             getFriendPop();
         }
+
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
             getFriendPop();
         }
@@ -383,7 +420,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
         @NonNull
         @Override
         public GoodsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_goods_list_home_fragment, parent, false);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_goods_list_home_jx_fragment, parent, false);
             GoodsViewHolder goodsViewHolder = new GoodsViewHolder(view);
             return goodsViewHolder;
         }
@@ -553,7 +590,7 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(getContext(), this);
         mPerfectWXCircleDialog.show();
         mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(), goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(),goodsBean.getPic());
+                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(), goodsBean.getPic());
     }
 
     @Override

@@ -186,16 +186,36 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
 
         final List<String> list = new ArrayList<>();
         if (entityBean != null) {
-            list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+
+            if (entityBean.getMarket_image() != null) {
+                if (startsWithHttp(entityBean.getMarket_image())) {
+                    list.add(entityBean.getMarket_image());
+                } else {
+                    list.add(ZRDConstants.HttpUrls.BASE_URL + entityBean.getMarket_image());
+                }
+            }
+
+
             String imageStr = entityBean.getImage();
             if (!TextUtils.isEmpty(imageStr)) {
                 if (imageStr.contains("#")) {
                     String[] imageArray = imageStr.split("#");
                     for (String img : imageArray) {
-                        list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+
+                        if (startsWithHttp(img)) {
+                            list.add(img);
+                        } else {
+                            list.add(ZRDConstants.HttpUrls.BASE_URL + img);
+                        }
+
                     }
                 } else {
-                    list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    if (startsWithHttp(imageStr)) {
+                        list.add(imageStr);
+                    } else {
+                        list.add(ZRDConstants.HttpUrls.BASE_URL + imageStr);
+                    }
+
                 }
             }
         } else {
@@ -244,7 +264,18 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         if (TextUtils.equals(mShareType, "TKL")) {
             shareTKL(tkl, tklType, goods_name, price, price_after_coupons);
+            return;
         }
+
+        if (mGoodsBean.getIs_friendpop() == 0) {
+
+            FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getPic());
+            shareFriendPopToWx(bean);
+            return;
+        }
+
         if (TextUtils.equals(mShareType, "WX")) {
             getFriendPop();
         }

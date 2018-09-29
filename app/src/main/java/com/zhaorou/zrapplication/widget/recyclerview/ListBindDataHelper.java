@@ -325,7 +325,7 @@ public class ListBindDataHelper<T extends BaseModel, D> {
                             }
 
                             page++;
-                            //     Logger.getLogger().logD(TAG, "---STATE_LOADING_MORE---------" + page);
+                            Log.d(TAG, "---STATE_LOADING_MORE---------" + page);
                             mMap.put(mPage, page);
                             getData(listBindDataInterface.getCall(mMap), false);
                         }

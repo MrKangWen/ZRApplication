@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhaorou.zrapplication.base.BaseActivity;
+import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.home.HomeFragment;
 import com.zhaorou.zrapplication.home.rd.RdFragment;
@@ -23,20 +24,30 @@ import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
 import com.zhaorou.zrapplication.network.update.UpdateAppService;
 import com.zhaorou.zrapplication.user.UserFragment;
+import com.zhaorou.zrapplication.user.model.UserInfoModel;
+import com.zhaorou.zrapplication.user.model.UserMessageEvent;
 import com.zhaorou.zrapplication.utils.AccessibilityUtils;
 import com.zhaorou.zrapplication.utils.AssistantService;
+import com.zhaorou.zrapplication.utils.GsonHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements ViewPager.OnPageChangeListener {
@@ -57,7 +68,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     @BindView(R.id.activity_main_tab_rd_tv)
     TextView mTabRdTv;
 
-
+    @BindView(R.id.mainMsgTv)
+    TextView mMainMsgTv;
     private VPAdapter mVPAdapter;
 
     private List<ImageView> mTabIconList;
@@ -99,7 +111,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
                         }
                     }).create().show();
         }
-
+        getUserInfo();
     }
 
     @Override
@@ -182,10 +194,6 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-
-    }
 
     private class VPAdapter extends FragmentPagerAdapter {
 
@@ -264,4 +272,64 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
                     }
                 }).create().show();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(UserMessageEvent messageEvent) {
+        if ("0".equals(messageEvent.getMessageCount()) || "-1".equals(messageEvent.getMessageCount())) {
+            mMainMsgTv.setVisibility(View.GONE);
+        } else {
+            mMainMsgTv.setVisibility(View.VISIBLE);
+            mMainMsgTv.setText(messageEvent.getMessageCount());
+        }
+    }
+
+
+    private void getUserInfo() {
+
+        if (!isLogin()) {
+
+            return;
+        }
+        Map<String, String> params = new HashMap<>(2);
+        params.put("token", getToken());
+        Call<ResponseBody> call = HttpRequestUtil.getRetrofitService().executeGet(ZRDConstants.HttpUrls.GET_USER_INFO, params);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    try {
+                        String responseStr = response.body().string();
+                        JSONObject jsonObj = new JSONObject(responseStr);
+                        if (jsonObj.optInt("code") == 200) {
+                            UserInfoModel userInfoModel = GsonHelper.fromJson(responseStr, UserInfoModel.class);
+                            UserInfoModel.DataBean data = userInfoModel.getData();
+                            if (data != null && data.getUser() != null) {
+                                UserInfoModel.DataBean.UserBean user = data.getUser();
+
+                                if (user.getUnread_msg_count().equals("0")) {
+                                    mMainMsgTv.setVisibility(View.GONE);
+                                } else {
+                                    mMainMsgTv.setVisibility(View.VISIBLE);
+                                    mMainMsgTv.setText(user.getUnread_msg_count());
+                                }
+
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+    }
+
 }

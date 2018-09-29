@@ -13,11 +13,23 @@
         android:layout_height="wrap_content"
         android:background="#d03a36">
 
-        <ImageView
-            android:id="@+id/userIvMsg"
+        <TextView
+            android:id="@+id/userMsgCountTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_margin="12dp"
+            android:padding="8dp"
+            android:text="1"
+            android:textColor="@android:color/white"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/userIvMsg"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_margin="15dp"
             android:padding="10dp"
             android:src="@drawable/ic_msg" />
 
@@ -272,7 +284,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icon_settings" />
+            android:src="@drawable/ic_help" />
 
         <TextView
             android:layout_width="0dp"

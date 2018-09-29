@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.eventbus.MessageEvent;
 import com.zhaorou.zrapplication.utils.ActivityController;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.utils.StatusBarUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -66,5 +68,13 @@ public class BaseActivity extends AppCompatActivity {
             actionBar.hide();
         }
     }
+    protected String getToken() {
 
+        String token = SPreferenceUtil.getString(getApplicationContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
+
+        return token;
+    }
+    protected boolean isLogin() {
+        return !TextUtils.isEmpty(getToken());
+    }
 }

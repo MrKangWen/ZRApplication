@@ -2,6 +2,7 @@ package com.zhaorou.zrapplication.utils;
 
 import android.accessibilityservice.AccessibilityService;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -44,6 +45,7 @@ public class AssistantService extends AccessibilityService {
                         arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,mMoments);
                         AccessibilityNodeInfo edtView = edt.get(0);
 
+                        Log.d("AssistantService",mMoments);
                         edtView.performAction(AccessibilityNodeInfo.FOCUS_INPUT);
                         edtView.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
                     }
