@@ -40,6 +40,7 @@ import com.zhaorou.zrapplication.home.model.GoodsListModel;
 import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.presenter.HomeFragmentPresenter;
 import com.zhaorou.zrapplication.login.LoginActivity;
+import com.zhaorou.zrapplication.utils.AccessibilityUtils;
 import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.DisplayUtil;
 import com.zhaorou.zrapplication.utils.FileUtils;
@@ -174,11 +175,15 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             mTaoword = mTaoword + "打开链接\n" + str;
         }
 
+
+        if (!isOpenService() && "WX_CIRCLE".equals(mShareType)) {
+            mTaoword = content;
+        }
+
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(getContext(), "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
-
         AssistantService.mMoments = content;
 
         final List<String> list = new ArrayList<>();

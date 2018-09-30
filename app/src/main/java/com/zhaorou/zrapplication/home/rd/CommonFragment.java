@@ -292,6 +292,12 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
             mTaoword = mTaoword + "打开链接\n" + str;
         }
 
+        if (!isOpenService() && "WX_CIRCLE".equals(mShareType)) {
+            mTaoword = content;
+        }
+
+
+
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);

@@ -396,6 +396,10 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
 
         }
 
+        if (!isOpenService() && "WX_CIRCLE".equals(mShareType)) {
+            mTaoword = content;
+        }
+
 
         ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);

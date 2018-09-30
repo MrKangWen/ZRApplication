@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.network.imp.HttpDialogLoading;
+import com.zhaorou.zrapplication.utils.AccessibilityUtils;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import java.util.HashMap;
@@ -88,5 +90,16 @@ public abstract class BaseFragment extends Fragment implements HttpDialogLoading
     }
 
 
-
+    /**
+     * 是否开始辅助
+     *
+     * @return
+     */
+    public boolean isOpenService() {
+        try {
+            return AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), getActivity());
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

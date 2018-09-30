@@ -181,17 +181,19 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
                     mGoodsBean = goodsBean;
 
                     String token = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-                    String pid = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_PID, "");
-                    String tao_session = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_TAO_SESSION, "");
 
                     if (TextUtils.isEmpty(token)) {
                         Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
                     } else {
-                        Map<String, String> params = new HashMap<>();
+                /*        Map<String, String> params = new HashMap<>();
                         params.put("id", goodsBean.getGoods_id());
                         params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                        mPresenter.getTaobaoTbkTpwd(params);*/
+                        FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+                        bean.setContent(mGoodsBean.getYugao_introd());
+                        bean.setImage(mGoodsBean.getYugao_pic());
+                        shareFriendPopToWx(bean);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

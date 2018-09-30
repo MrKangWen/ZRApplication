@@ -9,18 +9,14 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
-import com.tencent.mm.opensdk.openapi.IWXAPI;
-import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.zhaorou.zrapplication.MainActivity;
+
 import com.zhaorou.zrapplication.R;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
-import com.zhaorou.zrapplication.eventbus.MessageEvent;
+import com.zhaorou.zrapplication.utils.AccessibilityUtils;
 import com.zhaorou.zrapplication.utils.ActivityController;
+import com.zhaorou.zrapplication.utils.AssistantService;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
-import com.zhaorou.zrapplication.utils.StatusBarUtils;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -68,13 +64,29 @@ public class BaseActivity extends AppCompatActivity {
             actionBar.hide();
         }
     }
+
     protected String getToken() {
 
         String token = SPreferenceUtil.getString(getApplicationContext(), ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
 
         return token;
     }
+
     protected boolean isLogin() {
         return !TextUtils.isEmpty(getToken());
+    }
+
+
+    /**
+     * 是否开始辅助
+     *
+     * @return
+     */
+    public boolean isOpenService() {
+        try {
+            return AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), this);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
