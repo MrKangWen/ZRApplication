@@ -452,10 +452,10 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
 
 
             String price = goodsBean.getPrice_after_coupons();
-            holder.mPriceTv.setText("卷后价：" + price);
+            holder.mPriceTv.setText("￥" + price);
 
-            String mShenYuTv = goodsBean.getQuan_shengyu();
-            holder.mShenYuTv.setText("剩余：" + mShenYuTv);
+            String sales = goodsBean.getSales();
+            holder.mPayNumberTv.setText(sales + "人付款");
 
             String price_coupons = goodsBean.getPrice_coupons();
             holder.mCouponTv.setText("优惠券" + price_coupons + "元");
@@ -463,8 +463,8 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             String rate = goodsBean.getRate();
             holder.mRateTv.setText("佣金：" + rate + "%");
 
-            String sales = goodsBean.getSales();
-            holder.mSalesTv.setText("销量：" + sales);
+            String quan_shengyu = goodsBean.getQuan_shengyu();
+            holder.mRemainderTv.setText("剩余：" + quan_shengyu);
 
 
             int isFriendpop = goodsBean.getIs_friendpop();
@@ -616,9 +616,9 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
         private TextView mTitleTv;
         private TextView mCouponTv;
         private TextView mPriceTv;
-        private TextView mShenYuTv;
+        private TextView mPayNumberTv;
         private TextView mRateTv;
-        private TextView mSalesTv;
+        private TextView mRemainderTv;
         private TextView mBtnPerfectWXCircle;
         private TextView mBtnCopyWords;
         private RelativeLayout mBtnShareWXRl;
@@ -633,9 +633,9 @@ public class HomeJxFragment extends BaseFragment implements IHomeFragmentView, E
             mTitleTv = itemView.findViewById(R.id.item_goods_list_title_tv);
             mCouponTv = itemView.findViewById(R.id.item_goods_list_coupon_tv);
             mPriceTv = itemView.findViewById(R.id.item_goods_list_price_tv);
-            mShenYuTv = itemView.findViewById(R.id.item_goods_list_shenyu_tv);
+            mPayNumberTv = itemView.findViewById(R.id.item_goods_list_pay_number_tv);
             mRateTv = itemView.findViewById(R.id.item_goods_list_rate_tv);
-            mSalesTv = itemView.findViewById(R.id.item_goods_list_sales_tv);
+            mRemainderTv = itemView.findViewById(R.id.item_goods_list_remainder_tv);
             mBtnShareWXRl = itemView.findViewById(R.id.item_goods_list_btn_share_wx_rl);
             mBtnPerfectWXCircle = itemView.findViewById(R.id.item_goods_list_btn_perfect_wx_circle);
             mBtnCopyWords = itemView.findViewById(R.id.item_goods_list_btn_copy_words);
