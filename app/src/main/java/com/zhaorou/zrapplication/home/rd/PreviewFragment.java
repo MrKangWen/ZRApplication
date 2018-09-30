@@ -38,6 +38,7 @@ import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
 import com.zhaorou.zrapplication.widget.recyclerview.CombinationViewHolder;
+import com.zhaorou.zrapplication.widget.view.ScrollTextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -86,9 +87,16 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         }
         holder.setImageView(getActivity(), R.id.preview_img, pic);
 
-        TextView preview_title = holder.getView(R.id.preview_title);
+        ScrollTextView preview_title = holder.getView(R.id.preview_title);
         preview_title.setText(t.getYugao_introd());
-        preview_title.setMovementMethod(ScrollingMovementMethod.getInstance());
+        preview_title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
+                intent.putExtra("ID", t.getId());
+                startActivity(intent);
+            }
+        });
         holder.setText(R.id.preview_commission, "佣金：" + t.getRate() + "%");
         holder.setText(R.id.preview_live_time, "直播时间:" + t.getZhibo_time());
         holder.setText(R.id.preview_pay_price, "劵后价:" + t.getPrice_after_coupons());
@@ -202,12 +210,12 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         params.put("cid", "0");
         params.put("type", 2);
         params.put("flag", 1);
-        params.put("page", 1);
+      //  params.put("page", 1);
         if (isLogin()) {
             params.put("token", getToken());
         }
 
-        params.put("pagesize", 15);
+      //  params.put("pagesize", 15);
         return HttpRequestUtil.getRetrofitService(HomeApi.class).getJxList(params);
     }
 

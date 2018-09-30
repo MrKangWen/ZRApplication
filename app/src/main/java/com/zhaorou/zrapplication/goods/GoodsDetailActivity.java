@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
@@ -74,6 +75,7 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
             Glide.with(getApplicationContext()).
                     load(baseUrl + detailModel.getZhibo_pic1()).into(imageView1);
             TextView textView1 = findViewById(R.id.detailTv1);
+            textView1.setMovementMethod(ScrollingMovementMethod.getInstance());
             textView1.setText(detailModel.getZhibo_introd1());
 
             findViewById(R.id.detailShareTv1).setOnClickListener(new View.OnClickListener() {
@@ -104,7 +106,7 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
                     load(baseUrl + detailModel.getZhibo_pic2()).into(imageView2);
             TextView textView2 = findViewById(R.id.detailTv2);
             textView2.setText(detailModel.getZhibo_introd2());
-
+            textView2.setMovementMethod(ScrollingMovementMethod.getInstance());
 
             findViewById(R.id.detailShareTv2).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,7 +136,7 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
                     load(baseUrl + detailModel.getZhibo_pic3()).into(imageView3);
             TextView textView3 = findViewById(R.id.detailTv3);
             textView3.setText(detailModel.getZhibo_introd3());
-
+            textView3.setMovementMethod(ScrollingMovementMethod.getInstance());
             findViewById(R.id.detailShareTv3).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -367,17 +369,21 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
         if (mZhiBoIndex != 0) {
             mTaoword = content;
         } else {
+
+
             if ("WX".equals(mShareType)) {
                 mTaoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
                         price_after_coupons + "\n" +
                         "--------抢购方式--------" + "\n";
             } else {
-
                 //微信朋友圈
-                mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                mTaoword = "\n" + goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
                         price_after_coupons + "\n" +
                         "--------抢购方式--------" + "\n";
             }
+
+
+
 
             if (TextUtils.equals(tklType, "1")) {
                 mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";

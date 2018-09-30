@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ import com.zhaorou.zrapplication.utils.FileUtils;
 import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 import com.zhaorou.zrapplication.widget.recyclerview.BaseListBindDataFragment;
 import com.zhaorou.zrapplication.widget.recyclerview.CombinationViewHolder;
+import com.zhaorou.zrapplication.widget.view.ScrollTextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -83,12 +86,22 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
             pic = ZRDConstants.HttpUrls.BASE_URL + pic;
         }
         holder.setImageView(getActivity(), R.id.preview_img, pic);
-        holder.setText(R.id.common_title, t.getGoods_name());
+
         holder.setText(R.id.common_shengyu, "剩余：" + t.getQuan_shengyu());
         holder.setText(R.id.common_sales, "销量:" + t.getSales());
         holder.setText(R.id.common_pay_price, "劵后价:" + t.getPrice_after_coupons());
         holder.setText(R.id.common_coupon, "优惠券:" + t.getPrice_coupons());
 
+        ScrollTextView common_title=   holder.getView(R.id.common_title);
+        common_title.setText(t.getGoods_name());
+        common_title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
+                intent.putExtra("ID", t.getId());
+                startActivity(intent);
+            }
+        });
         holder.getView(R.id.commonDetailLl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -261,9 +274,17 @@ public class CommonFragment extends BaseListBindDataFragment<JxListModel, JxList
         String content = entityBean.getContent();
 
 
-        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
+
+        if("WX_CIRCLE".equals(mShareType)){
+            mTaoword = "\n" + goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+        }else {
+            mTaoword = "\n" + goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+        }
+
         if (TextUtils.equals(tklType, "1")) {
             mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {

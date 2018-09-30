@@ -165,9 +165,17 @@ public class HomeVPItemFragment extends BaseFragment implements IHomeFragmentVie
         String content = entityBean.getContent();
 
 
-        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
+
+        if("WX_CIRCLE".equals(mShareType)){
+            mTaoword = "\n" + goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+        }else {
+            mTaoword = "\n" + goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                    price_after_coupons + "\n" +
+                    "--------抢购方式--------" + "\n";
+        }
+
         if (TextUtils.equals(tklType, "1")) {
             mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {
