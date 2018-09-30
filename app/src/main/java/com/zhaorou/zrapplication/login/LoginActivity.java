@@ -3,6 +3,7 @@ package com.zhaorou.zrapplication.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,12 +28,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jpush.android.api.JPushInterface;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -138,6 +141,13 @@ public class LoginActivity extends BaseActivity {
                                 String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
                                 SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_TAO_SESSION, tao_session);
                                 Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+
+
+                                String alias = "zhaoroudan" + wxUserInfoModel.getData().getUser().getId();
+                                Log.d("mytest", alias);
+                                int sequence = (int) Calendar.getInstance().getTimeInMillis();
+                                JPushInterface.setAlias(LoginActivity.this, sequence, alias);
+                                SPreferenceUtil.put(LoginActivity.this, ZRDConstants.SPreferenceKey.SP_PUSH_ALIAS, sequence);
                                 finish();
                             }
                         } else {

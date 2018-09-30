@@ -32,12 +32,9 @@ public class BaseApplication extends Application {
         }
 
         Stetho.initializeWithDefaults(this);
-        JPushInterface.setDebugMode(false);
+        JPushInterface.setDebugMode(true);
         JPushInterface.init(this);
-        String token = SPreferenceUtil.getString(this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
-        if(!TextUtils.isEmpty(token)){
-            JPushInterface.setAlias(this, 0, token);
-        }
+
 
 
     }

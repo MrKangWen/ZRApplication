@@ -15,6 +15,7 @@ import com.zhaorou.zrapplication.base.BaseActivity;
 import com.zhaorou.zrapplication.constants.ZRDConstants;
 import com.zhaorou.zrapplication.home.dialog.LoadingDialog;
 import com.zhaorou.zrapplication.login.LoginActivity;
+import com.zhaorou.zrapplication.login.LoginByAccountActivity;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.user.model.UserMessageEvent;
 import com.zhaorou.zrapplication.utils.ApplicationUtils;
@@ -31,6 +32,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jpush.android.api.JPushInterface;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -135,6 +137,8 @@ public class SettingsActivity extends BaseActivity {
 
                                 EventBus.getDefault().post(new UserMessageEvent("-1"));
 
+                                int sequence = SPreferenceUtil.getInt(getApplicationContext(), ZRDConstants.SPreferenceKey.SP_PUSH_ALIAS, 0);
+                                JPushInterface.deleteAlias(getApplicationContext(), sequence);
                                 SPreferenceUtil.put(SettingsActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, "");
                                 Toast.makeText(SettingsActivity.this, "已退出登录", Toast.LENGTH_SHORT).show();
                                 finish();

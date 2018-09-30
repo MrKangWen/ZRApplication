@@ -1,7 +1,9 @@
 package com.zhaorou.zrapplication.login;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,12 +25,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jpush.android.api.JPushInterface;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -101,7 +105,14 @@ public class LoginByAccountActivity extends BaseActivity {
                             WXUserInfoModel wxUserInfoModel = GsonHelper.fromJson(responseStr, WXUserInfoModel.class);
                             if (wxUserInfoModel != null && wxUserInfoModel.getCode() == 200) {
                                 String token = wxUserInfoModel.getData().getToken();
+
+                                String alias = "zhaoroudan" + wxUserInfoModel.getData().getUser().getId();
+                                Log.d("mytest", alias);
+                                int sequence = (int) Calendar.getInstance().getTimeInMillis();
+                                JPushInterface.setAlias(LoginByAccountActivity.this, sequence, alias.trim());
+                                SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_PUSH_ALIAS, sequence);
                                 SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_LOGIN_TOKEN, token);
+
                                 String pid = wxUserInfoModel.getData().getUser().getPid();
                                 SPreferenceUtil.put(LoginByAccountActivity.this, ZRDConstants.SPreferenceKey.SP_PID, pid);
                                 String tao_session = wxUserInfoModel.getData().getUser().getTao_session();
