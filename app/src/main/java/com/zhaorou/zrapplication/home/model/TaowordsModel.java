@@ -35,9 +35,19 @@ public class TaowordsModel {
          */
 
         private String tkl;
+
         private String request_id;
         private GaoYongResultBean gao_yong_result;
 
+        public String getShort_url() {
+            return short_url;
+        }
+
+        public void setShort_url(String short_url) {
+            this.short_url = short_url;
+        }
+
+        private String short_url;
         public String getTkl() {
             return tkl;
         }

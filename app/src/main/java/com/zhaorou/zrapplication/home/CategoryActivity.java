@@ -104,7 +104,6 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
     }
 
 
-
     @Override
     public void onLoadMore(boolean loadMore) {
         if (loadMore) {
@@ -139,9 +138,8 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
             if (TextUtils.equals(tklType, "1")) {
                 mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
             } else if (TextUtils.equals(tklType, "2")) {
-                String pic = mGoodsBean.getPic();
-                String str = "https://wenan001.kuaizhan.com/?taowords=";
-                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+                String str = mTkl;
+                mTaoword = mTaoword + "打开链接\n" + str;
             }
         } else {
             mTaoword = content;
@@ -233,9 +231,9 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
         if (TextUtils.equals(tklType, "1")) {
             taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+            // String pic = mGoodsBean.getPic();
+            // String str = "https://wenan001.kuaizhan.com/?taowords=";
+            taoword = taoword + "打开链接\n" + tkl;
         }
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("tkl", taoword);
@@ -494,8 +492,8 @@ public class CategoryActivity extends BaseActivity implements IHomeFragmentView 
     private void showDialog(GoodsListModel.DataBean.ListBean goodsBean) {
         mPerfectWXCircleDialog = new PerfectWXCircleDialog(CategoryActivity.this);
         mPerfectWXCircleDialog.show();
-        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(),goodsBean.getQuan_guid_content(),
-                goodsBean.getIs_friendpop(),goodsBean.getGoods_name(),goodsBean.getPic());
+        mPerfectWXCircleDialog.setGoodsInfo(goodsBean.getGoods_id(), goodsBean.getQuan_guid_content(),
+                goodsBean.getIs_friendpop(), goodsBean.getGoods_name(), goodsBean.getPic());
     }
 
 

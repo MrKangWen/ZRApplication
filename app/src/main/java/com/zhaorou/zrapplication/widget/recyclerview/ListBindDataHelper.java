@@ -358,7 +358,7 @@ public class ListBindDataHelper<T extends BaseModel, D> {
         notifyDataSetChanged();
     }
 
-    private void notifyDataSetChanged() {
+    public void notifyDataSetChanged() {
 
         if (adapter != null) {
             adapter.notifyDataSetChanged();

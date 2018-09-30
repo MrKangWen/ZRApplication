@@ -87,22 +87,6 @@ public abstract class BaseFragment extends Fragment implements HttpDialogLoading
         return url.startsWith("http");
     }
 
-/*    private void shareTKL(String tkl, String tklType, String goods_name, String price, String price_after_coupons) {
 
-        String taoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
-        if (TextUtils.equals(tklType, "1")) {
-            taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
-        } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
-        }
-        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText("tkl", taoword);
-        cm.setPrimaryClip(clipData);
-        Toast.makeText(getContext(), "淘口令已复制", Toast.LENGTH_SHORT).show();
-    }*/
 
 }

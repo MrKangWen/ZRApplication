@@ -28,16 +28,20 @@
             android:padding="8dp">
 
 
-            <TextView
-                android:id="@+id/preview_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:text="牛奶滋润补水沐浴露800ml"
-                android:textColor="@color/colorBlack_333333"
-                android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/preview_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="60dp"
+                    android:scrollbars="horizontal"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:text="牛奶滋润补水沐浴露800ml"
+                    android:textColor="@color/colorBlack_333333"
+                    android:textSize="13sp" />
+
+
 
 
             <RelativeLayout

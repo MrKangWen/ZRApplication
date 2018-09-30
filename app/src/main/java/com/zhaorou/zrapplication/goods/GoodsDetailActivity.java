@@ -363,21 +363,46 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
         String content = entityBean.getContent();
 
 
-        mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                price_after_coupons + "\n" +
-                "--------抢购方式--------" + "\n";
-        if (TextUtils.equals(tklType, "1")) {
-            mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
-        } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+        //直播分享 和 分享都微信群都不需要文案
+        if (mZhiBoIndex != 0) {
+            mTaoword = content;
+        } else {
+            if ("WX".equals(mShareType)) {
+                mTaoword = goods_name + "\n" + "原价 " + price + "\n" + "券后 " +
+                        price_after_coupons + "\n" +
+                        "--------抢购方式--------" + "\n";
+            } else {
+
+                //微信朋友圈
+                mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
+                        price_after_coupons + "\n" +
+                        "--------抢购方式--------" + "\n";
+            }
+
+            if (TextUtils.equals(tklType, "1")) {
+                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
+            } else if (TextUtils.equals(tklType, "2"))
+
+            {
+                String str = mTkl;
+                mTaoword = mTaoword + "打开链接\n" + str;
+            }
+
         }
+
 
         ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
         Toast.makeText(this, "已复制文案，正在启动微信，请稍后...", Toast.LENGTH_SHORT).show();
+
+        mZhiBoIndex = 0;
+
+        startShareWx(entityBean, content);
+
+    }
+
+    private void startShareWx(FriendPopDetailModel.DataBean.EntityBean entityBean, String content) {
 
 
         AssistantService.mMoments = content;
@@ -469,21 +494,26 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
 
                     break;
             }
-            mZhiBoIndex = 0;
+
             shareFriendPopToWx(bean);
             return;
         }
 
         if (mGoodsBean.getIs_friendpop() == 0) {
             bean.setContent(mGoodsBean.getQuan_guid_content());
-            bean.setImage(mGoodsBean.getPic());
+            bean.setImage(mGoodsBean.getMarket_pic());
             shareFriendPopToWx(bean);
             return;
         }
 
 
         if (TextUtils.equals(mShareType, "WX")) {
-            getFriendPop();
+
+            bean.setContent(mGoodsBean.getQuan_guid_content());
+            bean.setImage(mGoodsBean.getMarket_pic());
+            shareFriendPopToWx(bean);
+            return;
+            //  getFriendPop();
         }
 
         if (TextUtils.equals(mShareType, "WX_CIRCLE")) {
@@ -505,9 +535,8 @@ public class GoodsDetailActivity extends BaseActivity implements IHomeFragmentVi
         if (TextUtils.equals(tklType, "1")) {
             taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+            String str = tkl;
+            taoword = taoword + "打开链接\n" + str;
         }
         ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("tkl", taoword);

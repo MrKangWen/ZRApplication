@@ -15,7 +15,9 @@ import com.zhaorou.zrapplication.home.model.JxListModel;
 import com.zhaorou.zrapplication.home.model.TaowordsModel;
 import com.zhaorou.zrapplication.network.HttpRequestUtil;
 import com.zhaorou.zrapplication.network.retrofit.AbsZCallback;
+import com.zhaorou.zrapplication.utils.ApplicationUtils;
 import com.zhaorou.zrapplication.utils.GsonHelper;
+import com.zhaorou.zrapplication.utils.SPreferenceUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -214,9 +216,17 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
                             if (taowordsModel != null && taowordsModel.getCode() == 200) {
                                 TaowordsModel.DataBeanX data = taowordsModel.getData();
                                 if (data != null) {
-                                    String tkl = data.getTkl();
+
                                     if (mView != null) {
-                                        mView.onGetTaowords(tkl);
+                                        String tklType = SPreferenceUtil.getString(ApplicationUtils.getApplicationContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+                                        if (tklType.equals("1")) {
+                                            String tkl = data.getTkl();
+                                            mView.onGetTaowords(tkl);
+                                        }else {
+                                            String short_url = data.getShort_url();
+                                            mView.onGetTaowords(short_url);
+                                        }
+
                                     }
                                 }
                             }
@@ -271,10 +281,9 @@ public class HomeFragmentPresenter extends BasePresenter<IHomeFragmentView> {
 
                 JxListModel body = response.body();
 //                Log.d("mytest", body.getData().getList().get(0).getGoods_id());
-                if(mJxListData!=null){
+                if (mJxListData != null) {
                     mJxListData.setValue(body.getData().getList());
                 }
-
 
 
             }

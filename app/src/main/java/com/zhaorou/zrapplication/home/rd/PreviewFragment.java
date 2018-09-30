@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +85,10 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             pic = ZRDConstants.HttpUrls.BASE_URL + pic;
         }
         holder.setImageView(getActivity(), R.id.preview_img, pic);
-        holder.setText(R.id.preview_title, t.getYugao_introd());
+
+        TextView preview_title = holder.getView(R.id.preview_title);
+        preview_title.setText(t.getYugao_introd());
+        preview_title.setMovementMethod(ScrollingMovementMethod.getInstance());
         holder.setText(R.id.preview_commission, "佣金：" + t.getRate() + "%");
         holder.setText(R.id.preview_live_time, "直播时间:" + t.getZhibo_time());
         holder.setText(R.id.preview_pay_price, "劵后价:" + t.getPrice_after_coupons());
@@ -104,10 +108,12 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             preview_set_remind.setBackgroundResource(R.drawable.selector_rect_whitebg_blackbor1_cor4);
             preview_set_remind.setTextColor(getResources().getColor(R.color.colorBlack_333333));
             preview_set_remind.setText("已提醒");
+            preview_set_remind.setClickable(false);
 
         } else {
             preview_set_remind.setBackgroundResource(R.drawable.selector_rect_whitebg_redbor1_cor4);
             preview_set_remind.setTextColor(getResources().getColor(R.color.colorRed_FF2200));
+            preview_set_remind.setClickable(true);
             preview_set_remind.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -115,7 +121,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
                         Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
                     } else {
-                        setPushRecord(t.getId());
+                        setPushRecord(t.getId(), position);
                     }
 
 
@@ -140,10 +146,15 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
                         Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
                     } else {
-                        Map<String, String> params = new HashMap<>();
+                  /*      Map<String, String> params = new HashMap<>();
                         params.put("id", goodsBean.getGoods_id());
                         params.put("token", token);
-                        mPresenter.getTaobaoTbkTpwd(params);
+                        mPresenter.getTaobaoTbkTpwd(params);*/
+
+                        FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
+                        bean.setContent(mGoodsBean.getYugao_introd());
+                        bean.setImage(mGoodsBean.getYugao_pic());
+                        shareFriendPopToWx(bean);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -211,26 +222,16 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
             Toast.makeText(getContext(), "请先完善朋友圈文案", Toast.LENGTH_SHORT).show();
             return;
         }
-        String tklType = SPreferenceUtil.getString(getContext(), ZRDConstants.SPreferenceKey.SP_LINK_TAO, "1");
+
         String goods_name = mGoodsBean.getGoods_name();
         String price = mGoodsBean.getPrice();
         String price_after_coupons = mGoodsBean.getPrice_after_coupons();
         String content = entityBean.getContent();
 
-     //   if (TextUtils.equals(mShareType, "WX")) {
-            mTaoword = goods_name + "\n" + content + "\n" + "原价 " + price + "\n" + "券后 " +
-                    price_after_coupons + "\n" +
-                    "--------抢购方式--------" + "\n";
-            if (TextUtils.equals(tklType, "1")) {
-                mTaoword = mTaoword + "复制本信息" + mTkl + "打开淘宝即可获取";
-            } else if (TextUtils.equals(tklType, "2")) {
-                String pic = mGoodsBean.getPic();
-                String str = "https://wenan001.kuaizhan.com/?taowords=";
-                mTaoword = mTaoword + "打开链接\n" + str + mTkl.substring(1, mTkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
-            }
-      /*  } else {
-            mTaoword = content;
-        }*/
+
+        mTaoword = content;
+
+
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("taoword", mTaoword);
         cm.setPrimaryClip(clipData);
@@ -325,8 +326,8 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         if (mGoodsBean.getIs_friendpop() == 0) {
 
             FriendPopDetailModel.DataBean.EntityBean bean = new FriendPopDetailModel.DataBean.EntityBean();
-            bean.setContent(mGoodsBean.getQuan_guid_content());
-            bean.setImage(mGoodsBean.getPic());
+            bean.setContent(mGoodsBean.getYugao_introd());
+            bean.setImage(mGoodsBean.getYugao_pic());
             shareFriendPopToWx(bean);
             return;
         }
@@ -355,9 +356,9 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
         if (TextUtils.equals(tklType, "1")) {
             taoword = taoword + "复制本信息" + tkl + "打开淘宝即可获取";
         } else if (TextUtils.equals(tklType, "2")) {
-            String pic = mGoodsBean.getPic();
-            String str = "https://wenan001.kuaizhan.com/?taowords=";
-            taoword = taoword + "打开链接\n" + str + tkl.substring(1, tkl.length() - 1) + "&pic=" + Base64.encodeToString(pic.getBytes(), Base64.DEFAULT);
+            //   String pic = mGoodsBean.getPic();
+            // String str = "https://wenan001.kuaizhan.com/?taowords=";
+            taoword = taoword + "打开链接\n" + tkl;
         }
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("tkl", taoword);
@@ -375,7 +376,7 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
     }
 
 
-    private void setPushRecord(int id) {
+    private void setPushRecord(int id, final int position) {
 
         Map<String, Object> map = new HashMap<>();
         map.put("rou_goods_id", id);
@@ -386,6 +387,10 @@ public class PreviewFragment extends BaseListBindDataFragment<JxListModel, JxLis
 
                 if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
                     showToast("设置成功");
+                    getHelper().getListData().get(position).setReminded(1);
+                    getHelper().notifyDataSetChanged();
+
+
                 } else {
                     showToast("设置失败");
                 }
