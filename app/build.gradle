@@ -26,9 +26,9 @@ android {
     signingConfigs {
         release {
             keyAlias 'key0'
-            keyPassword '123456'
+            keyPassword ''
             storeFile file('zrd_key_store.jks')
-            storePassword '123456'
+            storePassword ''
         }
     }
     buildTypes {
