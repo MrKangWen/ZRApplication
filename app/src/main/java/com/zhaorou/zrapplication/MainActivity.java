@@ -101,16 +101,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         EventBus.getDefault().register(this);
         appUpdate();
 
-        if (!AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), this)) {
-            new AlertDialog.Builder(this).setMessage("打开【设置——>辅助功能/无障碍——>找肉单——>开启】开启分享朋友圈自动粘贴文字功能")
-                    .setNegativeButton("取消", null)
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            AccessibilityUtils.openAccessibility(AssistantService.class.getName(), MainActivity.this);
-                        }
-                    }).create().show();
-        }
+        showAccessibility();
         getUserInfo();
     }
 
@@ -213,6 +204,19 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     }
 
 
+    private void showAccessibility() {
+        if (!AccessibilityUtils.isAccessibilitySettingsOn(AssistantService.class.getName(), this)) {
+            new AlertDialog.Builder(this).setMessage("打开【设置——>辅助功能/无障碍——>找肉单——>开启】开启分享朋友圈自动粘贴文字功能")
+                    .setNegativeButton("取消", null)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            AccessibilityUtils.openAccessibility(AssistantService.class.getName(), MainActivity.this);
+                        }
+                    }).create().show();
+        }
+    }
+
     public void appUpdate() {
 
         HttpRequestUtil.getRetrofitService(HomeApi.class).appUpdate().enqueue(new AbsZCallback<AppUpdateModel>() {
@@ -220,12 +224,14 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
             public void onSuccess(Call<AppUpdateModel> call, Response<AppUpdateModel> response) {
 
                 if (response.body().getData() == null) {
+
                     return;
                 }
 
                 AppUpdateModel.DataBean.EntityBean data = response.body().getData().getEntity();
 
                 if (data == null) {
+
                     return;
                 }
 

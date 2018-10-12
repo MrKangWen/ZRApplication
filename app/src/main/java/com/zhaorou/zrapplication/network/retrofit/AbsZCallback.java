@@ -31,7 +31,7 @@ public abstract class AbsZCallback<T extends BaseModel> implements Callback<T> {
         }
 
 
-        onSuccess(call, response);
+      //  onSuccess(call, response);
 
        if (response.body().getCode() == HTTP_STATUS_SUCCESS) {
             onSuccess(call, response);

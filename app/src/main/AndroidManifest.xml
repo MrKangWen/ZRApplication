@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -74,7 +74,23 @@
         <service android:name=".network.update.UpdateAppService" />
 
         <activity android:name=".user.msg.MsgActivity" />
-        <activity android:name=".goods.GoodsDetailActivity"></activity>
+        <activity android:name=".goods.GoodsDetailActivity" />
+
+        <receiver
+            android:name=".app.JGReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.REGISTRATION" />
+                <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" />
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" />
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" />
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_CLICK_ACTION" />
+                <action android:name="cn.jpush.android.intent.CONNECTION" />
+                <category android:name="com.zhaorou.zrapplication" />
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>

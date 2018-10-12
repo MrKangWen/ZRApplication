@@ -32,7 +32,7 @@ public class BaseApplication extends Application {
         }
 
         Stetho.initializeWithDefaults(this);
-        JPushInterface.setDebugMode(true);
+        JPushInterface.setDebugMode(false);
         JPushInterface.init(this);
 
 
